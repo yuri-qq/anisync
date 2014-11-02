@@ -1,7 +1,6 @@
 <?php
   /**
    * changed mysqli statements to object orientated style
-   * using switch instead of if-elseif-block
    * original code by php-login.net 
    */
 
