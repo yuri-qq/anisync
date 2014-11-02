@@ -31,32 +31,6 @@
   </head>
   <body>
     <div id="wrapper">
-      <div id="addmediainfodiv">
-        Accepted video codecs are h264, VP8 and ogg (.mp4/.webm/.ogv)<br />
-        You can add the following media resources:<br /><br />
-        <div class="mediaresource">
-          <div id="linklogo"></div>Direct links<br />
-          <div class="mediainfotext">
-            e.g. http://mywebsite.net/video.mp4<div class="mediainfotextgrey">|.webm|.ogv</div>
-          </div>
-        </div>
-        <div class="seperator"></div>
-        <div class="mediaresource">
-          <div id="ytlogo"></div>
-          <div class="mediainfotext">
-            e.g. https://www.youtube.com/watch?v=UC_qla6FQwM<br />
-            Note: Only 360p and 720p are available as mp4 video and can be played on this site. 144p/240p videos can't be played.
-          </div>
-        </div>
-        <div class="seperator"></div>
-        <div class="mediaresource">
-          <div id="vimeologo"></div>
-          <div class="mediainfotext">
-            e.g. http://vimeo.com/82522802<br />
-          </div>
-        </div>
-        <div class="seperator"></div>
-      </div>
       <div id="header">
         <div id="logo">
           <a href="http://sync.grzb.de/"><p id="grzb">GRZB</p><p id="sep">|</p><p id="synch">SYNC</p></a>
@@ -100,15 +74,19 @@
             Repeat password<br />
             <input name="user_password_repeat" type="password" required /><br />
               <?php
+                require_once('PHP/config/recaptcha.php');
                 require_once('PHP/recaptchalib.php');
-                $publickey = "6Ld7EfkSAAAAAJ8vBsTgPjiqD6HItVraGUVFFAKC";
+                $publickey = PUBLIC_KEY;
                 echo recaptcha_get_html($publickey, NULL, TRUE);
               ?>
             <input type="submit" value="Register" />
           </form>
         </div>
       </div>
+      
       <div id="systemmsg"></div>
+      <div id="privacypolicy"></div>
+      
       <div id="createchanneloverlay">
         <form method="post" id="createchannelform" autocomplete="off">
           Channel name:<br />
@@ -124,6 +102,7 @@
           <input type="submit" value="Create channel" />
         </form>
       </div>
+      
       <div id="checkpassword">
         <form method="post" id="checkpasswordform" autocomplete="off">
           Password:<br />
@@ -131,7 +110,6 @@
           <input type="submit" value="Join channel" />
         </form>
       </div>
-      
       <div class="sidebar"></div>
       <div id="content">
         <div id="channelcontrol">
@@ -164,8 +142,9 @@
       </div>
       <div class="sidebar"></div>
       <div class="clear"></div>
+      
       <div id="footer">
-        <a class="privacy" href="legal.php">Legal Notice</a>
+        <div id="legal">Legal Notice</div> · <a href="http://leafc.at"><div id="leafcatlogo"></div>Leafcat Coding</a> · <a href="https://github.com/Leafcat/sync">GitHub project page</a>
       </div>
     </div>
   </body>

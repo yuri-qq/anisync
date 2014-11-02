@@ -20,16 +20,6 @@ body, html  {
   color: #333;
 }
 
-a.privacy{
-  color: white;
-  text-decoration: none;
-}
-
-a.privacy:hover {
-  color: white;
-  text-decoration: none;
-}
-
 select {
   padding: 5px;
   font-size: 15px;
@@ -329,6 +319,27 @@ input[type="submit"]:hover {
   z-index: 2;
 }
 
+#privacypolicy {
+  position: fixed;
+  display: none;
+  top: 50px;
+  left: 17.5%;
+  width: 65%;
+  max-height: 80%;
+  overflow-y: scroll;
+  z-index: 2;
+  background-color: white;
+  border: 1px #B8B8B8 solid;
+  -moz-box-shadow:5px 5px 5px rgba(0,0,0,0.3);
+  -webkit-box-shadow:5px 5px 5px rgba(0,0,0,0.3);
+  box-shadow:5px 5px 5px rgba(0,0,0,0.3);
+  font-size: 20px;
+  padding: 30px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; 
+}
+
 .error {
   color: #EB3B3B;
 }
@@ -538,23 +549,33 @@ input[type="submit"]:hover {
   visibility: hidden;
 }
 
+#leftchannelside {
+  float: left;
+  width: 50%;
+}
+
+#rightchannelside {
+  float: right;
+  width: 50%;
+}
+
 #videowrapper {
   width: 50%;
-  float: left;
-    position: relative;
+  position: relative;
   vertical-align: top;
+  float: left;
 }
 
 #videowrapper:after {
-    padding-top: 56.25%;
-    display: block;
-    content: '';
+  padding-top: 56.25%;
+  display: block;
+  content: '';
 }
 
 #videocontainer {
   position: absolute;
-    top: 0; bottom: 0; right: 0; left: 0;
-    background-color: black;
+  top: 0; bottom: 0; right: 0; left: 0;
+  background-color: black;
 }
 
 #video {
@@ -570,8 +591,7 @@ input[type="submit"]:hover {
 }
 
 #chat {
-  float: right;
-  width: 50%;
+  width: 100%;
   height: 434px;
 }
 
@@ -691,9 +711,13 @@ input[type="submit"]:hover {
   margin-top: -5px;
 }
 
+#userstatistics {
+  width: 100%;
+  height: 434px;
+}
+
 #playlist {
-  float: left;
-  width: 50%;
+  width: 100%;
   margin-top: 10px;
   margin-bottom: 20px;
 }
@@ -756,9 +780,9 @@ input[type="submit"]:hover {
 
 #linklogo {
   display: inline-block;
-    background: url('./images/link.png') no-repeat;
-    width: 20px;
-    height: 20px;
+  background: url('./images/link.png') no-repeat;
+  width: 20px;
+  height: 20px;
   background-size: 100% 100%;
   margin-right: 4px;
   margin-bottom: -3px;
@@ -781,10 +805,9 @@ input[type="submit"]:hover {
 #addmediainfodiv {
   position: fixed;
   display: none;
-  margin-top: 90px;
-  margin-left: 20%;
-  width: 60%;
-  height: 80%;
+  width: 65%;
+  max-height: 60%;
+  overflow-y: scroll;
   z-index: 2;
   background-color: white;
   border: 1px #B8B8B8 solid;
@@ -887,4 +910,24 @@ input[type="submit"]:hover {
   color: white;
   vertical-align: middle;
   line-height: 50px;
+}
+
+#footer a {
+  color: #FFFFFF;
+  text-decoration: none;
+}
+
+#legal {
+   display: inline-block;
+   cursor: pointer;
+}
+
+#leafcatlogo {
+  display: inline-block;
+  margin-bottom: -6px;
+  margin-right: 4px;
+  height: 25px;
+  width: 25px;
+  background: url('http://leafc.at/assets/img/leafcat-avatar.png') no-repeat;
+  background-size: 100% 100%;
 }

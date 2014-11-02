@@ -1,30 +1,68 @@
+<div id="addmediainfodiv">
+  Accepted video codecs are h264, VP8 and ogg (.mp4/.webm/.ogv)<br />
+  Accepted audio codecs are mp3, wav and ogg<br /><br />
+  You can add the following media resources:<br /><br />
+  <div class="mediaresource">
+    <div id="linklogo"></div>Direct links<br />
+    <div class="mediainfotext">
+      e.g.<br />
+      http://mywebsite.net/video.mp4<div class="mediainfotextgrey">|.webm|.ogv</div><br />
+      http://mywebsite.net/audio.mp3<div class="mediainfotextgrey">|.wav|.ogg</div>
+    </div>
+  </div>
+  <div class="seperator"></div>
+  <div class="mediaresource">
+    <div id="ytlogo"></div>
+    <div class="mediainfotext">
+      e.g. https://www.youtube.com/watch?v=UC_qla6FQwM<br />
+      Note: Only 360p/720p videos are available as mp4 video and can be played on this site.
+    </div>
+  </div>
+  <div class="seperator"></div>
+  <div class="mediaresource">
+    <div id="vimeologo"></div>
+    <div class="mediainfotext">
+      e.g. http://vimeo.com/82522802<br />
+    </div>
+  </div>
+  <div class="seperator"></div>
+</div>
+
 <div id="videowrapper">
   <div id="videocontainer">
     <video id="video" class="video-js vjs-default-skin" controls preload="auto">
-    </video> 
-  </div>
-</div>
-<div id="chat">
-  <div id="chatdisplay">
-    <div id="chatboxwrapper">
-      <div id="chatbox"></div>
-    </div>
-    <div id="chatusers"></div>
-  </div>
-  <div id="chatcontrols">
-    <input type="text" id="chatinput" />
-    <div id="chatsend">send</div>
+    </video>
   </div>
 </div>
 
-<div id="playlist">
-  <div id="channeltitle"></div>
-  Playlist:<br />
-  <input type="text" id="medialink" />
-  <div id="addmedia">add</div>
-  <div id="addmediainfo">?</div>
-  <div class="clear"></div>
-  <ul id="mediaelements">
-  </ul>
+<div id="rightchannelside">
+  <div id="chat">
+    <div id="chatdisplay">
+      <div id="chatboxwrapper">
+        <div id="chatbox"></div>
+      </div>
+      <div id="chatusers"></div>
+    </div>
+    <div id="chatcontrols">
+      <input type="text" id="chatinput" />
+      <div id="chatsend">send</div>
+    </div>
+  </div>
+  <div id="userstatistics">
+  </div>
 </div>
+
+<div id="leftchannelside">
+  <div id="playlist">
+    <div id="channeltitle"></div>
+    Playlist:<br />
+    <input type="text" id="medialink" />
+    <div id="addmedia">add</div>
+    <div id="addmediainfo">?</div>
+    <div class="clear"></div>
+    <ul id="mediaelements">
+    </ul>
+  </div>
+</div>
+  
 <div class="clear"></div>

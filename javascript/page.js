@@ -3,7 +3,7 @@ $(function(){
   function scrollToAnchor(aid){
     var aTag = $("a[name='"+ aid +"']");
     $('html,body').animate({scrollTop: aTag.offset().top},'slow');
-  }
+  } // scroll to a HTML anchor smoothly
   
   function sortByKey(array, key) {
     return array.sort(function(a, b) {
@@ -26,7 +26,7 @@ $(function(){
       if (a[i] !== b[i]) return false;
     }
     return true;
-  }
+  } // if 2 arrays are equal
   
   function arraysKeyEqual(arrayA, arrayB, key) {
     var arrayAkey = new Array();
@@ -52,6 +52,21 @@ $(function(){
     scrollToAnchor('english');
   });
   
+  $('#footer').on('click', '#legal', function(e){
+    e.stopPropagation();
+    $.ajax({url: "legal.html", dataType: "text", success: 
+      function(data) {
+        $("#privacypolicy").html(data);
+        $("#privacypolicy").fadeIn();
+      }
+    });
+  });
+  
+  $(document).on('click', '#privacypolicy', function(e){
+    e.stopPropagation();
+  });
+  
+
   $('#content').on('click', '#addmediainfo', function(e){
     e.stopPropagation();
     $("#addmediainfodiv").fadeIn();
@@ -88,6 +103,7 @@ $(function(){
     $('#register').fadeOut();
     $('#createchanneloverlay').fadeOut();
     $('#addmediainfodiv').fadeOut();
+    $("#privacypolicy").fadeOut();
   });
   
   $("#createchannel").click(function(e) {
@@ -110,7 +126,7 @@ $(function(){
     var $form = $(this);
     var serializedData = $form.serialize();
     login = $.ajax({
-      url: "/PHP/functions.php",
+      url: "PHP/functions.php",
       type: "post",
       contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
       data: serializedData + '&login=1&action=login'
@@ -149,7 +165,7 @@ $(function(){
     var $form = $(this);
     var serializedData = $form.serialize();
     register = $.ajax({
-      url: "/PHP/functions.php",
+      url: "PHP/functions.php",
       type: "post",
       contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
       data: serializedData + '&register=1&action=register'
@@ -186,7 +202,7 @@ $(function(){
   $("#logoutbtn").click(function() {
     var logout
     logout = $.ajax({
-      url: "/PHP/functions.php",
+      url: "PHP/functions.php",
       type: "post",
       contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
       data: 'action=logout'
@@ -214,7 +230,7 @@ $(function(){
     var form = $(this);
     var serializedData = form.serialize();
     createchannel = $.ajax({
-      url: "/PHP/functions.php",
+      url: "PHP/functions.php",
       type: "post",
       contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
       data: serializedData + '&action=createChannel'
@@ -242,7 +258,7 @@ $(function(){
   (function getChannels() {
     var getChannelsCall;
     getChannelsCall = $.ajax({
-      url: "/PHP/functions.php",
+      url: "PHP/functions.php",
       type: "post",
       contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
       data: 'action=getChannels'
@@ -352,7 +368,7 @@ $(function(){
       
       var checkpass
       checkpass = $.ajax({
-        url: "/PHP/functions.php",
+        url: "PHP/functions.php",
         type: "post",
         contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
         data: 'password=' + password + '&channelID=' + channelid + '&action=checkpass'
@@ -411,7 +427,7 @@ $(function(){
         function getPeers(peerid) {
           var getpeers
           getpeers = $.ajax({
-            url: "/PHP/functions.php",
+            url: "PHP/functions.php",
             type: "post",
             contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
             data: 'peerid=' + peerid + '&password=' + password + '&channelID=' + channelid + '&action=getpeers'
@@ -431,7 +447,7 @@ $(function(){
         function keepAlive() {
           var keepalive
           keepalive = $.ajax({
-            url: "/PHP/functions.php",
+            url: "PHP/functions.php",
             type: "post",
             contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
             data: 'channelID=' + channelid + '&action=keepalive'
@@ -448,7 +464,7 @@ $(function(){
         function deletePeer(peerid) {
           var deletepeer;
           deletepeer = $.ajax({
-            url: "/PHP/functions.php",
+            url: "PHP/functions.php",
             type: "post",
             contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
             data: 'peerid=' + peerid + '&channelID=' + channelid + '&password=' + password + '&action=deletepeer'
@@ -464,7 +480,7 @@ $(function(){
         function updateUsername(peerid) {
           var updateusername;
           updateusername = $.ajax({
-            url: "/PHP/functions.php",
+            url: "PHP/functions.php",
             type: "post",
             contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
             data: 'peerid=' + peerid + '&action=updateusername'
@@ -489,7 +505,7 @@ $(function(){
           var urlpeers = JSON.stringify(allpeers);
           var displayusername;
           displayusername = $.ajax({
-            url: "/PHP/functions.php",
+            url: "PHP/functions.php",
             type: "post",
             contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
             data: 'peerids=' + urlpeers + '&action=displayusername'
@@ -511,7 +527,7 @@ $(function(){
           getPeers(id);
           var newpeer
           newpeer = $.ajax({
-            url: "/PHP/functions.php",
+            url: "PHP/functions.php",
             type: "post",
             contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
             data: 'peerid=' + id + '&channelID=' + channelid + '&action=newpeer'
@@ -744,7 +760,7 @@ $(function(){
             } 
           
             if(direct) {
-              var videoobj = {title: url, url: url};
+              var videoobj = {title: decodeURIComponent(url), url: url};
               var length = activeconnections.length;
               for (var i = 0; i < length; i++) {
                 var peerData = {
@@ -758,7 +774,7 @@ $(function(){
             else {
               var geturl
               geturl = $.ajax({
-                url: "/PHP/functions.php",
+                url: "PHP/functions.php",
                 type: "post",
                 contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
                 data: 'url=' + url + '&action=geturl'
@@ -775,7 +791,7 @@ $(function(){
                   $("#systemmsg").fadeIn().delay(3000).fadeOut();  
                 }
                 else {
-                  var videoobj = {title: videodata['title'], url: videodata['url']};
+                  var videoobj = {title: decodeURIComponent(videodata['title']), url: videodata['url']};
                   var length = activeconnections.length;
                   for (var i = 0; i < length; i++) {
                     var peerData = {
@@ -1104,6 +1120,7 @@ $(function(){
           $('.chattext').last().text(data.text);
           $('#chatbox').scrollTop($('#chatbox')[0].scrollHeight);
         }
+        
         
       });
     });

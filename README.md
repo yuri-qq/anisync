@@ -8,4 +8,3 @@ This application uses the following third party libraries:
 - jQuery/jQuery-UI http://jquery.com/
 - Video.js http://www.videojs.com/
 - recaptchalib https://developers.google.com/recaptcha/
-
