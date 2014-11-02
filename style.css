@@ -1,0 +1,890 @@
+/* disable default video element controls by webkit */
+video::-webkit-media-controls { 
+  display: none !important; 
+}
+
+/*  set display: none to Chrome's weird 0x0 iframe on the bottom the page 
+    since it caused a white space below the footer */
+body>iframe { 
+  display: none;
+}
+
+* {
+  margin: 0px;
+  padding: 0px;
+}
+
+body, html  {
+  height: 100%;
+  font-family: "proxima-nova",sans-serif;
+  color: #333;
+}
+
+a.privacy{
+  color: white;
+  text-decoration: none;
+}
+
+a.privacy:hover {
+  color: white;
+  text-decoration: none;
+}
+
+select {
+  padding: 5px;
+  font-size: 15px;
+  border: 1px solid #b8b8b8;
+  resize: none;
+  -moz-box-shadow: inset 1px 1px 5px #ccc;
+  box-shadow: inset 1px 1px 5px #ccc;
+        
+  -webkit-transition: all 300ms ease;
+  -moz-transition: all 300ms ease;
+  -ms-transition: all 300ms ease;
+  -o-transition: all 300ms ease;
+  transition: all 300ms ease;
+}
+
+select:hover{
+  -moz-box-shadow: inset 3px 3px 5px #ccc;
+  box-shadow: inset 3px 3px 5px #ccc;
+      
+  -webkit-transition: all 400ms ease;
+  -moz-transition: all 400ms ease;
+  -ms-transition: all 400ms ease;
+  -o-transition: all 400ms ease;
+  transition: all 400ms ease;
+}
+
+input[type="text"], input[type="password"]  {
+  padding: 6px;
+  font-size: 16px;
+  border: 1px solid #B8B8B8;
+  box-shadow: 1px 1px 5px #CCC inset;
+  
+  -webkit-transition: all 300ms ease;
+  -moz-transition: all 300ms ease;
+  -ms-transition: all 300ms ease;
+  -o-transition: all 300ms ease;
+  transition: all 300ms ease;
+}
+
+input[type="text"]:focus, input[type="password"]:focus {
+  -moz-box-shadow: inset 3px 3px 5px #ccc;
+  box-shadow: inset 3px 3px 5px #ccc;
+      
+  -webkit-transition: all 400ms ease;
+  -moz-transition: all 400ms ease;
+  -ms-transition: all 400ms ease;
+  -o-transition: all 400ms ease;
+  transition: all 400ms ease;
+}
+
+input[type="submit"] {
+    text-align: center;
+  padding: 6px;
+  font-size: 16px;
+    cursor: pointer;
+  
+  -webkit-transition: all 300ms ease;
+  -moz-transition: all 300ms ease;
+  -ms-transition: all 300ms ease;
+  -o-transition: all 300ms ease;
+  transition: all 300ms ease;
+}
+
+input[type="submit"]:hover {
+    box-shadow: 2px 2px 5px #535353 inset;
+  
+  -webkit-transition: all 400ms ease;
+  -moz-transition: all 400ms ease;
+  -ms-transition: all 400ms ease;
+  -o-transition: all 400ms ease;
+  transition: all 400ms ease;
+}
+
+.anchor{
+  color: #333;
+  text-decoration: none;
+  display: inline-block;
+}
+
+#wrapper {
+  min-height: 100%;
+  min-width: 800px;
+  position: relative;
+  background-image: url(./images/bg.jpg);
+}
+
+#header {
+  height: 100px;
+  width: 100%;
+  background-color: #4863A0;
+  padding-top: 10px;
+}
+
+#logo {
+  width: 550px;
+  height: 100px;
+  margin: 0 auto;
+  font-family: "futura-pt",sans-serif;
+  font-size: 83px;
+  text-align: center;
+  -webkit-user-select: none;   
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+#logo a {
+  text-decoration: none;
+}
+
+#logo p {
+  display: inline;
+  position: relative;
+}
+
+#grzb {
+  color: #D3D3D3;
+}
+
+#sep {
+  color: #D3D3D3;
+  top: -10px;
+}
+
+#synch {
+  color: white;
+}
+
+#loginbtn {
+  position: absolute;
+  top: 35px;
+  left: 85%;
+  height: 35px;
+  width: 75px;
+  line-height: 35px;
+  vertical-align: middle;
+  font-size: 18px;
+  border: 1px solid #4863A0;
+  color: white;
+  padding-left: 5px;
+  cursor: pointer;
+  -webkit-user-select: none;   
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-transition: all 300ms ease;
+  -moz-transition: all 300ms ease;
+  -ms-transition: all 300ms ease;
+  -o-transition: all 300ms ease;
+  transition: all 300ms ease;
+}
+
+#loginbtn:hover {
+  border: 1px solid white;
+  -webkit-transition: all 400ms ease;
+  -moz-transition: all 400ms ease;
+  -ms-transition: all 400ms ease;
+  -o-transition: all 400ms ease;
+  transition: all 400ms ease;
+}
+
+#logoutbtn {
+  position: absolute;
+  top: 35px;
+  left: 85%;
+  height: 35px;
+  width: 75px;
+  line-height: 35px;
+  vertical-align: middle;
+  font-size: 18px;
+  border: 1px solid #4863A0;
+  color: white;
+  padding-left: 5px;
+  cursor: pointer;
+  -webkit-user-select: none;   
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-transition: all 300ms ease;
+  -moz-transition: all 300ms ease;
+  -ms-transition: all 300ms ease;
+  -o-transition: all 300ms ease;
+  transition: all 300ms ease;
+}
+
+#logoutbtn:hover {
+  border: 1px solid white;
+  -webkit-transition: all 400ms ease;
+  -moz-transition: all 400ms ease;
+  -ms-transition: all 400ms ease;
+  -o-transition: all 400ms ease;
+  transition: all 400ms ease;
+}
+
+#logoutarrow {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 4px 0 4px 8px;
+  border-color: transparent transparent transparent #ffffff;
+  display: inline-block;
+  margin-bottom: 2px;
+  margin-right: 5px;
+}
+
+#loginarrow {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 8px 7px 0 7px;
+  border-color: #ffffff transparent transparent transparent;
+  display: inline-block;
+  margin-left: 5px;
+  margin-bottom: 2px;
+}
+
+#login {
+  display: none;
+  position: absolute;
+  top: 75px;
+  left: 85%;
+  margin-left: -179px;
+  height: 210px;
+  width: 250px;
+  font-size: 18px;
+  border: 1px solid #4863A0;
+  background-color: white;
+  padding-left: 10px;
+  padding-top: 10px;
+  z-index: 1;
+}
+
+#username {
+  width: 225px;
+  margin-bottom: 5px;
+}
+
+#password {
+  width: 225px;
+  margin-bottom: 10px;
+}
+
+#submitlogin {
+  background-color: #4863A0;
+    color: white;
+  border: 1px solid #B8B8B8;
+  width: 240px;
+  margin-bottom: 5px;
+}
+
+#registerbtn {
+  background-color: #e38b1e;
+    color: white;
+  border: 1px solid #B8B8B8;
+  width: 240px;
+  margin-bottom: 5px;
+}
+
+#register {
+  display: none;
+  position: absolute;
+  top: 75px;
+  left: 85%;
+  margin-left: -254px;
+  height: 420px;
+  width: 325px;
+  font-size: 18px;
+  border: 1px solid #4863A0;
+  background-color: white;
+  padding-left: 10px;
+  padding-top: 10px;
+}
+
+#register input {
+  width: 301px;
+  margin-bottom: 5px;
+}
+
+#register input[type=submit] {
+  background-color: #e38b1e;
+    color: white;
+  border: 1px solid #B8B8B8;
+  width: 316px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+#systemmsg {
+  display: none;
+  position: fixed;
+  top: 150px;
+  left: 17.5%;
+  min-height: 45px;
+  width: 65%;
+  text-align: center;
+  line-height: 45px;
+  vertical-align: middle;
+  border: 1px solid grey;
+  background-color: lightgrey;
+  z-index: 2;
+}
+
+.error {
+  color: #EB3B3B;
+}
+
+.sidebar {
+  width: 17.5%;
+  float: left;
+  padding-bottom: 100px;
+  padding-top: 100px;
+}
+
+#content {
+  margin: 0 auto;
+  width: 65%;
+  min-width: 480px;
+  padding-bottom: 50px;
+  padding-top: 30px;
+  float: left;
+}
+
+#channels {
+  margin-top: 15px;
+}
+
+.channel {
+  display: flex;
+  width: 90%;
+  height: 40px;
+  margin: 0 auto;
+  margin-bottom: 20px;
+  background-color: white;
+  border: 1px solid #333;
+  cursor: pointer;
+  -webkit-transition: all 300ms ease;
+  -moz-transition: all 300ms ease;
+  -ms-transition: all 300ms ease;
+  -o-transition: all 300ms ease;
+  transition: all 300ms ease;
+}
+
+.channel:hover {
+  box-shadow: 0 0 4px #00BFFF;
+    -webkit-box-shadow: 0 0 4px #00BFFF; 
+    -moz-box-shadow: 0 0 4px #00BFFF; 
+
+  -webkit-transition: all 400ms ease;
+  -moz-transition: all 400ms ease;
+  -ms-transition: all 400ms ease;
+  -o-transition: all 400ms ease;
+  transition: all 400ms ease;
+}
+
+.private {
+  flex-shrink: 0;
+  height: 40px;
+  width: 60px;
+  border-right: 1px solid #333;
+  background-color: #F08080;
+  text-align: center;
+  line-height: 40px;
+  vertical-align: middle;
+}
+
+.public {
+  flex-shrink: 0;
+  height: 40px;
+  width: 60px;
+  border-right: 1px solid #333;
+  background-color: lightgreen;
+  text-align: center;
+  line-height: 40px;
+  vertical-align: middle;
+}
+
+.channeltitle {
+  height: 40px;
+  width: 100%;
+  text-align: center;
+  line-height: 40px;
+  vertical-align: middle;
+  overflow: hidden;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.clients {
+  flex-shrink: 0;
+  height: 40px;
+  width: 80px;
+  border-left: 1px solid #333;
+  text-align: center;
+  line-height: 40px;
+  vertical-align: middle;
+}
+
+#channelcontrol {
+  float: left;
+  width: 50%;
+}
+
+#searchdiv {
+  display: inline-block;
+}
+
+#sortafterdiv {
+  display: inline-block;
+}
+
+#search {
+  margin-right: 10px;
+}
+
+#sortafter {
+  width: 125px;
+  font-size: 16px;
+}
+
+#description {
+  float: left;
+  width: 50%;
+  margin-bottom: 10px;
+}
+
+#createchannel {
+  margin-top: 10px;
+  width: 100%;
+  height: 35px;
+  background-color: #e38b1e;
+    color: white;
+  border: 1px solid #B8B8B8;
+  cursor: pointer;
+  line-height: 35px;
+  vertical-align: middle;
+  text-align: center;
+  -webkit-transition: all 300ms ease;
+  -moz-transition: all 300ms ease;
+  -ms-transition: all 300ms ease;
+  -o-transition: all 300ms ease;
+  transition: all 300ms ease;
+}
+
+#createchannel:hover {
+    box-shadow: 2px 2px 5px #535353 inset;
+  
+  -webkit-transition: all 400ms ease;
+  -moz-transition: all 400ms ease;
+  -ms-transition: all 400ms ease;
+  -o-transition: all 400ms ease;
+  transition: all 400ms ease;
+}
+
+#createchanneloverlay {
+  position: fixed;
+  width: 265px;
+  height: 240px;
+  top: 50%;
+  left: 50%;
+  margin-left: -134px;
+  margin-top: -121px;
+  padding: 10px;
+  background-color: white;
+  border: 1px solid black;
+  z-index: 1;
+  display: none;
+}
+
+#createchanneloverlay input[type=text], input[type=password] {
+  width: 250px;
+}
+
+#createchanneloverlay input[type=submit] {
+  background-color: #e38b1e;
+    color: white;
+  border: 1px solid #B8B8B8;
+  margin-top: 5px;
+  width: 264px;
+}
+
+#checkpassword {
+  position: fixed;
+  width: 265px;
+  height: 90px;
+  top: 50%;
+  left: 50%;
+  margin-left: -134px;
+  margin-top: -46px;
+  padding: 10px;
+  background-color: white;
+  border: 1px solid black;
+  z-index: 1;
+  display: none;
+}
+
+#checkpassword input[type=password] {
+  width: 250px;
+}
+
+#checkpassword input[type=submit] {
+  background-color: #e38b1e;
+    color: white;
+  border: 1px solid #B8B8B8;
+  margin-top: 5px;
+  width: 264px;
+}
+
+#makeprivatediv {
+  visibility: hidden;
+}
+
+#videowrapper {
+  width: 50%;
+  float: left;
+    position: relative;
+  vertical-align: top;
+}
+
+#videowrapper:after {
+    padding-top: 56.25%;
+    display: block;
+    content: '';
+}
+
+#videocontainer {
+  position: absolute;
+    top: 0; bottom: 0; right: 0; left: 0;
+    background-color: black;
+}
+
+#video {
+  width: 100%;
+}
+
+.vjs-default-skin.vjs-paused .vjs-big-play-button  {
+  display: none;
+}
+
+.vjs-default-skin.vjs-paused .vjs-control-bar {
+  display: block;
+}
+
+#chat {
+  float: right;
+  width: 50%;
+  height: 434px;
+}
+
+#chatdisplay {
+  display: flex;
+  width: 100%;
+  height: 400px;
+}
+
+#chatboxwrapper {
+  width: 100%;
+  overflow-y: scroll;
+  background-color: white;
+}
+
+#chatbox {
+  width: 100%;
+  min-height: 400px;
+  padding: 7px;
+  -moz-box-shadow:    inset 0 0 4px #000000;
+  -webkit-box-shadow: inset 0 0 4px #000000;
+  box-shadow:         inset 0 0 4px #000000;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; 
+  word-break: break-all;
+}
+
+.username {
+  display: inline-block;
+  font-weight: bold;
+}
+
+.chattext {
+  display: inline-block;
+  margin-left: 3px;
+}
+
+#chatusers {
+  background: white;
+  font-size: 14px;
+  width: 200px;
+  overflow-y: scroll;
+}
+
+.chatuser {
+  border-bottom: 1px solid black;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  text-align: center;
+  cursor: default;
+  -webkit-user-select: none;   
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-transition: all 300ms ease;
+  -moz-transition: all 300ms ease;
+  -ms-transition: all 300ms ease;
+  -o-transition: all 300ms ease;
+  transition: all 300ms ease;
+}
+
+.chatuser:hover {
+  background-color: lightgrey;
+  -webkit-transition: all 400ms ease;
+  -moz-transition: all 400ms ease;
+  -ms-transition: all 400ms ease;
+  -o-transition: all 400ms ease;
+  transition: all 400ms ease;
+}
+
+#chatcontrols {
+  display: flex;
+  width: 100%;
+}
+
+#chatcontrols input {
+    width: 100%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+#chatsend {
+  width: 200px;
+  height: 35px;
+  text-align: center;
+  border: 1px solid #B8B8B8;
+  border-left: none;
+  color: white;
+  line-height: 35px;
+  vertical-align: middle;
+  background-color: #e38b1e;
+  cursor: pointer;
+  transition: all 300ms ease 0s;
+}
+
+#chatsend:hover {
+  box-shadow: 2px 2px 5px #535353 inset;
+  transition: all 400ms ease 0s;
+}
+
+#enlargeplayer {
+  float: right;
+  height: 30px;
+  width: 30px;
+  margin-left: 17px;
+  background-image: url(./images/maximize.png);
+  cursor: pointer;
+}
+
+#channeltitle {
+  width: 100%;
+  word-break: break-all;
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 15px;
+  margin-top: -5px;
+}
+
+#playlist {
+  float: left;
+  width: 50%;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+#medialink {
+  float: left;
+}
+
+#addmedia {
+  float: left;
+  background-color: #E38B1E;
+  color: white;
+  border: 1px solid #B8B8B8;
+  height: 32px;
+  width: 70px;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 32px;
+  margin-left: 3px;
+  cursor: pointer;
+  transition: all 300ms ease 0s;
+}
+
+#addmedia:hover {
+  box-shadow: 2px 2px 5px #535353 inset;
+  transition: all 400ms ease 0s;
+}
+
+#addmediainfo {
+  float: left;
+  height: 32px;
+  width: 32px;
+  margin-left: 3px;
+  line-height: 32px;
+  text-align: center;
+  vertical-align: middle;
+  background-color: lightgrey;
+  cursor: pointer;
+  border: 1px #B8B8B8 solid;
+}
+
+.seperator {
+  height: 2px;
+  width: 100%;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  background-color: grey;
+}
+
+.mediainfotext {
+  margin-top: 10px;
+  margin-left: 30px;
+  font-size: 18px;
+}
+
+.mediainfotextgrey {
+  display: inline-block;
+  color: lightgrey;
+}
+
+#linklogo {
+  display: inline-block;
+    background: url('./images/link.png') no-repeat;
+    width: 20px;
+    height: 20px;
+  background-size: 100% 100%;
+  margin-right: 4px;
+  margin-bottom: -3px;
+}
+
+#ytlogo {
+  background: url('//s.ytimg.com/yts/imgbin/www-hitchhiker-vflCwII0O.png') no-repeat scroll 0px -842px transparent;
+  width: 72px;
+  height: 30px;
+}
+
+#vimeologo {
+  background: url('https://f.vimeocdn.com/images_v6/logo.png') no-repeat;
+  background-size: 100% 100%;
+  fill: black;
+  width: 72px;
+  height: 43px;
+}
+
+#addmediainfodiv {
+  position: fixed;
+  display: none;
+  margin-top: 90px;
+  margin-left: 20%;
+  width: 60%;
+  height: 80%;
+  z-index: 2;
+  background-color: white;
+  border: 1px #B8B8B8 solid;
+  -moz-box-shadow:5px 5px 5px rgba(0,0,0,0.3);
+  -webkit-box-shadow:5px 5px 5px rgba(0,0,0,0.3);
+  box-shadow:5px 5px 5px rgba(0,0,0,0.3);
+  font-size: 20px;
+  padding: 30px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; 
+}
+
+#mediaelements {
+  margin-top: 20px;
+  max-height: 400px;
+  overflow-y: scroll;
+  list-style-type: none;
+  padding-left: 10px;
+}
+
+.plelement {
+  width: 99%;
+  margin-top: 10px;
+  height: 40px;
+  border: 1px solid #B8B8B8;
+}
+
+.mediafile {
+  height: 40px;
+  overflow: hidden;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 40px;
+  background-color: white;
+  cursor: pointer;
+}
+
+.removemediafile {
+  position: relative;
+    float: right;
+    width: 50px;
+  height: 40px;
+  background-color: #FF5656;
+  border-left: 1px solid #B8B8B8;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 40px;
+  cursor: pointer;
+}
+
+.mediafileinfo {
+  position: relative;
+    float: left;
+    width: 100px;
+  height: 40px;
+  background-color: #BCDAFF;
+  border-right: 1px solid #B8B8B8;
+  text-align: left;
+  vertical-align: middle;
+  line-height: 40px;
+  cursor: pointer;
+}
+
+.handle {
+    cursor: move;
+  font-family: "Droid Sans",sans-serif;
+  color: #555;
+  font-size: 22px;
+  margin-left: 3px;
+  -webkit-user-select: none;   
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.currentlyplaying {
+  float: right;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 10px 0 10px 20px;
+  border-color: transparent transparent transparent #000000;
+  margin-top: 10px;
+  margin-right: 5px;
+  display: none;
+}
+
+.clear {
+  clear: both;
+}
+
+#footer {
+  height: 50px;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background-color: #4863A0;
+  text-align: center;
+  color: white;
+  vertical-align: middle;
+  line-height: 50px;
+}
