@@ -550,58 +550,64 @@ $(function(){
             deletePeer(receive.peer);
             refreshUsernames();
           });
+          
           receive.on('data', function(data) {
             console.log("RECEIVING DATA", data);
-            if(data.action === 'PLAY') {
-              blocked = true;
-              videoplayer.play();
-            }
-            else if(data.action === 'PAUSE') {
-              blocked = true;
-              videoplayer.currentTime(data.time);
-              videoplayer.pause();
-            }
-            else if(data.action === 'SEEK') {
-              videoplayer.currentTime(data.time);
-            }
-            else if(data.action === 'ADDMEDIA') {
-              addMedia(data.videoobj);
-            }
-            else if(data.action === 'REMOVEMEDIA') {
-              removeMedia(data.removeid);
-            }
-            else if(data.action === 'PLAYMEDIA') {
-              playMedia(data.playid);
-            }
-            else if(data.action === 'PLAYLIST') {
-              updatePlaylist(data.order);
-            }
-            else if(data.action === 'READY') {
-              waitForLoaded();
-            }
-            else if(data.action === 'GETSTARTUP') {
-              var peerData = {
-                action: 'SETSTARTUP',
-                nextid: nextid,
-                playlist: mediaelements,
-                currenttime: videoplayer.currentTime(),
-                paused: videoplayer.paused()
-              };
-              length = activeconnections.length;
-              for (var i = 0; i < length; i++) {
-                if(activeconnections[i]['peer'] === receive['peer']) {
-                  console.log("SENDING CHANNEL DATA TO PEER", activeconnections[i]['peer']);
-                  activeconnections[i].send(peerData);
+            
+            switch(data.action) {
+              case "PLAY":
+                blocked = true;
+                videoplayer.play();
+                break;
+              case "PAUSE":
+                blocked = true;
+                videoplayer.currentTime(data.time);
+                videoplayer.pause();
+                break;
+              case "SEEK":
+                videoplayer.currentTime(data.time);
+                break;
+              case "ADDMEDIA":
+                addMedia(data.videoobj);
+                break;
+              case "REMOVEMEDIA":
+                removeMedia(data.removeid);
+                break;
+              case "PLAYMEDIA":
+                playMedia(data.playid);
+                break;
+              case "PLAYLIST":
+                updatePlaylist(data.order);
+                break;
+              case "READY":
+                waitForLoaded();
+                break;
+              case "GETSTARTUP":
+                var peerData = {
+                  action: 'SETSTARTUP',
+                  nextid: nextid,
+                  playlist: mediaelements,
+                  currenttime: videoplayer.currentTime(),
+                  paused: videoplayer.paused()
+                };
+                length = activeconnections.length;
+                for (var i = 0; i < length; i++) {
+                  if(activeconnections[i]['peer'] === receive['peer']) {
+                    console.log("SENDING CHANNEL DATA TO PEER", activeconnections[i]['peer']);
+                    activeconnections[i].send(peerData);
+                  }
                 }
-              }
-            }
-            else if(data.action === 'SETSTARTUP') {
-              setStartup(data);
-            }
-            else if(data.action === 'CHAT') {
-              data['user'] = receive.peer;
-              receiveChat(data);
-            }
+                break;
+              case "SETSTARTUP":
+                setStartup(data);
+                break;
+              case "CHAT":
+                data.user = receive.peer;
+                receiveChat(data);
+                break;
+              case "UPDATESTATS":
+                break;
+            } // handle received data
           });
             
           receive.on('open', function() {
@@ -681,7 +687,7 @@ $(function(){
               console.log('FATAL ERROR', 'unknown', 'An unknown error has occurred.', err);
               break;
           } 
-        });
+        }); // print WebRTC errors to console
           
         var blocked = false;
         videoplayer.on("play", function() {
@@ -1121,6 +1127,24 @@ $(function(){
           $('#chatbox').scrollTop($('#chatbox')[0].scrollHeight);
         }
         
+        (function pushStats() {
+          var buffered = Math.round(videoplayer.bufferedPercent() * 100); // percentage of buffered video data
+          var minutes = Math.floor(videoplayer.currentTime() / 60); // get full minutes
+          var seconds = ("0" + Math.floor(videoplayer.currentTime()) % 60).slice(-2); // get rest and convert to 2 digit string (using Math.floor here to not end up with 2:60 or some shit)
+          var time = minutes + ":" + seconds; // create time string var
+          
+          var length = activeconnections.length;
+          for(var i = 0; i < length; i++) {
+            var peerData = {
+              action: 'UPDATESTATS',
+              buffered: buffered,
+              time: time
+            };
+            activeconnections[i].send(peerData);
+          } //send stats to every user
+          
+          setTimeout(pushStats, 1000); // call every second
+        })(); //invoke function immediately
         
       });
     });
