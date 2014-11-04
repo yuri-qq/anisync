@@ -688,17 +688,21 @@ $(function(){
               break;
           } 
         }); // print WebRTC errors to console
+        
+        function sendData(peerData) {
+          var length = activeconnections.length;
+          for (var i = 0; i < length; i++) {
+            activeconnections[i].send(peerData);
+          }
+        } // send data to all connected users
           
         var blocked = false;
         videoplayer.on("play", function() {
           if(!blocked) {
-            var length = activeconnections.length;
-            for (var i = 0; i < length; i++) {
-              var peerData = {
-                action: 'PLAY'
-              };
-              activeconnections[i].send(peerData);
+            var peerData = {
+              action: 'PLAY'
             }
+            sendData(peerData);
           }
           else {
             blocked = false;
@@ -706,28 +710,22 @@ $(function(){
         });
         videoplayer.on("pause", function() {
           if(!blocked) {
-            var length = activeconnections.length;
-            for (var i = 0; i < length; i++) {
-              var peerData = {
-                action: 'PAUSE',
-                time: videoplayer.currentTime()
-              };
-              activeconnections[i].send(peerData);
+            var peerData = {
+              action: 'PAUSE',
+              time: videoplayer.currentTime()
             }
+            sendData(peerData);
           }
           else {
             blocked = false;
           }
         });
         window.ClickedProgressbar = function() {
-          var length = activeconnections.length;
-          for (var i = 0; i < length; i++) {
-            var peerData = {
-              action: 'SEEK',
-              time: videoplayer.currentTime()
-            };
-            activeconnections[i].send(peerData);
+          var peerData = {
+            action: 'SEEK',
+            time: videoplayer.currentTime()
           }
+          sendData(peerData);
         }
     
         var enlarged = false
@@ -767,14 +765,11 @@ $(function(){
           
             if(direct) {
               var videoobj = {title: decodeURIComponent(url), url: url};
-              var length = activeconnections.length;
-              for (var i = 0; i < length; i++) {
-                var peerData = {
-                  action: 'ADDMEDIA',
-                  videoobj: videoobj
-                };
-                activeconnections[i].send(peerData);
+              var peerData = {
+                action: 'ADDMEDIA',
+                videoobj: videoobj
               }
+              sendData(peerData);
               addMedia(videoobj);
             }
             else {
@@ -798,14 +793,11 @@ $(function(){
                 }
                 else {
                   var videoobj = {title: decodeURIComponent(videodata['title']), url: videodata['url']};
-                  var length = activeconnections.length;
-                  for (var i = 0; i < length; i++) {
-                    var peerData = {
-                      action: 'ADDMEDIA',
-                      videoobj: videoobj
-                    };
-                  activeconnections[i].send(peerData);
+                  var peerData = {
+                    action: 'ADDMEDIA',
+                    videoobj: videoobj
                   }
+                  sendData(peerData);
                   addMedia(videoobj);
                 }
               });
@@ -823,27 +815,21 @@ $(function(){
           
         $('#content').on('click', '.removemediafile', function() {
           var removeid = parseInt($(this).parent().attr('class').split(' ')[1], 10);
-          var length = activeconnections.length;
-          for (var i = 0; i < length; i++) {
-            var peerData = {
-              action: 'REMOVEMEDIA',
-              removeid: removeid
-            };
-            activeconnections[i].send(peerData);
+          var peerData = {
+            action: 'REMOVEMEDIA',
+            removeid: removeid
           }
+          sendData(peerData);
           removeMedia(removeid);
         });
           
         $('#content').on('click', '.mediafile, .mediafileinfo', function() {
           var playid = parseInt($(this).parent().attr('class').split(' ')[1], 10);
-          var length = activeconnections.length;
-          for (var i = 0; i < length; i++) {
-            var peerData = {
-              action: 'PLAYMEDIA',
-              playid: playid
-            };
-            activeconnections[i].send(peerData);
+          var peerData = {
+            action: 'PLAYMEDIA',
+            playid: playid
           }
+          sendData(peerData);
           playMedia(playid);
         });
           
@@ -860,13 +846,10 @@ $(function(){
         videoplayer.on("loadeddata", function(){
           if(!blockload) {
             console.log("READY");
-            var length = activeconnections.length;
-            for (var i = 0; i < length; i++) {
-              var peerData = {
-                action: 'READY'
-              };
-              activeconnections[i].send(peerData);
+            var peerData = {
+              action: 'READY'
             }
+            sendData(peerData);
             waitForLoaded();
           }
           else {
@@ -987,15 +970,12 @@ $(function(){
             var newId = parseInt(sortableArray[i].split(' ')[1], 10);
             idArray.push(newId);
           }
-          
-          var length = activeconnections.length;
-          for (var i = 0; i < length; i++) {
-            var peerData = {
-              action: 'PLAYLIST',
-              order: idArray
-            };
-            activeconnections[i].send(peerData);
+
+          var peerData = {
+            action: 'PLAYLIST',
+            order: idArray
           }
+          sendData(peerData);
           
           var newOrder = new Array();
           var length = idArray.length;
@@ -1100,14 +1080,11 @@ $(function(){
             $('.username').last().text(username + ':');
             $('.chattext').last().text(text);
             $('#chatboxwrapper').scrollTop($('#chatbox')[0].scrollHeight);
-            var length = activeconnections.length;
-            for (var i = 0; i < length; i++) {
-              var peerData = {
-                action: 'CHAT',
-                text: text
-              };
-              activeconnections[i].send(peerData);
+            var peerData = {
+              action: 'CHAT',
+              text: text
             }
+            sendData(peerData);
             $('#chatinput').val('');
           }
         }
@@ -1133,15 +1110,12 @@ $(function(){
           var seconds = ("0" + Math.floor(videoplayer.currentTime()) % 60).slice(-2); // get rest and convert to 2 digit string (using Math.floor here to not end up with 2:60 or some shit)
           var time = minutes + ":" + seconds; // create time string var
           
-          var length = activeconnections.length;
-          for(var i = 0; i < length; i++) {
-            var peerData = {
-              action: 'UPDATESTATS',
-              buffered: buffered,
-              time: time
-            };
-            activeconnections[i].send(peerData);
-          } //send stats to every user
+          var peerData = {
+            action: 'UPDATESTATS',
+            buffered: buffered,
+            time: time
+          }
+          sendData(peerData); //send stats to every user
           
           setTimeout(pushStats, 1000); // call every second
         })(); //invoke function immediately
