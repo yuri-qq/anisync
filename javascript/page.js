@@ -42,6 +42,17 @@ $(function(){
     return arraysEqual(arrayAkey,arrayBkey);
   }
   
+  function postAjax(url, data) {
+    var ajax = $.ajax({
+      url: url,
+      type: "post",
+      contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
+      data: data
+    });
+    
+    return ajax;
+  } // make async ajax call
+  
   $(".german").click(function(e) {
     e.preventDefault();
     scrollToAnchor('german');
@@ -121,16 +132,11 @@ $(function(){
   });
   
   $("#loginform").submit(function(e) {
-    var login
     e.preventDefault();
     var $form = $(this);
-    var serializedData = $form.serialize();
-    login = $.ajax({
-      url: "PHP/functions.php",
-      type: "post",
-      contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
-      data: serializedData + '&login=1&action=login'
-    });
+    var serializedData = $form.serialize() + '&login=1&action=login';
+    
+    var login = postAjax("PHP/functions.php", serializedData);
     
     login.done(function(response) {
       if(response) {
@@ -160,17 +166,10 @@ $(function(){
   });
   
   $("#registerform").submit(function(e) {
-    var register
     e.preventDefault();
     var $form = $(this);
-    var serializedData = $form.serialize();
-    register = $.ajax({
-      url: "PHP/functions.php",
-      type: "post",
-      contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
-      data: serializedData + '&register=1&action=register'
-    });
-    
+    var serializedData = $form.serialize() + "&register=1&action=register";
+    var register = postAjax("PHP/functions.php", serializedData);
     register.done(function(response) {
       var errors = JSON.parse(response);
       
@@ -189,25 +188,16 @@ $(function(){
         $("#systemmsg").fadeIn().delay(3000).fadeOut();
       }
     });
-    
     register.fail(function(jqXHR, textStatus, errorThrown) {
       console.log('REGISTRATION FAILED: ' + errorThrown);
     });
-    
     register.always(function() {
       Recaptcha.reload();
     });
   });
   
   $("#logoutbtn").click(function() {
-    var logout
-    logout = $.ajax({
-      url: "PHP/functions.php",
-      type: "post",
-      contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
-      data: 'action=logout'
-    });
-    
+    var logout = postAjax("PHP/functions.php", 'action=logout');
     logout.done(function(response) {
       if(response) {
         $("#logoutbtn").hide();
@@ -216,7 +206,6 @@ $(function(){
         $("#systemmsg").fadeIn().delay(2000).fadeOut();
       }
     });
-    
     logout.fail(
       function(jqXHR, textStatus, errorThrown) {
         console.log('LOGOUT FAILED: ' + errorThrown);
@@ -225,16 +214,10 @@ $(function(){
   });
   
   $("#createchannelform").submit(function(e) {
-    var createchannel
     e.preventDefault();
     var form = $(this);
-    var serializedData = form.serialize();
-    createchannel = $.ajax({
-      url: "PHP/functions.php",
-      type: "post",
-      contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
-      data: serializedData + '&action=createChannel'
-    });
+    var serializedData = form.serialize() + "&action=createChannel";
+    var createchannel = postAjax("PHP/functions.php", serializedData);
     createchannel.done(function(response) {
       $("#createchanneloverlay").fadeOut();
       var password = $('#channelpassword').val();
@@ -256,23 +239,14 @@ $(function(){
   var channels;
   var notinchannel = true;
   (function getChannels() {
-    var getChannelsCall;
-    getChannelsCall = $.ajax({
-      url: "PHP/functions.php",
-      type: "post",
-      contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
-      data: 'action=getChannels'
-    });
-    
+    var getChannelsCall = postAjax("PHP/functions.php", 'action=getChannels');
     getChannelsCall.done(function(response) {
       channels = JSON.parse(response);
       displayChannels();
     });
-    
     getChannelsCall.fail(function(jqXHR, textStatus, errorThrown) {
       console.log('GET CHANNELS FAILED: ' + errorThrown);
     });
-    
     getChannelsCall.always(function() {
       if(notinchannel) {
         setTimeout(getChannels, 5000);
@@ -365,14 +339,8 @@ $(function(){
     $('#checkpasswordform').submit(function(e) {
       e.preventDefault();
       var password = $('#checkchannelpw').val();
-      
-      var checkpass
-      checkpass = $.ajax({
-        url: "PHP/functions.php",
-        type: "post",
-        contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
-        data: 'password=' + password + '&channelID=' + channelid + '&action=checkpass'
-      });
+      var data = "password=" + password + "&channelID=" + channelid + "&action=checkpass";
+      var checkpass = postAjax("PHP/functions.php", data);
       checkpass.done(function(response) {
         if(response === 'right') {
           $('#checkpassword').fadeOut();
@@ -425,13 +393,8 @@ $(function(){
           
         var startup = true;
         function getPeers(peerid) {
-          var getpeers
-          getpeers = $.ajax({
-            url: "PHP/functions.php",
-            type: "post",
-            contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
-            data: 'peerid=' + peerid + '&password=' + password + '&channelID=' + channelid + '&action=getpeers'
-          });
+          var data = "peerid=" + peerid + "&password=" + password + "&channelID=" + channelid + "&action=getpeers";
+          var getpeers = postAjax("PHP/functions.php", data);
           getpeers.done(function(response) {
             var peers = JSON.parse(response);
             if(peers.length === 0) {
@@ -439,36 +402,26 @@ $(function(){
             }
             connectPeers(peers);
           });
+          
           getpeers.fail(function(jqXHR, textStatus, errorThrown) {
             console.log('FAILED TO GET PEERS', errorThrown);
           });
         }
           
-        function keepAlive() {
-          var keepalive
-          keepalive = $.ajax({
-            url: "PHP/functions.php",
-            type: "post",
-            contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
-            data: 'channelID=' + channelid + '&action=keepalive'
-          });
+        (function keepAlive() {
+          var data = "channelID=" + channelid + "&action=keepalive";
+          var keepalive = postAjax("PHP/functions.php", data);
           keepalive.always(function() {
             setTimeout(keepAlive, 5000);
           });
           keepalive.fail(function(jqXHR, textStatus, errorThrown) {
             console.log('FAILED TO KEEP CHANNEL ALIVE', errorThrown);
           });
-        }
-        keepAlive();
+        }());
           
         function deletePeer(peerid) {
-          var deletepeer;
-          deletepeer = $.ajax({
-            url: "PHP/functions.php",
-            type: "post",
-            contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
-            data: 'peerid=' + peerid + '&channelID=' + channelid + '&password=' + password + '&action=deletepeer'
-          });
+          var data = "peerid=" + peerid + "&channelID=" + channelid + "&password=" + password + "&action=deletepeer";
+          var deletepeer = postAjax("PHP/functions.php", data);
           deletepeer.done(function() {
             console.log('DELETED PEER', peerid);
           });
@@ -478,13 +431,8 @@ $(function(){
         }
         
         function updateUsername(peerid) {
-          var updateusername;
-          updateusername = $.ajax({
-            url: "PHP/functions.php",
-            type: "post",
-            contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
-            data: 'peerid=' + peerid + '&action=updateusername'
-          });
+          var data = "peerid=" + peerid + "&action=updateusername";
+          var updateusername = postAjax("PHP/functions.php", data);
           updateusername.done(function() {
             console.log('UPDATED USERNAME', peerid);
           });
@@ -503,13 +451,8 @@ $(function(){
           allpeers.push(peer['id']);
           
           var urlpeers = JSON.stringify(allpeers);
-          var displayusername;
-          displayusername = $.ajax({
-            url: "PHP/functions.php",
-            type: "post",
-            contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
-            data: 'peerids=' + urlpeers + '&action=displayusername'
-          });
+          var data = 'peerids=' + urlpeers + '&action=displayusername';
+          var displayusername = postAjax("PHP/functions.php", data);
           displayusername.done(function(response) {
             console.log('DISPLAYING USERNAMES');
             usernames = JSON.parse(response);
@@ -525,13 +468,8 @@ $(function(){
           console.log("CREATED PEER", id);
           updateUsername(peer['id']);
           getPeers(id);
-          var newpeer
-          newpeer = $.ajax({
-            url: "PHP/functions.php",
-            type: "post",
-            contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
-            data: 'peerid=' + id + '&channelID=' + channelid + '&action=newpeer'
-          });
+          var data = "peerid=" + id + "&channelID=" + channelid + "&action=newpeer";
+          var newpeer = postAjax("PHP/functions.php", data);
           newpeer.fail(function(jqXHR, textStatus, errorThrown) {
             console.log('INSERTING NEW PEER FAILED', errorThrown);
           });
@@ -773,13 +711,8 @@ $(function(){
               addMedia(videoobj);
             }
             else {
-              var geturl
-              geturl = $.ajax({
-                url: "PHP/functions.php",
-                type: "post",
-                contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
-                data: 'url=' + url + '&action=geturl'
-              });
+              var data = 'url=' + url + '&action=geturl';
+              var geturl = postAjax("PHP/functions.php", data);
               geturl.done(function(response) {
                 console.log(response);
                 var videodata = JSON.parse(response);
