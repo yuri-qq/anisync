@@ -2,7 +2,7 @@
 $(function(){
   function scrollToAnchor(aid){
     var aTag = $("a[name='"+ aid +"']");
-    $('html,body').animate({scrollTop: aTag.offset().top},'slow');
+    $("html,body").animate({scrollTop: aTag.offset().top},"slow");
   } // scroll to a HTML anchor smoothly
   
   function sortByKey(array, key) {
@@ -46,7 +46,7 @@ $(function(){
     var ajax = $.ajax({
       url: url,
       type: "post",
-      contentType: 'application/x-www-form-urlencoded;charset=UTF-8',
+      contentType: "application/x-www-form-urlencoded;charset=UTF-8",
       data: data
     });
     
@@ -55,15 +55,15 @@ $(function(){
   
   $(".german").click(function(e) {
     e.preventDefault();
-    scrollToAnchor('german');
+    scrollToAnchor("german");
   });
   
   $(".english").click(function(e) {
     e.preventDefault();
-    scrollToAnchor('english');
+    scrollToAnchor("english");
   });
   
-  $('#footer').on('click', '#legal', function(e){
+  $("#footer").on("click", "#legal", function(e){
     e.stopPropagation();
     $.ajax({url: "legal.html", dataType: "text", success: 
       function(data) {
@@ -73,18 +73,9 @@ $(function(){
     });
   });
   
-  $(document).on('click', '#privacypolicy', function(e){
-    e.stopPropagation();
-  });
-  
-
-  $('#content').on('click', '#addmediainfo', function(e){
+  $("#content").on("click", "#addmediainfo", function(e){
     e.stopPropagation();
     $("#addmediainfodiv").fadeIn();
-  });
-  
-  $("#addmediainfodiv").click(function(e) {
-    e.stopPropagation();
   });
   
   $("#loginbtn").click(function(e) {
@@ -93,28 +84,17 @@ $(function(){
     e.stopPropagation();
   });
   
-  $("#login").click(function(e) {
-    e.stopPropagation();
-  });
-  
-  $("#register").click(function(e) {
-    e.stopPropagation();
-  });
-  
-  $("#createchanneloverlay").click(function(e) {
-    e.stopPropagation();
-  });
-  
-  $("#checkpassword").click(function(e) {
+  $("#login, #register, #createchanneloverlay, #checkpassword, #addmediainfodiv, #privacypolicy").click(function(e) {
     e.stopPropagation();
   });
   
   $(document).click(function() {
-    $('#login').fadeOut();
-    $('#register').fadeOut();
-    $('#createchanneloverlay').fadeOut();
-    $('#addmediainfodiv').fadeOut();
-    $("#privacypolicy").fadeOut();
+    $("#login, #register, #createchanneloverlay, #addmediainfodiv, #privacypolicy").fadeOut();
+  });
+  
+  $("#registerbtn").click(function() {
+    $("#login").fadeOut();
+    $("#register").fadeIn();
   });
   
   $("#createchannel").click(function(e) {
@@ -134,10 +114,9 @@ $(function(){
   $("#loginform").submit(function(e) {
     e.preventDefault();
     var $form = $(this);
-    var serializedData = $form.serialize() + '&login=1&action=login';
+    var serializedData = $form.serialize() + "&login=1&action=login";
     
     var login = postAjax("PHP/functions.php", serializedData);
-    
     login.done(function(response) {
       if(response) {
         $("#systemmsg").html("System message: " + response);
@@ -155,14 +134,9 @@ $(function(){
     
     login.fail(
       function(jqXHR, textStatus, errorThrown) {
-        console.log('LOGIN FAILED: ' + errorThrown);
+        console.log("LOGIN FAILED: " + errorThrown);
       }
     );
-  });
-  
-  $("#registerbtn").click(function() {
-    $("#login").fadeOut();
-    $("#register").fadeIn();
   });
   
   $("#registerform").submit(function(e) {
@@ -189,7 +163,7 @@ $(function(){
       }
     });
     register.fail(function(jqXHR, textStatus, errorThrown) {
-      console.log('REGISTRATION FAILED: ' + errorThrown);
+      console.log("REGISTRATION FAILED: " + errorThrown);
     });
     register.always(function() {
       Recaptcha.reload();
@@ -197,7 +171,7 @@ $(function(){
   });
   
   $("#logoutbtn").click(function() {
-    var logout = postAjax("PHP/functions.php", 'action=logout');
+    var logout = postAjax("PHP/functions.php", "action=logout");
     logout.done(function(response) {
       if(response) {
         $("#logoutbtn").hide();
@@ -208,7 +182,7 @@ $(function(){
     });
     logout.fail(
       function(jqXHR, textStatus, errorThrown) {
-        console.log('LOGOUT FAILED: ' + errorThrown);
+        console.log("LOGOUT FAILED: " + errorThrown);
       }
     );
   });
@@ -220,32 +194,30 @@ $(function(){
     var createchannel = postAjax("PHP/functions.php", serializedData);
     createchannel.done(function(response) {
       $("#createchanneloverlay").fadeOut();
-      var password = $('#channelpassword').val();
-      var channeltitle = form.serializeArray()[0]['value'];
-      if(password === '') {
+      var password = $("#channelpassword").val();
+      var channeltitle = form.serializeArray()[0]["value"];
+      if(password === "") {
         loadChannel(response, channeltitle, false);
       }
       else {
         loadChannel(response, channeltitle, password);
       }
-      
     });
-    
     createchannel.fail(function(jqXHR, textStatus, errorThrown) {
-      console.log('CREATE CHANNEL FAILED: ' + errorThrown);
+      console.log("CREATE CHANNEL FAILED: " + errorThrown);
     });
   });
   
   var channels;
   var notinchannel = true;
   (function getChannels() {
-    var getChannelsCall = postAjax("PHP/functions.php", 'action=getChannels');
+    var getChannelsCall = postAjax("PHP/functions.php", "action=getChannels");
     getChannelsCall.done(function(response) {
       channels = JSON.parse(response);
       displayChannels();
     });
     getChannelsCall.fail(function(jqXHR, textStatus, errorThrown) {
-      console.log('GET CHANNELS FAILED: ' + errorThrown);
+      console.log("GET CHANNELS FAILED: " + errorThrown);
     });
     getChannelsCall.always(function() {
       if(notinchannel) {
@@ -257,34 +229,34 @@ $(function(){
   function displayChannels() {
     if(channels && notinchannel) {
       var settings = {
-        search: $('#search').val(),
-        sort: $('#sortafter').val(),
-        showfull: $('#showfull').is(':checked'),
-        showprivate: $('#showprivate').is(':checked')
+        search: $("#search").val(),
+        sort: $("#sortafter").val(),
+        showfull: $("#showfull").is(":checked"),
+        showprivate: $("#showprivate").is(":checked")
       };
       
-      if(settings['sort'] === 'creation time') {
-        channels = sortByKey(channels, 'id');
+      if(settings["sort"] === "creation time") {
+        channels = sortByKey(channels, "id");
         channels.reverse();
       }
-      else if(settings['sort'] === 'name') {
-        channels = sortByKey(channels, 'name');
+      else if(settings["sort"] === "name") {
+        channels = sortByKey(channels, "name");
       }
       else {
-        channels = sortByKey(channels, 'name');
+        channels = sortByKey(channels, "name");
         channels.reverse();
-        channels = sortByKey(channels, 'clients');
+        channels = sortByKey(channels, "clients");
         channels.reverse();
       }
       
       var channelshtml = "";
       var i;
       for (i = 0; i < channels.length; ++i) {
-        if(settings['search'] === "" || channels[i]['name'].toLowerCase().indexOf(settings['search'].toLowerCase()) > -1) {
-          if(settings['showprivate'] || channels[i]['private'] === 0) {
-            if(settings['showfull'] || channels[i]['clients'] < channels[i]['maxclients']) {
+        if(settings["search"] === "" || channels[i]["name"].toLowerCase().indexOf(settings["search"].toLowerCase()) > -1) {
+          if(settings["showprivate"] || channels[i]["private"] === 0) {
+            if(settings["showfull"] || channels[i]["clients"] < channels[i]["maxclients"]) {
               var status;
-              if(channels[i]['private'] === 1) {
+              if(channels[i]["private"] === 1) {
                 status = "<div class='private'>private</div>";
               }
               else {
@@ -300,29 +272,29 @@ $(function(){
     }
   }
   
-  $('#search').on('input', function() { 
+  $("#search").on("input", function() { 
     displayChannels();
   });
   
-  $('#sortafter').on('change', function() { 
+  $("#sortafter").on("change", function() { 
     displayChannels();
   });
   
-  $('#showprivate').click(function() {
+  $("#showprivate").click(function() {
     displayChannels();
   });
   
-  $('#showfull').click(function() {
+  $("#showfull").click(function() {
     displayChannels();
   });
 
-  $('#channels').on('click', '.channel', function(e) {
-    if($('#checkpassword').css('display') === 'none') {
+  $("#channels").on("click", ".channel", function(e) {
+    if($("#checkpassword").css("display") === "none") {
       e.stopPropagation();
     }
-    var channelid = $(this).attr('class').split(' ')[1];
-    var channeltitle = $(this).children('.channeltitle').text();
-    if($(this).children().html() === 'public') {
+    var channelid = $(this).attr("class").split(" ")[1];
+    var channeltitle = $(this).children(".channeltitle").text();
+    if($(this).children().html() === "public") {
       joinChannel(channelid, channeltitle);
     }
     else {
@@ -331,19 +303,19 @@ $(function(){
   });
   
   function enterPassword(channelid, channeltitle) {
-    $('#checkpassword').fadeIn();
+    $("#checkpassword").fadeIn();
     $(document).one("click", function() { 
-      $('#checkpassword').fadeOut();
+      $("#checkpassword").fadeOut();
     });
     
-    $('#checkpasswordform').submit(function(e) {
+    $("#checkpasswordform").submit(function(e) {
       e.preventDefault();
-      var password = $('#checkchannelpw').val();
+      var password = $("#checkchannelpw").val();
       var data = "password=" + password + "&channelID=" + channelid + "&action=checkpass";
       var checkpass = postAjax("PHP/functions.php", data);
       checkpass.done(function(response) {
-        if(response === 'right') {
-          $('#checkpassword').fadeOut();
+        if(response === "right") {
+          $("#checkpassword").fadeOut();
           loadChannel(channelid, channeltitle, password);
         }
         else {
@@ -352,13 +324,13 @@ $(function(){
         }
       });
       checkpass.fail(function(jqXHR, textStatus, errorThrown) {
-        console.log('FAILED TO GET PEERS', errorThrown);
+        console.log("FAILED TO GET PEERS", errorThrown);
       });
     });
   }
   
   function joinChannel(channelid, channeltitle) {
-    var clients = $('.' + channelid).children('.clients').html().split('/');
+    var clients = $("." + channelid).children(".clients").html().split("/");
     if(clients[1] - clients[0] > 0) {
       loadChannel(channelid, channeltitle, false);
     }
@@ -371,20 +343,32 @@ $(function(){
   var peer;
   function loadChannel(channelid, channeltitle, password) {
     notinchannel = false;
-    $('#content').html("");
+    $("#content").html("");
     $("#content").load("channel.html", function() {
-      $('#channeltitle').text(channeltitle);
+      $("#channeltitle").text(channeltitle);
       videojs("video", {"width": "100%", "height": "100%"}, function() {
-        $('.vjs-fullscreen-control').after('<div id="enlargeplayer"></div>');
+        // --- on startup when video element is ready ---
+        $(".vjs-fullscreen-control").after("<div id='enlargeplayer'></div>");
         var videoplayer = this;
         videoplayer.hide();
+        
+        (function keepAlive() {
+            var data = "channelID=" + channelid + "&action=keepalive";
+            var keepalive = postAjax("PHP/functions.php", data);
+            keepalive.always(function() {
+              setTimeout(keepAlive, 5000);
+            });
+            keepalive.fail(function(jqXHR, textStatus, errorThrown) {
+              console.log("FAILED TO KEEP CHANNEL ALIVE", errorThrown);
+            });
+        }());
       
         var activeconnections = new Array();
         function connectPeers(peers) {
           var connections = new Array();
           var length = peers.length;    
           for (var i = 0; i < length; i++) {
-            var singlePeer = peer.connect(peers[i]['peerid'])
+            var singlePeer = peer.connect(peers[i]["peerid"])
             connections.push(singlePeer);
           }
           activeconnections = connections;
@@ -404,84 +388,78 @@ $(function(){
           });
           
           getpeers.fail(function(jqXHR, textStatus, errorThrown) {
-            console.log('FAILED TO GET PEERS', errorThrown);
+            console.log("FAILED TO GET PEERS", errorThrown);
           });
         }
+        
+        function setStartup(data) {
+          mediaelements = data.playlist;
+          var length = data.playlist.length;
+          for(var i = 0; i < length; i++) {
+            if(data.playlist[i]["playing"]) {
+              videoplayer.one("loadedmetadata", function() {
+                videoplayer.currentTime(data.currenttime);
+                if(!data.paused) {
+                  blocked = true;
+                  videoplayer.play();
+                }
+              });
+              videoplayer.show();
+              blockload = true;
+              videoplayer.src(data.playlist[i]["url"]);
+              videoplayer.load();
+              var playing = i;
+            }
+          }
           
-        (function keepAlive() {
-          var data = "channelID=" + channelid + "&action=keepalive";
-          var keepalive = postAjax("PHP/functions.php", data);
-          keepalive.always(function() {
-            setTimeout(keepAlive, 5000);
-          });
-          keepalive.fail(function(jqXHR, textStatus, errorThrown) {
-            console.log('FAILED TO KEEP CHANNEL ALIVE', errorThrown);
-          });
-        }());
+          nextid = data.nextid;
           
+          var length = mediaelements.length;
+          for (var i = 0; i < length; i++) {
+            $("#mediaelements").append("<li class='plelement " + mediaelements[i]['id'] + "'><div class='mediafileinfo'><span class='handle'>::</span></div><div class='removemediafile'>X</div><div class='mediafile'></div></li>");
+            $("." + mediaelements[i]["id"]).children(".mediafile").text(mediaelements[i]["title"]);
+          }
+          $("#mediaelements").sortable("refresh");
+
+          
+          if(mediaelements.length) {
+            $("." + mediaelements[playing]["id"]).css({"border-color":"#9ecaed", "box-shadow":"0 0 10px #9ecaed"});
+          }
+          $("#mediaelements").sortable("refresh");
+          console.log("LOADED CHANNEL DATA");
+        }
+        
         function deletePeer(peerid) {
           var data = "peerid=" + peerid + "&channelID=" + channelid + "&password=" + password + "&action=deletepeer";
           var deletepeer = postAjax("PHP/functions.php", data);
           deletepeer.done(function() {
-            console.log('DELETED PEER', peerid);
+            console.log("DELETED PEER", peerid);
           });
           deletepeer.fail(function(jqXHR, textStatus, errorThrown) {
-            console.log('FAILED TO DELETE PEER', errorThrown);
+            console.log("FAILED TO DELETE PEER", errorThrown);
           });
         }
         
-        function updateUsername(peerid) {
-          var data = "peerid=" + peerid + "&action=updateusername";
-          var updateusername = postAjax("PHP/functions.php", data);
-          updateusername.done(function() {
-            console.log('UPDATED USERNAME', peerid);
-          });
-          updateusername.fail(function(jqXHR, textStatus, errorThrown) {
-            console.log('FAILED TO UPDATE USERNAME', errorThrown);
-          });
-        }
-        
-        var usernames = new Array();
-        function refreshUsernames() {
-          var allpeers = new Array();
-          var length = activeconnections.length;
-          for (var i = 0; i < length; i++) {
-            allpeers.push(activeconnections[i]['peer']);
-          }
-          allpeers.push(peer['id']);
-          
-          var urlpeers = JSON.stringify(allpeers);
-          var data = 'peerids=' + urlpeers + '&action=displayusername';
-          var displayusername = postAjax("PHP/functions.php", data);
-          displayusername.done(function(response) {
-            console.log('DISPLAYING USERNAMES');
-            usernames = JSON.parse(response);
-            updateChatusers();
-          });
-          displayusername.fail(function(jqXHR, textStatus, errorThrown) {
-            console.log('FAILED TO DISPLAY USERNAMEs', errorThrown);
-          });
-        }
-        
-        peer = new Peer({key: 'yxero4atx4cuwhfr'});
-        peer.on('open', function(id) {
+        // --- webRTC/PeerJS ---
+        peer = new Peer({key: "yxero4atx4cuwhfr"});
+        peer.on("open", function(id) {
           console.log("CREATED PEER", id);
-          updateUsername(peer['id']);
+          updateUsername(peer["id"]);
           getPeers(id);
           var data = "peerid=" + id + "&channelID=" + channelid + "&action=newpeer";
           var newpeer = postAjax("PHP/functions.php", data);
           newpeer.fail(function(jqXHR, textStatus, errorThrown) {
-            console.log('INSERTING NEW PEER FAILED', errorThrown);
+            console.log("INSERTING NEW PEER FAILED", errorThrown);
           });
           refreshUsernames();
         });
 
-        peer.on('connection', function(receive) {
-          receive.on('close', function() {
+        peer.on("connection", function(receive) {
+          receive.on("close", function() {
             console.log("PEER DISCONNECTED", receive.peer);
             var length = activeconnections.length;
             for (var i = 0; i < length; i++) {
-              if(activeconnections[i]['peer'] === receive.peer) {
+              if(activeconnections[i]["peer"] === receive.peer) {
                 activeconnections.splice(i, 1);
               }
             }
@@ -489,7 +467,7 @@ $(function(){
             refreshUsernames();
           });
           
-          receive.on('data', function(data) {
+          receive.on("data", function(data) {
             console.log("RECEIVING DATA", data);
             
             switch(data.action) {
@@ -522,7 +500,7 @@ $(function(){
                 break;
               case "GETSTARTUP":
                 var peerData = {
-                  action: 'SETSTARTUP',
+                  action: "SETSTARTUP",
                   nextid: nextid,
                   playlist: mediaelements,
                   currenttime: videoplayer.currentTime(),
@@ -530,8 +508,8 @@ $(function(){
                 };
                 length = activeconnections.length;
                 for (var i = 0; i < length; i++) {
-                  if(activeconnections[i]['peer'] === receive['peer']) {
-                    console.log("SENDING CHANNEL DATA TO PEER", activeconnections[i]['peer']);
+                  if(activeconnections[i]["peer"] === receive["peer"]) {
+                    console.log("SENDING CHANNEL DATA TO PEER", activeconnections[i]["peer"]);
                     activeconnections[i].send(peerData);
                   }
                 }
@@ -548,12 +526,12 @@ $(function(){
             } // handle received data
           });
             
-          receive.on('open', function() {
+          receive.on("open", function() {
             var length = activeconnections.length;
             var connectnew = false;
             if(length > 0) {
               for (var i = 0; i < length; i++) {
-                if(activeconnections[i]['peer'] === receive.peer) {
+                if(activeconnections[i]["peer"] === receive.peer) {
                   connectnew = true;
                 }
               }
@@ -569,11 +547,11 @@ $(function(){
             console.log("CONNECTED TO PEERS", activeconnections);
             if(startup) {
               for (var i = 0; i < length; i++) {
-                if(activeconnections[i]['peer'] === receive['peer']) {
+                if(activeconnections[i]["peer"] === receive["peer"]) {
                   startup = false;
                   console.log("GETTING CHANNEL DATA", activeconnections[i], receive);
                   var peerData = {
-                    action: 'GETSTARTUP'
+                    action: "GETSTARTUP"
                   };
                   activeconnections[i].send(peerData);
                 }
@@ -583,46 +561,46 @@ $(function(){
           });
         });
           
-        peer.on('error', function(err) {
+        peer.on("error", function(err) {
           switch(err.type) {
-            case 'browser-incompatible':
-              console.log('FATAL ERROR', 'browser-incompatible', 'Your browser does not support some or all WebRTC features that you are trying to use.', err);
+            case "browser-incompatible":
+              console.log("FATAL ERROR", "browser-incompatible", "Your browser does not support some or all WebRTC features that you are trying to use.", err);
               break;
-            case 'disconnected':
-              console.log('FATAL ERROR', 'disconnected', 'You\'ve already disconnected this peer from the server and can no longer make any new connections on it.', err);
+            case "disconnected":
+              console.log("FATAL ERROR", "disconnected", "You've already disconnected this peer from the server and can no longer make any new connections on it.", err);
               break;
-            case 'invalid-id':
-              console.log('FATAL ERROR', 'invalid-id', 'The ID passed into the Peer constructor contains illegal characters.', err);
+            case "invalid-id":
+              console.log("FATAL ERROR", "invalid-id", "The ID passed into the Peer constructor contains illegal characters.", err);
               break;
-            case 'invalid-key':
-              console.log('FATAL ERROR', 'invalid-key', 'The API key passed into the Peer constructor contains illegal characters or is not in the system.', err);
+            case "invalid-key":
+              console.log("FATAL ERROR", "invalid-key", "The API key passed into the Peer constructor contains illegal characters or is not in the system.", err);
               break;
-            case 'network':
-              console.log('FATAL ERROR', 'network', 'Lost or cannot establish a connection to the signalling server.', err);
+            case "network":
+              console.log("FATAL ERROR", "network", "Lost or cannot establish a connection to the signalling server.", err);
               break;
-            case 'peer-unavailable':
-              console.log('FATAL ERROR', 'peer-unavailable', 'The peer you\'re trying to connect to does not exist.', err);
+            case "peer-unavailable":
+              console.log("FATAL ERROR", "peer-unavailable", "The peer you\"re trying to connect to does not exist.", err);
               break;
-            case 'ssl-unavailable':
-              console.log('FATAL ERROR', 'ssl-unavailable', 'PeerJS is being used securely, but the cloud server does not support SSL. Use a custom PeerServer.', err);
+            case "ssl-unavailable":
+              console.log("FATAL ERROR", "ssl-unavailable", "PeerJS is being used securely, but the cloud server does not support SSL. Use a custom PeerServer.", err);
               break;
-            case 'server-error':
-              console.log('FATAL ERROR', 'server-error', 'Unable to reach the server.', err);
+            case "server-error":
+              console.log("FATAL ERROR", "server-error", "Unable to reach the server.", err);
               break;
-            case 'socket-error':
-              console.log('FATAL ERROR', 'socket-error', 'An error in the underlying socket has occurred.', err);
+            case "socket-error":
+              console.log("FATAL ERROR", "socket-error", "An error in the underlying socket has occurred.", err);
               break;
-            case 'socket-closed':
-              console.log('FATAL ERROR', 'socket-closed', 'The underlying socket closed unexpectedly.', err);
+            case "socket-closed":
+              console.log("FATAL ERROR", "socket-closed", "The underlying socket closed unexpectedly.", err);
               break;
-            case 'unavailable-id':
-              console.log('FATAL ERROR', 'unavailable-id', 'The ID passed into the Peer constructor is already taken.', err);
+            case "unavailable-id":
+              console.log("FATAL ERROR", "unavailable-id", "The ID passed into the Peer constructor is already taken.", err);
               break;
-            case 'webrtc':
-              console.log('FATAL ERROR', 'webrtc', 'Native WebRTC error.', err);
+            case "webrtc":
+              console.log("FATAL ERROR", "webrtc", "Native WebRTC error.", err);
               break;
             default:
-              console.log('FATAL ERROR', 'unknown', 'An unknown error has occurred.', err);
+              console.log("FATAL ERROR", "unknown", "An unknown error has occurred.", err);
               break;
           } 
         }); // print WebRTC errors to console
@@ -633,12 +611,13 @@ $(function(){
             activeconnections[i].send(peerData);
           }
         } // send data to all connected users
-          
+        
+        // --- video player controls
         var blocked = false;
         videoplayer.on("play", function() {
           if(!blocked) {
             var peerData = {
-              action: 'PLAY'
+              action: "PLAY"
             }
             sendData(peerData);
           }
@@ -646,10 +625,11 @@ $(function(){
             blocked = false;
           }
         });
+        
         videoplayer.on("pause", function() {
           if(!blocked) {
             var peerData = {
-              action: 'PAUSE',
+              action: "PAUSE",
               time: videoplayer.currentTime()
             }
             sendData(peerData);
@@ -658,76 +638,82 @@ $(function(){
             blocked = false;
           }
         });
-        window.ClickedProgressbar = function() {
+        
+        videoplayer.on("clickedProgressbar", function() {
           var peerData = {
-            action: 'SEEK',
+            action: "SEEK",
             time: videoplayer.currentTime()
           }
           sendData(peerData);
-        }
+        }); // listen for click on progress bar. See line 5200 in video.dev.js
     
         var enlarged = false
-        $('#content').on('click', '#enlargeplayer', function() {
+        $("#content").on("click", "#enlargeplayer", function() {
           if(enlarged) {
-            $('#videowrapper').animate({'width': "50%"}, 500);
-            $(this).css('background-image', 'url(./images/maximize.png)');
+            $("#videowrapper").animate({"width": "50%"}, 500);
+            $(this).css("background-image", "url(./images/maximize.png)");
             enlarged = false;
           }
           else {
-            $('#videowrapper').animate({'width': "100%"}, 500);
-            $(this).css('background-image', 'url(./images/minimize.png)');;
+            $("#videowrapper").animate({"width": "100%"}, 500);
+            $(this).css("background-image", "url(./images/minimize.png)");;
             enlarged = true;
           }
         });
         
-        $('#content').on('keyup', '#medialink', function(e) {
-          if(e.keyCode == '13') {
+        // --- playlist ---
+        var videoReady = 0;
+        var mediaelements = new Array();
+        var nextid = 0;
+
+        $("#content").on("keyup", "#medialink", function(e) {
+          if(e.keyCode == "13") {
             addMediaClick();
           }
         });  
         
-        $('#content').on('click', '#addmedia', function() {
+        $("#content").on("click", "#addmedia", function() {
           addMediaClick();
         });
         
         function addMediaClick() {
-          var url = $('#medialink').val();
-          if(url.indexOf('http://') > -1 || url.indexOf('https://') > -1) {
+          var url = $("#medialink").val();
+          if(url.indexOf("http://") > -1 || url.indexOf("https://") > -1) {
             var direct = true;
-            if(url.indexOf('youtube.com') > -1) {
+            if(url.indexOf("youtube.com") > -1) {
               direct = false;
             }
-            else if(url.indexOf('vimeo.com') > -1) {
+            else if(url.indexOf("vimeo.com") > -1) {
               direct = false;
             } 
           
             if(direct) {
               var videoobj = {title: decodeURIComponent(url), url: url};
               var peerData = {
-                action: 'ADDMEDIA',
+                action: "ADDMEDIA",
                 videoobj: videoobj
               }
               sendData(peerData);
               addMedia(videoobj);
             }
             else {
-              var data = 'url=' + url + '&action=geturl';
+              var data = "url=" + url + "&action=geturl";
               var geturl = postAjax("PHP/functions.php", data);
               geturl.done(function(response) {
                 console.log(response);
                 var videodata = JSON.parse(response);
-                if(videodata === 'invalid') {
+                if(videodata === "invalid") {
                   $("#systemmsg").html("System message: This media link is invalid.");
                   $("#systemmsg").fadeIn().delay(3000).fadeOut();                
                 }
-                else if(videodata === 'notexist') {
+                else if(videodata === "notexist") {
                   $("#systemmsg").html("System message: This video does not exist.");
                   $("#systemmsg").fadeIn().delay(3000).fadeOut();  
                 }
                 else {
-                  var videoobj = {title: decodeURIComponent(videodata['title']), url: videodata['url']};
+                  var videoobj = {title: decodeURIComponent(videodata["title"]), url: videodata["url"]};
                   var peerData = {
-                    action: 'ADDMEDIA',
+                    action: "ADDMEDIA",
                     videoobj: videoobj
                   }
                   sendData(peerData);
@@ -735,7 +721,7 @@ $(function(){
                 }
               });
               geturl.fail(function(jqXHR, textStatus, errorThrown) {
-                console.log('FAILED TO VIDEO URL', errorThrown);
+                console.log("FAILED TO VIDEO URL", errorThrown);
               });
             }
           }
@@ -743,23 +729,23 @@ $(function(){
             $("#systemmsg").html("System message: Please enter a valid URL.");
             $("#systemmsg").fadeIn().delay(3000).fadeOut();    
           }
-          $('#medialink').val('');
+          $("#medialink").val("");
         }
-          
-        $('#content').on('click', '.removemediafile', function() {
-          var removeid = parseInt($(this).parent().attr('class').split(' ')[1], 10);
+        
+        $("#content").on("click", ".removemediafile", function() {
+          var removeid = parseInt($(this).parent().attr("class").split(" ")[1], 10);
           var peerData = {
-            action: 'REMOVEMEDIA',
+            action: "REMOVEMEDIA",
             removeid: removeid
           }
           sendData(peerData);
           removeMedia(removeid);
         });
           
-        $('#content').on('click', '.mediafile, .mediafileinfo', function() {
-          var playid = parseInt($(this).parent().attr('class').split(' ')[1], 10);
+        $("#content").on("click", ".mediafile, .mediafileinfo", function() {
+          var playid = parseInt($(this).parent().attr("class").split(" ")[1], 10);
           var peerData = {
-            action: 'PLAYMEDIA',
+            action: "PLAYMEDIA",
             playid: playid
           }
           sendData(peerData);
@@ -780,7 +766,7 @@ $(function(){
           if(!blockload) {
             console.log("READY");
             var peerData = {
-              action: 'READY'
+              action: "READY"
             }
             sendData(peerData);
             waitForLoaded();
@@ -790,32 +776,28 @@ $(function(){
           }
         });
           
-        var videoReady = 0;
-        var mediaelements = new Array();
-        var nextid = 0;
-          
         function addMedia(videoobj) {
-          $('#mediaelements').append("<li class='plelement " + nextid + "'><div class='mediafileinfo'><span class='handle'>::</span></div><div class='removemediafile'>X</div><div class='mediafile'></div></li>");
-          $('.' + nextid).children('.mediafile').text(videoobj['title']);
+          $("#mediaelements").append("<li class='plelement " + nextid + "'><div class='mediafileinfo'><span class='handle'>::</span></div><div class='removemediafile'>X</div><div class='mediafile'></div></li>");
+          $("." + nextid).children(".mediafile").text(videoobj["title"]);
           if(mediaelements.length === 0) {
-            videoplayer.src(videoobj['url']);
-            mediaelements.push({id: nextid, title: videoobj['title'], url: videoobj['url'], playing: true});
-            $('.plelement').first().css({"border-color":"#9ecaed","box-shadow":"0 0 10px #9ecaed"});
+            videoplayer.src(videoobj["url"]);
+            mediaelements.push({id: nextid, title: videoobj["title"], url: videoobj["url"], playing: true});
+            $(".plelement").first().css({"border-color": "#9ecaed", "box-shadow": "0 0 10px #9ecaed"});
             videoplayer.show();
           }
           else {
-            mediaelements.push({id: nextid, title: videoobj['title'], url: videoobj['url'], playing: false});
+            mediaelements.push({id: nextid, title: videoobj["title"], url: videoobj["url"], playing: false});
           }
           nextid = nextid + 1;
-          $('#mediaelements').sortable("refresh");
+          $("#mediaelements").sortable("refresh");
         }
         
         function removeMedia(id) {
           var length = mediaelements.length;
           for (var i = 0; i < length; i++) {
-            if(mediaelements[i]['id'] === id) {
+            if(mediaelements[i]["id"] === id) {
               var arraykey = i;
-              if(mediaelements[i]['playing'] && mediaelements.length > 1) {
+              if(mediaelements[i]["playing"] && mediaelements.length > 1) {
                 nextMedia();
               }
               else if(mediaelements.length === 1) {
@@ -826,41 +808,41 @@ $(function(){
             }
           }
           mediaelements.splice(arraykey, 1);
-          $('.' + id).remove();
-          $('#mediaelements').sortable("refresh");
+          $("." + id).remove();
+          $("#mediaelements").sortable("refresh");
         }
         
         function nextMedia() {
           var length = mediaelements.length;
           for(var i = 0; i < length; i++) {
-            if(mediaelements[i]['playing']) {
-              mediaelements[i]['playing'] = false;
-              $('.' + mediaelements[i]['id']).css({"border-color":"#B8B8B8","box-shadow":"none"});
+            if(mediaelements[i]["playing"]) {
+              mediaelements[i]["playing"] = false;
+              $("." + mediaelements[i]["id"]).css({"border-color": "#B8B8B8", "box-shadow": "none"});
               play = i + 1;
             }
           }
           if(play >= mediaelements.length) {
             play = 0;
           }
-          mediaelements[play]['playing'] = true;
-          $('.' + mediaelements[play]['id']).css({"border-color":"#9ecaed","box-shadow":"0 0 10px #9ecaed"});
+          mediaelements[play]["playing"] = true;
+          $("." + mediaelements[play]["id"]).css({"border-color": "#9ecaed", "box-shadow": "0 0 10px #9ecaed"});
           videoplayer.currentTime(0);
-          videoplayer.src(mediaelements[play]['url']);
+          videoplayer.src(mediaelements[play]["url"]);
           videoReady = 0;
         }
 
         function playMedia(id) {
           var length = mediaelements.length;
           for(var i = 0; i < length; i++) {
-            if(mediaelements[i]['id'] === id && mediaelements[i]['playing'] === false) {
+            if(mediaelements[i]["id"] === id && mediaelements[i]["playing"] === false) {
               for(var i2 = 0; i2 < length; i2++) {
-                mediaelements[i2]['playing'] = false;
-                $('.' + mediaelements[i2]['id']).css({"border-color":"#B8B8B8","box-shadow":"none"});
+                mediaelements[i2]["playing"] = false;
+                $("." + mediaelements[i2]["id"]).css({"border-color": "#B8B8B8", "box-shadow": "none"});
               }
-              mediaelements[i]['playing'] = true;
-              $('.' + mediaelements[i]['id']).css({"border-color":"#9ecaed","box-shadow":"0 0 10px #9ecaed"});
+              mediaelements[i]["playing"] = true;
+              $("." + mediaelements[i]["id"]).css({"border-color": "#9ecaed", "box-shadow": "0 0 10px #9ecaed"});
               videoplayer.currentTime(0);
-              videoplayer.src(mediaelements[i]['url']);
+              videoplayer.src(mediaelements[i]["url"]);
               videoReady = 0;
             }
           }
@@ -869,43 +851,43 @@ $(function(){
         function waitForLoaded() {
           videoReady = videoReady + 1;
           if(videoReady === activeconnections.length + 1 && videoplayer.paused()) {
-            console.log("VIDEO READY", 'PLAYING');
+            console.log("VIDEO READY", "PLAYING");
             blocked = true;
             videoplayer.play();
           }
         }
-          
+        
         function updatePlaylist(order) {
           var newHTML = "";
           var newOrder = new Array();
           var length = order.length;
           for (var i = 0; i < length; i++) {
             for (var i2 = 0; i2 < length; i2++) {
-              if(order[i] === mediaelements[i2]['id']) {
+              if(order[i] === mediaelements[i2]["id"]) {
                 newOrder.push(mediaelements[i2]);
-                newHTML = newHTML + $('.' +  mediaelements[i2]['id'])[0].outerHTML;
+                newHTML = newHTML + $("." +  mediaelements[i2]["id"])[0].outerHTML;
               }
             }
           }
           mediaelements = newOrder;
-          $('#mediaelements').html(newHTML);
-          $('#mediaelements').sortable("refresh");
+          $("#mediaelements").html(newHTML);
+          $("#mediaelements").sortable("refresh");
         }
         
-        $('#mediaelements').sortable({handle: '.handle'});
-        $('#mediaelements').on("sortupdate", finishedSorting);
+        $("#mediaelements").sortable({handle: ".handle"});
+        $("#mediaelements").on("sortupdate", finishedSorting);
           
         function finishedSorting() {
-          var sortableArray = $('#mediaelements').sortable('toArray', {attribute: 'class'});
+          var sortableArray = $("#mediaelements").sortable("toArray", {attribute: "class"});
           var idArray = new Array();
           var length = sortableArray.length;
           for(var i = 0; i < length; i++) {
-            var newId = parseInt(sortableArray[i].split(' ')[1], 10);
+            var newId = parseInt(sortableArray[i].split(" ")[1], 10);
             idArray.push(newId);
           }
 
           var peerData = {
-            action: 'PLAYLIST',
+            action: "PLAYLIST",
             order: idArray
           }
           sendData(peerData);
@@ -914,7 +896,7 @@ $(function(){
           var length = idArray.length;
           for (var i = 0; i < length; i++) {
             for (var i2 = 0; i2 < length; i2++) {
-              if(idArray[i] === mediaelements[i2]['id']) {
+              if(idArray[i] === mediaelements[i2]["id"]) {
                 newOrder.push(mediaelements[i2]);
               }
             }
@@ -922,59 +904,56 @@ $(function(){
           mediaelements = newOrder;
         }
         
-        function setStartup(data) {
-          mediaelements = data.playlist;
-          var length = data.playlist.length;
-          for(var i = 0; i < length; i++) {
-            if(data.playlist[i]['playing']) {
-              videoplayer.one('loadedmetadata', function() {
-                videoplayer.currentTime(data.currenttime);
-                if(!data.paused) {
-                  blocked = true;
-                  videoplayer.play();
-                }
-              });
-              videoplayer.show();
-              blockload = true;
-              videoplayer.src(data.playlist[i]['url']);
-              videoplayer.load();
-              var playing = i;
-            }
-          }
-          
-          nextid = data.nextid;
-          
-          var length = mediaelements.length;
-          for (var i = 0; i < length; i++) {
-            $('#mediaelements').append("<li class='plelement " + mediaelements[i]['id'] + "'><div class='mediafileinfo'><span class='handle'>::</span></div><div class='removemediafile'>X</div><div class='mediafile'></div></li>");
-            $('.' + mediaelements[i]['id']).children('.mediafile').text(mediaelements[i]['title']);
-          }
-          $('#mediaelements').sortable("refresh");
-
-          
-          if(mediaelements.length) {
-            $('.' + mediaelements[playing]['id']).css({"border-color":"#9ecaed","box-shadow":"0 0 10px #9ecaed"});
-          }
-          $('#mediaelements').sortable("refresh");
-          console.log("LOADED CHANNEL DATA");
-        }
-        
-        $('#content').on('click', '#chatsend', function() {
+        // --- chat stuff ---
+        $("#content").on("click", "#chatsend", function() {
           sendChat();
         });
         
-        $('#content').on('keyup', '#chatinput', function(e) {
-          if(e.keyCode == '13') {
+        $("#content").on("keyup", "#chatinput", function(e) {
+          if(e.keyCode == "13") {
             sendChat();
           }
         });
         
+        function updateUsername(peerid) {
+          var data = "peerid=" + peerid + "&action=updateusername";
+          var updateusername = postAjax("PHP/functions.php", data);
+          updateusername.done(function() {
+            console.log("UPDATED USERNAME", peerid);
+          });
+          updateusername.fail(function(jqXHR, textStatus, errorThrown) {
+            console.log("FAILED TO UPDATE USERNAME", errorThrown);
+          });
+        }
+        
+        var usernames = new Array();
+        function refreshUsernames() {
+          var allpeers = new Array();
+          var length = activeconnections.length;
+          for (var i = 0; i < length; i++) {
+            allpeers.push(activeconnections[i]["peer"]);
+          }
+          allpeers.push(peer["id"]);
+          
+          var urlpeers = JSON.stringify(allpeers);
+          var data = "peerids=" + urlpeers + "&action=displayusername";
+          var displayusername = postAjax("PHP/functions.php", data);
+          displayusername.done(function(response) {
+            console.log("DISPLAYING USERNAMES");
+            usernames = JSON.parse(response);
+            updateChatusers();
+          });
+          displayusername.fail(function(jqXHR, textStatus, errorThrown) {
+            console.log("FAILED TO DISPLAY USERNAMEs", errorThrown);
+          });
+        }
+        
         function updateChatusers() {
-          var usershtml = '<div class="chatuser ' + peer['id'] + '">' + peer['id'] + '</div>';
+          var usershtml = "<div class='chatuser " + peer["id"] + "'>" + peer["id"] + "</div>";
           var length = usernames.length;
           for (var i = 0; i < length; i++) {
-            if(peer['id'] === usernames[i]['peerid']) {
-              usershtml = '<div class="chatuser ' + peer['id'] + '">' + usernames[i]['username'] + '</div>';
+            if(peer["id"] === usernames[i]["peerid"]) {
+              usershtml = "<div class='chatuser " + peer["id"] + "'>" + usernames[i]["username"] + "</div>";
             }
           }
           var length = activeconnections.length;
@@ -982,43 +961,43 @@ $(function(){
             var hasusername = false;
             var length2 = usernames.length;
             for (var i2 = 0; i2 < length2; i2++) {
-              if(activeconnections[i]['peer'] === usernames[i2]['peerid']) {
+              if(activeconnections[i]["peer"] === usernames[i2]["peerid"]) {
                 hasusername = true;
                 var usernameid = i2;
               }
             }
             
             if(hasusername) {
-              usershtml = usershtml + '<div class="chatuser ' + activeconnections[i]['peer'] + '">' + usernames[usernameid]['username'] + '</div>';
+              usershtml = usershtml + "<div class='chatuser " + activeconnections[i]["peer"] + "'>" + usernames[usernameid]["username"] + "</div>";
             }
             else {
-              usershtml = usershtml + '<div class="chatuser ' + activeconnections[i]['peer'] + '">' + activeconnections[i]['peer'] + '</div>';
+              usershtml = usershtml + "<div class='chatuser " + activeconnections[i]["peer"] + "'>" + activeconnections[i]["peer"] + "</div>";
             }
           }
-          $('#chatusers').html(usershtml);
+          $("#chatusers").html(usershtml);
         }
         
         function sendChat() {
-          var text = $('#chatinput').val();
-          if(text !== '') {
-            var username = peer['id'];
+          var text = $("#chatinput").val();
+          if(text !== "") {
+            var username = peer["id"];
             var length = usernames.length;
             for (var i = 0; i < length; i++) {
-              if(peer['id'] === usernames[i]['peerid']) {
-                username = usernames[i]['username'];
+              if(peer["id"] === usernames[i]["peerid"]) {
+                username = usernames[i]["username"];
               }
             }
           
-            $('#chatbox').append('<div class="username"></div><div class="chattext"></div><br />');
-            $('.username').last().text(username + ':');
-            $('.chattext').last().text(text);
-            $('#chatboxwrapper').scrollTop($('#chatbox')[0].scrollHeight);
+            $("#chatbox").append("<div class='username'></div><div class='chattext'></div><br />");
+            $(".username").last().text(username + ":");
+            $(".chattext").last().text(text);
+            $("#chatboxwrapper").scrollTop($("#chatbox")[0].scrollHeight);
             var peerData = {
-              action: 'CHAT',
+              action: "CHAT",
               text: text
             }
             sendData(peerData);
-            $('#chatinput').val('');
+            $("#chatinput").val("");
           }
         }
         
@@ -1026,17 +1005,18 @@ $(function(){
           var username = data.user;
           var length = usernames.length;
           for (var i = 0; i < length; i++) {
-            if(data.user === usernames[i]['peerid']) {
-              username = usernames[i]['username'];
+            if(data.user === usernames[i]["peerid"]) {
+              username = usernames[i]["username"];
             }
           }
           
-          $('#chatbox').append('<div class="username"></div><div class="chattext"></div><br />');
-          $('.username').last().text(username + ':');
-          $('.chattext').last().text(data.text);
-          $('#chatbox').scrollTop($('#chatbox')[0].scrollHeight);
+          $("#chatbox").append("<div class='username'></div><div class='chattext'></div><br />");
+          $(".username").last().text(username + ":");
+          $(".chattext").last().text(data.text);
+          $("#chatbox").scrollTop($("#chatbox")[0].scrollHeight);
         }
         
+        // --- statistics ---
         (function pushStats() {
           var buffered = Math.round(videoplayer.bufferedPercent() * 100); // percentage of buffered video data
           var minutes = Math.floor(videoplayer.currentTime() / 60); // get full minutes
@@ -1044,7 +1024,7 @@ $(function(){
           var time = minutes + ":" + seconds; // create time string var
           
           var peerData = {
-            action: 'UPDATESTATS',
+            action: "UPDATESTATS",
             buffered: buffered,
             time: time
           }

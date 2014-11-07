@@ -5197,7 +5197,7 @@ vjs.SeekBar.prototype.onMouseUp = function(event){
   if (this.videoWasPlaying) {
     this.player_.play();
   }
-	ClickedProgressbar();
+  this.player().trigger("clickedProgressbar"); // triggering a custom event for page.js here
 };
 
 vjs.SeekBar.prototype.stepForward = function(){
