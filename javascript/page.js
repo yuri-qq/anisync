@@ -78,23 +78,16 @@ $(function(){
     $("#addmediainfodiv").fadeIn();
   });
   
-  $("#loginbtn").click(function(e) {
-    $("#login").fadeToggle()
-    $("#register").fadeOut()
+  $(document).on("click", "#addmediainfodiv", function(e){
     e.stopPropagation();
   });
   
-  $("#login, #register, #createchanneloverlay, #checkpassword, #addmediainfodiv, #privacypolicy").click(function(e) {
+  $("#joinchanneloverlay, #createchanneloverlay, #checkpassword, #privacypolicy").click(function(e) {
     e.stopPropagation();
   });
   
   $(document).click(function() {
-    $("#login, #register, #createchanneloverlay, #addmediainfodiv, #privacypolicy").fadeOut();
-  });
-  
-  $("#registerbtn").click(function() {
-    $("#login").fadeOut();
-    $("#register").fadeIn();
+    $("#joinchanneloverlay, #createchanneloverlay, #addmediainfodiv, #privacypolicy").fadeOut();
   });
   
   $("#createchannel").click(function(e) {
@@ -111,96 +104,28 @@ $(function(){
     }
   });
   
-  $("#loginform").submit(function(e) {
-    e.preventDefault();
-    var $form = $(this);
-    var serializedData = $form.serialize() + "&login=1&action=login";
-    
-    var login = postAjax("PHP/functions.php", serializedData);
-    login.done(function(response) {
-      if(response) {
-        $("#systemmsg").html("System message: " + response);
-        $("#systemmsg").fadeIn().delay(3000).fadeOut();
-      }
-      if(response === "") {
-        $("#login").hide();
-        $("#loginbtn").hide();
-        $("#logoutbtn").show();
-        
-        $("#systemmsg").html("System message: You have successfully been logged in.");
-        $("#systemmsg").fadeIn().delay(2000).fadeOut();
-      }
-    });
-    
-    login.fail(
-      function(jqXHR, textStatus, errorThrown) {
-        console.log("LOGIN FAILED: " + errorThrown);
-      }
-    );
-  });
-  
-  $("#registerform").submit(function(e) {
-    e.preventDefault();
-    var $form = $(this);
-    var serializedData = $form.serialize() + "&register=1&action=register";
-    var register = postAjax("PHP/functions.php", serializedData);
-    register.done(function(response) {
-      var errors = JSON.parse(response);
-      
-      if(errors.length === 0) {
-        $("#register").hide();
-        $("#systemmsg").html("System message: Your account has been created successfully. You can now log in.");
-        $("#systemmsg").fadeIn().delay(3000).fadeOut();
-      }
-      else {
-        var responseHTML = "";
-        var i;
-        for (i = 0; i < errors.length; ++i) {
-          responseHTML = responseHTML + "<div class='error'>" + errors[i] + "</div>";
-        }
-        $("#systemmsg").html(responseHTML);
-        $("#systemmsg").fadeIn().delay(3000).fadeOut();
-      }
-    });
-    register.fail(function(jqXHR, textStatus, errorThrown) {
-      console.log("REGISTRATION FAILED: " + errorThrown);
-    });
-    register.always(function() {
-      Recaptcha.reload();
-    });
-  });
-  
-  $("#logoutbtn").click(function() {
-    var logout = postAjax("PHP/functions.php", "action=logout");
-    logout.done(function(response) {
-      if(response) {
-        $("#logoutbtn").hide();
-        $("#loginbtn").show();
-        $("#systemmsg").html("System message: " + response);
-        $("#systemmsg").fadeIn().delay(2000).fadeOut();
-      }
-    });
-    logout.fail(
-      function(jqXHR, textStatus, errorThrown) {
-        console.log("LOGOUT FAILED: " + errorThrown);
-      }
-    );
-  });
-  
   $("#createchannelform").submit(function(e) {
     e.preventDefault();
     var form = $(this);
     var serializedData = form.serialize() + "&action=createChannel";
     var createchannel = postAjax("PHP/functions.php", serializedData);
     createchannel.done(function(response) {
-      $("#createchanneloverlay").fadeOut();
-      var password = $("#channelpassword").val();
-      var channeltitle = form.serializeArray()[0]["value"];
-      if(password === "") {
-        loadChannel(response, channeltitle, false);
+      var channelid = JSON.parse(response);
+      if(channelid !== false) {
+        $("#createchanneloverlay").fadeOut();
+        var username = $("#channelusername").val();
+        var password = $("#channelpassword").val();
+        var channeltitle = $("#channelname").val();
+        if(password === "") {
+          loadChannel(channelid, channeltitle, false, username);
+        }
+        else {
+          loadChannel(channelid, channeltitle, password, username);
+        }
       }
       else {
-        loadChannel(response, channeltitle, password);
+        $("#systemmsg").html("System message: This username is already in use.");
+        $("#systemmsg").fadeIn().delay(3000).fadeOut();
       }
     });
     createchannel.fail(function(jqXHR, textStatus, errorThrown) {
@@ -289,68 +214,94 @@ $(function(){
   });
 
   $("#channels").on("click", ".channel", function(e) {
-    if($("#checkpassword").css("display") === "none") {
+    if($("#joinchanneloverlay").css("display") === "none") {
       e.stopPropagation();
     }
     var channelid = $(this).attr("class").split(" ")[1];
     var channeltitle = $(this).children(".channeltitle").text();
-    if($(this).children().html() === "public") {
-      joinChannel(channelid, channeltitle);
+    var channeltype = $(this).children().html();
+    
+    if(channeltype === "public") {
+      $("#password").css({visibility: "hidden"});
     }
     else {
-      enterPassword(channelid, channeltitle);
+      $("#password").css({visibility: "visible"});
     }
-  });
-  
-  function enterPassword(channelid, channeltitle) {
-    $("#checkpassword").fadeIn();
-    $(document).one("click", function() { 
-      $("#checkpassword").fadeOut();
+    
+    $("#joinchanneloverlay").fadeIn();
+    
+    $("#joinchannelform").submit(function(e) {
+      e.preventDefault();
+      
+      var channelfree;
+      var clients = $("." + channelid).children(".clients").html().split("/");
+      if(clients[1] - clients[0] > 0) {
+        channelfree = true;
+      }
+      else {
+        $("#systemmsg").html("System message: The channel you are trying to join is full.");
+        $("#systemmsg").fadeIn().delay(2000).fadeOut();
+      }
+      
+      if(channelfree) {
+        var username = $("#username").val();
+        var password = $("#channelpw").val();
+        var data = "username=" + username + "&password=" + password + "&channelID=" + channelid + "&action=validate";
+        
+        var validate = postAjax("PHP/functions.php", data);
+        validate.done(function(response) {
+          var joinchannel = JSON.parse(response);
+          
+          if(channeltype === "public") {
+            if(joinchannel["username"]) {
+              loadChannel(channelid, channeltitle, false, username);
+            }
+            else {
+              $("#systemmsg").html("System message: This username is already in use.");
+              $("#systemmsg").fadeIn().delay(3000).fadeOut();
+            }
+          }
+          else {
+            if(joinchannel["password"]) {
+              if(joinchannel["username"]) {
+                loadChannel(channelid, channeltitle, password, username);
+              }
+              else {
+                $("#systemmsg").html("System message: This username is already in use.");
+                $("#systemmsg").fadeIn().delay(3000).fadeOut();
+              }
+            }
+            else {
+              $("#systemmsg").html("System message: Wrong password.");
+              $("#systemmsg").fadeIn().delay(3000).fadeOut();
+            }
+          }
+
+        });
+        validate.fail(function(jqXHR, textStatus, errorThrown) {
+          console.log("FAILED TO VALIDATE CHANNELDATA", errorThrown);
+        });
+      }
     });
     
-    $("#checkpasswordform").submit(function(e) {
-      e.preventDefault();
-      var password = $("#checkchannelpw").val();
-      var data = "password=" + password + "&channelID=" + channelid + "&action=checkpass";
-      var checkpass = postAjax("PHP/functions.php", data);
-      checkpass.done(function(response) {
-        if(response === "right") {
-          $("#checkpassword").fadeOut();
-          loadChannel(channelid, channeltitle, password);
-        }
-        else {
-          $("#systemmsg").html("System message: Wrong password.");
-          $("#systemmsg").fadeIn().delay(3000).fadeOut();
-        }
-      });
-      checkpass.fail(function(jqXHR, textStatus, errorThrown) {
-        console.log("FAILED TO GET PEERS", errorThrown);
-      });
-    });
-  }
+  });
   
-  function joinChannel(channelid, channeltitle) {
-    var clients = $("." + channelid).children(".clients").html().split("/");
-    if(clients[1] - clients[0] > 0) {
-      loadChannel(channelid, channeltitle, false);
-    }
-    else {
-      $("#systemmsg").html("System message: The channel you are trying to join is full.");
-      $("#systemmsg").fadeIn().delay(2000).fadeOut();
-    }
-  }
   
   var peer;
-  function loadChannel(channelid, channeltitle, password) {
+  function loadChannel(channelid, channeltitle, password, username) {
+    $("#joinchanneloverlay").fadeOut();
     notinchannel = false;
     $("#content").html("");
     $("#content").load("channel.html", function() {
-      $("#channeltitle").text(channeltitle);
       videojs("video", {"width": "100%", "height": "100%"}, function() {
         // --- on startup when video element is ready ---
         $(".vjs-fullscreen-control").after("<div id='enlargeplayer'></div>");
         var videoplayer = this;
         videoplayer.hide();
+        
+        $("#channeltitle").text(channeltitle);
+        $("#mediaelements").sortable({handle: ".handle"});
+        $("#mediaelements").on("sortupdate", finishedSorting);
         
         (function keepAlive() {
             var data = "channelID=" + channelid + "&action=keepalive";
@@ -362,8 +313,8 @@ $(function(){
               console.log("FAILED TO KEEP CHANNEL ALIVE", errorThrown);
             });
         }());
-      
-        var activeconnections = new Array();
+        
+        var conn = new Array();
         function connectPeers(peers) {
           var connections = new Array();
           var length = peers.length;    
@@ -371,9 +322,9 @@ $(function(){
             var singlePeer = peer.connect(peers[i]["peerid"])
             connections.push(singlePeer);
           }
-          activeconnections = connections;
+          conn = connections;
           console.log("CONNECTED TO", connections);
-        }  
+        }
           
         var startup = true;
         function getPeers(peerid) {
@@ -423,7 +374,7 @@ $(function(){
 
           
           if(mediaelements.length) {
-            $("." + mediaelements[playing]["id"]).css({"border-color":"#9ecaed", "box-shadow":"0 0 10px #9ecaed"});
+            $("." + mediaelements[playing]["id"]).css({"border-color": "#9ecaed", "box-shadow": "0 0 10px #9ecaed"});
           }
           $("#mediaelements").sortable("refresh");
           console.log("LOADED CHANNEL DATA");
@@ -441,30 +392,29 @@ $(function(){
         }
         
         // --- webRTC/PeerJS ---
-        peer = new Peer({key: "yxero4atx4cuwhfr"});
+        peer = new Peer(username, {host: "sync.rrerr.net", port: 443, secure: true});
         peer.on("open", function(id) {
           console.log("CREATED PEER", id);
-          updateUsername(peer["id"]);
           getPeers(id);
-          var data = "peerid=" + id + "&channelID=" + channelid + "&action=newpeer";
+          var data = "peerid=" + id + "&channelID=" + channelid + "&password=" + password + "&action=newpeer";
           var newpeer = postAjax("PHP/functions.php", data);
           newpeer.fail(function(jqXHR, textStatus, errorThrown) {
             console.log("INSERTING NEW PEER FAILED", errorThrown);
           });
-          refreshUsernames();
+          updateChatusers();
         });
 
         peer.on("connection", function(receive) {
           receive.on("close", function() {
             console.log("PEER DISCONNECTED", receive.peer);
-            var length = activeconnections.length;
+            var length = conn.length;
             for (var i = 0; i < length; i++) {
-              if(activeconnections[i]["peer"] === receive.peer) {
-                activeconnections.splice(i, 1);
+              if(conn[i]["peer"] === receive.peer) {
+                conn.splice(i, 1);
               }
             }
             deletePeer(receive.peer);
-            refreshUsernames();
+            updateChatusers();
           });
           
           receive.on("data", function(data) {
@@ -506,11 +456,11 @@ $(function(){
                   currenttime: videoplayer.currentTime(),
                   paused: videoplayer.paused()
                 };
-                length = activeconnections.length;
+                length = conn.length;
                 for (var i = 0; i < length; i++) {
-                  if(activeconnections[i]["peer"] === receive["peer"]) {
-                    console.log("SENDING CHANNEL DATA TO PEER", activeconnections[i]["peer"]);
-                    activeconnections[i].send(peerData);
+                  if(conn[i]["peer"] === receive["peer"]) {
+                    console.log("SENDING CHANNEL DATA TO PEER", conn[i]["peer"]);
+                    conn[i].send(peerData);
                   }
                 }
                 break;
@@ -527,37 +477,37 @@ $(function(){
           });
             
           receive.on("open", function() {
-            var length = activeconnections.length;
+            var length = conn.length;
             var connectnew = false;
             if(length > 0) {
               for (var i = 0; i < length; i++) {
-                if(activeconnections[i]["peer"] === receive.peer) {
+                if(conn[i]["peer"] === receive.peer) {
                   connectnew = true;
                 }
               }
               if(connectnew === false) {
                 newpeer = peer.connect(receive.peer);
-                activeconnections.push(newpeer);
+                conn.push(newpeer);
               }
             }
             else {
               newpeer = peer.connect(receive.peer);
-              activeconnections.push(newpeer);
+              conn.push(newpeer);
             }
-            console.log("CONNECTED TO PEERS", activeconnections);
+            console.log("CONNECTED TO PEERS", conn);
             if(startup) {
               for (var i = 0; i < length; i++) {
-                if(activeconnections[i]["peer"] === receive["peer"]) {
+                if(conn[i]["peer"] === receive["peer"]) {
                   startup = false;
-                  console.log("GETTING CHANNEL DATA", activeconnections[i], receive);
+                  console.log("GETTING CHANNEL DATA", conn[i], receive);
                   var peerData = {
                     action: "GETSTARTUP"
                   };
-                  activeconnections[i].send(peerData);
+                  conn[i].send(peerData);
                 }
               }
             }
-            refreshUsernames();
+            updateChatusers();
           });
         });
           
@@ -606,9 +556,9 @@ $(function(){
         }); // print WebRTC errors to console
         
         function sendData(peerData) {
-          var length = activeconnections.length;
+          var length = conn.length;
           for (var i = 0; i < length; i++) {
-            activeconnections[i].send(peerData);
+            conn[i].send(peerData);
           }
         } // send data to all connected users
         
@@ -680,13 +630,16 @@ $(function(){
           var url = $("#medialink").val();
           if(url.indexOf("http://") > -1 || url.indexOf("https://") > -1) {
             var direct = true;
-            if(url.indexOf("youtube.com") > -1) {
-              direct = false;
+            
+            switch(true) { // if url is any of these sites, grab source with PHP script
+              case(url.indexOf("youtube.com") > -1):
+              case(url.indexOf("vimeo.com") > -1):
+              case(url.indexOf("nicovideo.jp") > -1):
+              case(url.indexOf("soundcloud.com") > -1):
+              case(url.indexOf("bandcamp.com") > -1):
+                direct = false;
             }
-            else if(url.indexOf("vimeo.com") > -1) {
-              direct = false;
-            } 
-          
+            
             if(direct) {
               var videoobj = {title: decodeURIComponent(url), url: url};
               var peerData = {
@@ -700,7 +653,6 @@ $(function(){
               var data = "url=" + url + "&action=geturl";
               var geturl = postAjax("PHP/functions.php", data);
               geturl.done(function(response) {
-                console.log(response);
                 var videodata = JSON.parse(response);
                 if(videodata === "invalid") {
                   $("#systemmsg").html("System message: This media link is invalid.");
@@ -711,7 +663,7 @@ $(function(){
                   $("#systemmsg").fadeIn().delay(3000).fadeOut();  
                 }
                 else {
-                  var videoobj = {title: decodeURIComponent(videodata["title"]), url: videodata["url"]};
+                  var videoobj = {title: decodeURIComponent(videodata["title"]).replace(/&amp;/g, '&'), url: videodata["url"]}; // replace &amp; with & manually since url decode doesn't decode it
                   var peerData = {
                     action: "ADDMEDIA",
                     videoobj: videoobj
@@ -850,7 +802,7 @@ $(function(){
     
         function waitForLoaded() {
           videoReady = videoReady + 1;
-          if(videoReady === activeconnections.length + 1 && videoplayer.paused()) {
+          if(videoReady === conn.length + 1 && videoplayer.paused()) {
             console.log("VIDEO READY", "PLAYING");
             blocked = true;
             videoplayer.play();
@@ -873,10 +825,7 @@ $(function(){
           $("#mediaelements").html(newHTML);
           $("#mediaelements").sortable("refresh");
         }
-        
-        $("#mediaelements").sortable({handle: ".handle"});
-        $("#mediaelements").on("sortupdate", finishedSorting);
-          
+
         function finishedSorting() {
           var sortableArray = $("#mediaelements").sortable("toArray", {attribute: "class"});
           var idArray = new Array();
@@ -915,64 +864,11 @@ $(function(){
           }
         });
         
-        function updateUsername(peerid) {
-          var data = "peerid=" + peerid + "&action=updateusername";
-          var updateusername = postAjax("PHP/functions.php", data);
-          updateusername.done(function() {
-            console.log("UPDATED USERNAME", peerid);
-          });
-          updateusername.fail(function(jqXHR, textStatus, errorThrown) {
-            console.log("FAILED TO UPDATE USERNAME", errorThrown);
-          });
-        }
-        
-        var usernames = new Array();
-        function refreshUsernames() {
-          var allpeers = new Array();
-          var length = activeconnections.length;
-          for (var i = 0; i < length; i++) {
-            allpeers.push(activeconnections[i]["peer"]);
-          }
-          allpeers.push(peer["id"]);
-          
-          var urlpeers = JSON.stringify(allpeers);
-          var data = "peerids=" + urlpeers + "&action=displayusername";
-          var displayusername = postAjax("PHP/functions.php", data);
-          displayusername.done(function(response) {
-            console.log("DISPLAYING USERNAMES");
-            usernames = JSON.parse(response);
-            updateChatusers();
-          });
-          displayusername.fail(function(jqXHR, textStatus, errorThrown) {
-            console.log("FAILED TO DISPLAY USERNAMEs", errorThrown);
-          });
-        }
-        
         function updateChatusers() {
           var usershtml = "<div class='chatuser " + peer["id"] + "'>" + peer["id"] + "</div>";
-          var length = usernames.length;
+          var length = conn.length;
           for (var i = 0; i < length; i++) {
-            if(peer["id"] === usernames[i]["peerid"]) {
-              usershtml = "<div class='chatuser " + peer["id"] + "'>" + usernames[i]["username"] + "</div>";
-            }
-          }
-          var length = activeconnections.length;
-          for (var i = 0; i < length; i++) {
-            var hasusername = false;
-            var length2 = usernames.length;
-            for (var i2 = 0; i2 < length2; i2++) {
-              if(activeconnections[i]["peer"] === usernames[i2]["peerid"]) {
-                hasusername = true;
-                var usernameid = i2;
-              }
-            }
-            
-            if(hasusername) {
-              usershtml = usershtml + "<div class='chatuser " + activeconnections[i]["peer"] + "'>" + usernames[usernameid]["username"] + "</div>";
-            }
-            else {
-              usershtml = usershtml + "<div class='chatuser " + activeconnections[i]["peer"] + "'>" + activeconnections[i]["peer"] + "</div>";
-            }
+            usershtml = usershtml + "<div class='chatuser " + conn[i]["peer"] + "'>" + conn[i]["peer"] + "</div>";
           }
           $("#chatusers").html(usershtml);
         }
@@ -981,12 +877,6 @@ $(function(){
           var text = $("#chatinput").val();
           if(text !== "") {
             var username = peer["id"];
-            var length = usernames.length;
-            for (var i = 0; i < length; i++) {
-              if(peer["id"] === usernames[i]["peerid"]) {
-                username = usernames[i]["username"];
-              }
-            }
           
             $("#chatbox").append("<div class='username'></div><div class='chattext'></div><br />");
             $(".username").last().text(username + ":");
@@ -1003,12 +893,6 @@ $(function(){
         
         function receiveChat(data) {
           var username = data.user;
-          var length = usernames.length;
-          for (var i = 0; i < length; i++) {
-            if(data.user === usernames[i]["peerid"]) {
-              username = usernames[i]["username"];
-            }
-          }
           
           $("#chatbox").append("<div class='username'></div><div class='chattext'></div><br />");
           $(".username").last().text(username + ":");

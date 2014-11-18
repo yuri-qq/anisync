@@ -147,163 +147,6 @@ input[type="submit"]:hover {
   color: white;
 }
 
-#loginbtn {
-  position: absolute;
-  top: 35px;
-  left: 85%;
-  height: 35px;
-  width: 75px;
-  line-height: 35px;
-  vertical-align: middle;
-  font-size: 18px;
-  border: 1px solid #4863A0;
-  color: white;
-  padding-left: 5px;
-  cursor: pointer;
-  -webkit-user-select: none;   
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -webkit-transition: all 300ms ease;
-  -moz-transition: all 300ms ease;
-  -ms-transition: all 300ms ease;
-  -o-transition: all 300ms ease;
-  transition: all 300ms ease;
-}
-
-#loginbtn:hover {
-  border: 1px solid white;
-  -webkit-transition: all 400ms ease;
-  -moz-transition: all 400ms ease;
-  -ms-transition: all 400ms ease;
-  -o-transition: all 400ms ease;
-  transition: all 400ms ease;
-}
-
-#logoutbtn {
-  position: absolute;
-  top: 35px;
-  left: 85%;
-  height: 35px;
-  width: 75px;
-  line-height: 35px;
-  vertical-align: middle;
-  font-size: 18px;
-  border: 1px solid #4863A0;
-  color: white;
-  padding-left: 5px;
-  cursor: pointer;
-  -webkit-user-select: none;   
-  -moz-user-select: none;
-  -ms-user-select: none;
-  -webkit-transition: all 300ms ease;
-  -moz-transition: all 300ms ease;
-  -ms-transition: all 300ms ease;
-  -o-transition: all 300ms ease;
-  transition: all 300ms ease;
-}
-
-#logoutbtn:hover {
-  border: 1px solid white;
-  -webkit-transition: all 400ms ease;
-  -moz-transition: all 400ms ease;
-  -ms-transition: all 400ms ease;
-  -o-transition: all 400ms ease;
-  transition: all 400ms ease;
-}
-
-#logoutarrow {
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 4px 0 4px 8px;
-  border-color: transparent transparent transparent #ffffff;
-  display: inline-block;
-  margin-bottom: 2px;
-  margin-right: 5px;
-}
-
-#loginarrow {
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 8px 7px 0 7px;
-  border-color: #ffffff transparent transparent transparent;
-  display: inline-block;
-  margin-left: 5px;
-  margin-bottom: 2px;
-}
-
-#login {
-  display: none;
-  position: absolute;
-  top: 75px;
-  left: 85%;
-  margin-left: -179px;
-  height: 210px;
-  width: 250px;
-  font-size: 18px;
-  border: 1px solid #4863A0;
-  background-color: white;
-  padding-left: 10px;
-  padding-top: 10px;
-  z-index: 1;
-}
-
-#username {
-  width: 225px;
-  margin-bottom: 5px;
-}
-
-#password {
-  width: 225px;
-  margin-bottom: 10px;
-}
-
-#submitlogin {
-  background-color: #4863A0;
-    color: white;
-  border: 1px solid #B8B8B8;
-  width: 240px;
-  margin-bottom: 5px;
-}
-
-#registerbtn {
-  background-color: #e38b1e;
-    color: white;
-  border: 1px solid #B8B8B8;
-  width: 240px;
-  margin-bottom: 5px;
-}
-
-#register {
-  display: none;
-  position: absolute;
-  top: 75px;
-  left: 85%;
-  margin-left: -254px;
-  height: 420px;
-  width: 325px;
-  font-size: 18px;
-  border: 1px solid #4863A0;
-  background-color: white;
-  padding-left: 10px;
-  padding-top: 10px;
-}
-
-#register input {
-  width: 301px;
-  margin-bottom: 5px;
-}
-
-#register input[type=submit] {
-  background-color: #e38b1e;
-    color: white;
-  border: 1px solid #B8B8B8;
-  width: 316px;
-  margin-top: 5px;
-  margin-bottom: 5px;
-}
-
 #systemmsg {
   display: none;
   position: fixed;
@@ -344,20 +187,17 @@ input[type="submit"]:hover {
   color: #EB3B3B;
 }
 
-.sidebar {
-  width: 17.5%;
-  float: left;
-  padding-bottom: 100px;
-  padding-top: 100px;
-}
-
 #content {
   margin: 0 auto;
-  width: 65%;
+  width: 100%;
   min-width: 480px;
   padding-bottom: 50px;
   padding-top: 30px;
-  float: left;
+  padding-left: 10%;
+  padding-right: 10%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; 
 }
 
 #channels {
@@ -382,8 +222,8 @@ input[type="submit"]:hover {
 
 .channel:hover {
   box-shadow: 0 0 4px #00BFFF;
-    -webkit-box-shadow: 0 0 4px #00BFFF; 
-    -moz-box-shadow: 0 0 4px #00BFFF; 
+  -webkit-box-shadow: 0 0 4px #00BFFF; 
+  -moz-box-shadow: 0 0 4px #00BFFF; 
 
   -webkit-transition: all 400ms ease;
   -moz-transition: all 400ms ease;
@@ -468,7 +308,7 @@ input[type="submit"]:hover {
   width: 100%;
   height: 35px;
   background-color: #e38b1e;
-    color: white;
+  color: white;
   border: 1px solid #B8B8B8;
   cursor: pointer;
   line-height: 35px;
@@ -482,7 +322,7 @@ input[type="submit"]:hover {
 }
 
 #createchannel:hover {
-    box-shadow: 2px 2px 5px #535353 inset;
+  box-shadow: 2px 2px 5px #535353 inset;
   
   -webkit-transition: all 400ms ease;
   -moz-transition: all 400ms ease;
@@ -493,17 +333,20 @@ input[type="submit"]:hover {
 
 #createchanneloverlay {
   position: fixed;
-  width: 265px;
-  height: 240px;
+  width: 285px;
+  height: 310px;
   top: 50%;
   left: 50%;
-  margin-left: -134px;
-  margin-top: -121px;
+  margin-left: -142px;
+  margin-top: -155px;
   padding: 10px;
   background-color: white;
   border: 1px solid black;
   z-index: 1;
   display: none;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; 
 }
 
 #createchanneloverlay input[type=text], input[type=password] {
@@ -512,37 +355,48 @@ input[type="submit"]:hover {
 
 #createchanneloverlay input[type=submit] {
   background-color: #e38b1e;
-    color: white;
+  color: white;
   border: 1px solid #B8B8B8;
   margin-top: 5px;
   width: 264px;
 }
 
-#checkpassword {
+#joinchanneloverlay {
   position: fixed;
-  width: 265px;
-  height: 90px;
+  width: 285px;
+  height: 165px;
   top: 50%;
   left: 50%;
-  margin-left: -134px;
-  margin-top: -46px;
+  margin-left: -140px;
+  margin-top: -75px;
   padding: 10px;
   background-color: white;
   border: 1px solid black;
   z-index: 1;
   display: none;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; 
 }
 
-#checkpassword input[type=password] {
+#joinchanneloverlay input[type=password] {
   width: 250px;
 }
 
-#checkpassword input[type=submit] {
+#joinchanneloverlay input[type=text] {
+  width: 250px;
+}
+
+#joinchanneloverlay input[type=submit] {
   background-color: #e38b1e;
-    color: white;
+  color: white;
   border: 1px solid #B8B8B8;
   margin-top: 5px;
   width: 264px;
+}
+
+#password {
+  visibility: hidden;
 }
 
 #makeprivatediv {
@@ -611,9 +465,9 @@ input[type="submit"]:hover {
   width: 100%;
   min-height: 400px;
   padding: 7px;
-  -moz-box-shadow:    inset 0 0 4px #000000;
+  -moz-box-shadow: inset 0 0 4px #000000;
   -webkit-box-shadow: inset 0 0 4px #000000;
-  box-shadow:         inset 0 0 4px #000000;
+  box-shadow: inset 0 0 4px #000000;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box; 
@@ -668,7 +522,7 @@ input[type="submit"]:hover {
 }
 
 #chatcontrols input {
-    width: 100%;
+  width: 100%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -794,12 +648,35 @@ input[type="submit"]:hover {
   height: 30px;
 }
 
+#nicologo {
+  background: url('./images/nicovideo.png') no-repeat;
+  background-size: 100% 100%;
+  width: 231px;
+  height: 62px;
+}
+
 #vimeologo {
   background: url('https://f.vimeocdn.com/images_v6/logo.png') no-repeat;
   background-size: 100% 100%;
   fill: black;
   width: 72px;
   height: 43px;
+}
+
+#soundcloudlogo {
+  background: url('https://a-v2.sndcdn.com/assets/images/header/logo-af6f94.png') no-repeat;
+  background-size: 100% 100%;
+  background-color: rgba(255, 72, 0, 1.0);
+  width: 82px;
+  height: 44px;
+}
+
+#bandcamplogo {
+  background: url('https://s1.bcbits.com/img/bandcamp-logo-color-white-175.png') no-repeat;
+  background-size: 100% 100%;
+  background-color: #465053;
+  width: 175px;
+  height: 28px;
 }
 
 #addmediainfodiv {
@@ -848,8 +725,8 @@ input[type="submit"]:hover {
 
 .removemediafile {
   position: relative;
-    float: right;
-    width: 50px;
+  float: right;
+  width: 50px;
   height: 40px;
   background-color: #FF5656;
   border-left: 1px solid #B8B8B8;
@@ -861,8 +738,8 @@ input[type="submit"]:hover {
 
 .mediafileinfo {
   position: relative;
-    float: left;
-    width: 100px;
+  float: left;
+  width: 100px;
   height: 40px;
   background-color: #BCDAFF;
   border-right: 1px solid #B8B8B8;
@@ -873,7 +750,7 @@ input[type="submit"]:hover {
 }
 
 .handle {
-    cursor: move;
+  cursor: move;
   font-family: "Droid Sans",sans-serif;
   color: #555;
   font-size: 22px;
@@ -918,8 +795,8 @@ input[type="submit"]:hover {
 }
 
 #legal {
-   display: inline-block;
-   cursor: pointer;
+  display: inline-block;
+  cursor: pointer;
 }
 
 #leafcatlogo {
@@ -928,6 +805,6 @@ input[type="submit"]:hover {
   margin-right: 4px;
   height: 25px;
   width: 25px;
-  background: url('http://leafc.at/assets/img/leafcat-avatar.png') no-repeat;
+  background: url('./images/leafcat-avatar.png') no-repeat;
   background-size: 100% 100%;
 }
