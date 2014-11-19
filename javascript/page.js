@@ -253,7 +253,7 @@ $(function(){
           var joinchannel = JSON.parse(response);
           
           if(channeltype === "public") {
-            if(joinchannel["username"]) {
+            if(!joinchannel["username"]) {
               loadChannel(channelid, channeltitle, false, username);
             }
             else {
@@ -263,7 +263,7 @@ $(function(){
           }
           else {
             if(joinchannel["password"]) {
-              if(joinchannel["username"]) {
+              if(!joinchannel["username"]) {
                 loadChannel(channelid, channeltitle, password, username);
               }
               else {
@@ -394,6 +394,7 @@ $(function(){
         // --- webRTC/PeerJS ---
         peer = new Peer(username, {host: "sync.rrerr.net", port: 443, secure: true});
         peer.on("open", function(id) {
+          $("#userstatistics").append("<div class='statuser " + id + "'><div class='peerusername'>" + id + "</div><div class='buffer'><div class='bufferbar'></div></div><div class='time'></div></div>");
           console.log("CREATED PEER", id);
           getPeers(id);
           var data = "peerid=" + id + "&channelID=" + channelid + "&password=" + password + "&action=newpeer";
@@ -407,6 +408,7 @@ $(function(){
         peer.on("connection", function(receive) {
           receive.on("close", function() {
             console.log("PEER DISCONNECTED", receive.peer);
+            $("#userstatistics").children("." + receive.peer).remove();
             var length = conn.length;
             for (var i = 0; i < length; i++) {
               if(conn[i]["peer"] === receive.peer) {
@@ -472,11 +474,13 @@ $(function(){
                 receiveChat(data);
                 break;
               case "UPDATESTATS":
+                updatestats(receive.peer, data);
                 break;
             } // handle received data
           });
             
           receive.on("open", function() {
+            $("#userstatistics").append("<div class='statuser " + receive.peer + "'><div class='peerusername'>" + receive.peer + "</div><div class='buffer'><div class='bufferbar'></div></div><div class='time'></div></div>");
             var length = conn.length;
             var connectnew = false;
             if(length > 0) {
@@ -907,6 +911,12 @@ $(function(){
           var seconds = ("0" + Math.floor(videoplayer.currentTime()) % 60).slice(-2); // get rest and convert to 2 digit string (using Math.floor here to not end up with 2:60 or some shit)
           var time = minutes + ":" + seconds; // create time string var
           
+          var userstats = $("#userstatistics").children("." + peer.id);
+          userstats.children(".time").text(time);
+          userstats.children(".buffer").text(buffered + "%");
+          userstats.children(".buffer").append("<div class='bufferbar'></div>");
+          userstats.children(".buffer").children(".bufferbar").css({"width": buffered + "%"});
+          
           var peerData = {
             action: "UPDATESTATS",
             buffered: buffered,
@@ -916,6 +926,14 @@ $(function(){
           
           setTimeout(pushStats, 1000); // call every second
         })(); //invoke function immediately
+        
+        function updatestats(peer, data) {
+          var userstats =  $("#userstatistics").children("." + peer);
+          userstats.children(".time").text(data.time);
+          userstats.children(".buffer").text(data.buffered + "%");
+          userstats.children(".buffer").append("<div class='bufferbar'></div>");
+          userstats.children(".buffer").children(".bufferbar").css({"width": data.buffered + "%"});
+        }
         
       });
     });
