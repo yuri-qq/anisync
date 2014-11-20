@@ -392,7 +392,7 @@ $(function(){
         }
         
         // --- webRTC/PeerJS ---
-        peer = new Peer(username, {host: "sync.rrerr.net", port: 443, secure: true});
+        peer = new Peer(username, PEER_SERVER);
         peer.on("open", function(id) {
           $("#userstatistics").append("<div class='statuser " + id + "'><div class='peerusername'>" + id + "</div><div class='buffer'><div class='bufferbar'></div></div><div class='time'></div></div>");
           console.log("CREATED PEER", id);

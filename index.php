@@ -18,6 +18,7 @@
     <script type="text/javascript" src="https://code.jquery.com/ui/1.11.2/jquery-ui.min.js"></script>
     <script type="text/javascript" src="javascript/video-js/video.dev.js"></script>
     <script type="text/javascript" src="javascript/peer.js"></script>
+     <script type="text/javascript" src="javascript/config.js"></script>
     <script type="text/javascript" src="javascript/page.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css" />
   </head>
