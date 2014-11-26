@@ -18,16 +18,18 @@
     <script type="text/javascript" src="https://code.jquery.com/ui/1.11.2/jquery-ui.min.js"></script>
     <script type="text/javascript" src="javascript/video-js/video.dev.js"></script>
     <script type="text/javascript" src="javascript/peer.js"></script>
-     <script type="text/javascript" src="javascript/config.js"></script>
+    <script type="text/javascript" src="javascript/config.js"></script>
     <script type="text/javascript" src="javascript/page.js"></script>
-    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link rel="stylesheet" type="text/css" href="style/style.css" />
+    <link id="light" rel="stylesheet" type="text/css" href="style/light.css" title="light" />
+    <link id="dark" rel="alternate stylesheet" type="text/css" href="style/dark.css" title="dark" />
   </head>
   <body>
     <div id="wrapper">
     
       <div id="header">
         <div id="logo">
-          <a href="https://sync.grzb.de/"><p id="grzb">GRZB</p><p id="sep">|</p><p id="synch">SYNC</p></a>
+          <a href="https://sync.grzb.de/"><p id="grzb">GRZB</p><p id="sep">|</p><p id="sync">SYNC</p></a>
         </div>
       </div>
       
@@ -95,7 +97,7 @@
       </div>
       
       <div id="footer">
-        <div id="legal">Legal Notice</div> · <a href="http://leafc.at"><div id="leafcatlogo"></div>Leafcat Coding</a> · <a href="https://github.com/Leafcat/sync">GitHub project page</a>
+        <div id="legal">Legal Notice</div> · <a href="http://leafc.at"><div id="leafcatlogo"></div>Leafcat Coding</a> · <a href="https://github.com/Leafcat/sync">GitHub project page</a> · <div id="changetheme">Turn off the lights</div> 
       </div>
       
     </div>

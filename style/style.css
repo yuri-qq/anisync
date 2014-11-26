@@ -17,13 +17,13 @@ body>iframe {
 body, html  {
   height: 100%;
   font-family: "proxima-nova",sans-serif;
-  color: #333;
+  overflow: auto;
 }
 
 select {
   padding: 5px;
   font-size: 15px;
-  border: 1px solid #b8b8b8;
+  border: 1px solid;
   resize: none;
   -moz-box-shadow: inset 1px 1px 5px #ccc;
   box-shadow: inset 1px 1px 5px #ccc;
@@ -49,7 +49,7 @@ select:hover{
 input[type="text"], input[type="password"]  {
   padding: 6px;
   font-size: 16px;
-  border: 1px solid #B8B8B8;
+  border: 1px solid;
   box-shadow: 1px 1px 5px #CCC inset;
   
   -webkit-transition: all 300ms ease;
@@ -62,7 +62,7 @@ input[type="text"], input[type="password"]  {
 input[type="text"]:focus, input[type="password"]:focus {
   -moz-box-shadow: inset 3px 3px 5px #ccc;
   box-shadow: inset 3px 3px 5px #ccc;
-      
+
   -webkit-transition: all 400ms ease;
   -moz-transition: all 400ms ease;
   -ms-transition: all 400ms ease;
@@ -71,10 +71,10 @@ input[type="text"]:focus, input[type="password"]:focus {
 }
 
 input[type="submit"] {
-    text-align: center;
+  text-align: center;
   padding: 6px;
   font-size: 16px;
-    cursor: pointer;
+  cursor: pointer;
   
   -webkit-transition: all 300ms ease;
   -moz-transition: all 300ms ease;
@@ -84,7 +84,7 @@ input[type="submit"] {
 }
 
 input[type="submit"]:hover {
-    box-shadow: 2px 2px 5px #535353 inset;
+  box-shadow: 2px 2px 5px #535353 inset;
   
   -webkit-transition: all 400ms ease;
   -moz-transition: all 400ms ease;
@@ -94,7 +94,6 @@ input[type="submit"]:hover {
 }
 
 .anchor{
-  color: #333;
   text-decoration: none;
   display: inline-block;
 }
@@ -103,13 +102,11 @@ input[type="submit"]:hover {
   min-height: 100%;
   min-width: 800px;
   position: relative;
-  background-image: url(./images/bg.jpg);
 }
 
 #header {
   height: 100px;
   width: 100%;
-  background-color: #4863A0;
   padding-top: 10px;
 }
 
@@ -135,16 +132,13 @@ input[type="submit"]:hover {
 }
 
 #grzb {
-  color: #D3D3D3;
 }
 
 #sep {
-  color: #D3D3D3;
   top: -10px;
 }
 
-#synch {
-  color: white;
+#sync {
 }
 
 #systemmsg {
@@ -157,8 +151,7 @@ input[type="submit"]:hover {
   text-align: center;
   line-height: 45px;
   vertical-align: middle;
-  border: 1px solid grey;
-  background-color: lightgrey;
+  border: 1px solid;
   z-index: 2;
 }
 
@@ -172,7 +165,7 @@ input[type="submit"]:hover {
   overflow-y: scroll;
   z-index: 2;
   background-color: white;
-  border: 1px #B8B8B8 solid;
+  border: 1px solid;
   -moz-box-shadow:5px 5px 5px rgba(0,0,0,0.3);
   -webkit-box-shadow:5px 5px 5px rgba(0,0,0,0.3);
   box-shadow:5px 5px 5px rgba(0,0,0,0.3);
@@ -184,7 +177,6 @@ input[type="submit"]:hover {
 }
 
 .error {
-  color: #EB3B3B;
 }
 
 #content {
@@ -210,8 +202,7 @@ input[type="submit"]:hover {
   height: 40px;
   margin: 0 auto;
   margin-bottom: 20px;
-  background-color: white;
-  border: 1px solid #333;
+  border: 1px solid;
   cursor: pointer;
   -webkit-transition: all 300ms ease;
   -moz-transition: all 300ms ease;
@@ -236,8 +227,7 @@ input[type="submit"]:hover {
   flex-shrink: 0;
   height: 40px;
   width: 60px;
-  border-right: 1px solid #333;
-  background-color: #F08080;
+  border-right: 1px solid;
   text-align: center;
   line-height: 40px;
   vertical-align: middle;
@@ -247,8 +237,7 @@ input[type="submit"]:hover {
   flex-shrink: 0;
   height: 40px;
   width: 60px;
-  border-right: 1px solid #333;
-  background-color: lightgreen;
+  border-right: 1px solid;
   text-align: center;
   line-height: 40px;
   vertical-align: middle;
@@ -269,7 +258,7 @@ input[type="submit"]:hover {
   flex-shrink: 0;
   height: 40px;
   width: 80px;
-  border-left: 1px solid #333;
+  border-left: 1px solid;
   text-align: center;
   line-height: 40px;
   vertical-align: middle;
@@ -307,9 +296,8 @@ input[type="submit"]:hover {
   margin-top: 10px;
   width: 100%;
   height: 35px;
-  background-color: #e38b1e;
   color: white;
-  border: 1px solid #B8B8B8;
+  border: 1px solid;
   cursor: pointer;
   line-height: 35px;
   vertical-align: middle;
@@ -340,8 +328,7 @@ input[type="submit"]:hover {
   margin-left: -142px;
   margin-top: -155px;
   padding: 10px;
-  background-color: white;
-  border: 1px solid black;
+  border: 1px solid;
   z-index: 1;
   display: none;
   -webkit-box-sizing: border-box;
@@ -354,9 +341,8 @@ input[type="submit"]:hover {
 }
 
 #createchanneloverlay input[type=submit] {
-  background-color: #e38b1e;
   color: white;
-  border: 1px solid #B8B8B8;
+  border: 1px solid;
   margin-top: 5px;
   width: 264px;
 }
@@ -370,8 +356,7 @@ input[type="submit"]:hover {
   margin-left: -140px;
   margin-top: -75px;
   padding: 10px;
-  background-color: white;
-  border: 1px solid black;
+  border: 1px solid;
   z-index: 1;
   display: none;
   -webkit-box-sizing: border-box;
@@ -388,9 +373,7 @@ input[type="submit"]:hover {
 }
 
 #joinchanneloverlay input[type=submit] {
-  background-color: #e38b1e;
-  color: white;
-  border: 1px solid #B8B8B8;
+  border: 1px solid;
   margin-top: 5px;
   width: 264px;
 }
@@ -428,8 +411,10 @@ input[type="submit"]:hover {
 
 #videocontainer {
   position: absolute;
-  top: 0; bottom: 0; right: 0; left: 0;
-  background-color: black;
+  top: 0; 
+  bottom: 0; 
+  right: 0; 
+  left: 0;
 }
 
 #video {
@@ -458,7 +443,6 @@ input[type="submit"]:hover {
 #chatboxwrapper {
   width: 100%;
   overflow-y: scroll;
-  background-color: white;
 }
 
 #chatbox {
@@ -470,29 +454,29 @@ input[type="submit"]:hover {
   box-shadow: inset 0 0 4px #000000;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
-  box-sizing: border-box; 
-  word-break: break-all;
+  box-sizing: border-box;
+ 
 }
 
 .username {
-  display: inline-block;
   font-weight: bold;
 }
 
 .chattext {
   display: inline-block;
   margin-left: 3px;
+  word-wrap: break-word;
+  width: 100%;
 }
 
 #chatusers {
-  background: white;
   font-size: 14px;
   width: 200px;
   overflow-y: scroll;
 }
 
 .chatuser {
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid;
   padding-top: 5px;
   padding-bottom: 5px;
   text-align: center;
@@ -508,7 +492,6 @@ input[type="submit"]:hover {
 }
 
 .chatuser:hover {
-  background-color: lightgrey;
   -webkit-transition: all 400ms ease;
   -moz-transition: all 400ms ease;
   -ms-transition: all 400ms ease;
@@ -532,12 +515,11 @@ input[type="submit"]:hover {
   width: 200px;
   height: 35px;
   text-align: center;
-  border: 1px solid #B8B8B8;
+  border: 1px solid;
   border-left: none;
   color: white;
   line-height: 35px;
   vertical-align: middle;
-  background-color: #e38b1e;
   cursor: pointer;
   transition: all 300ms ease 0s;
 }
@@ -552,7 +534,7 @@ input[type="submit"]:hover {
   height: 30px;
   width: 30px;
   margin-left: 17px;
-  background-image: url(./images/maximize.png);
+  background-image: url(./../images/maximize.png);
   cursor: pointer;
 }
 
@@ -595,7 +577,7 @@ input[type="submit"]:hover {
   height: 30px;
   margin: 0 auto;
   background-color: white;
-  border: 1px solid lightgrey;
+  border: 1px solid;
   text-align: center;
   vertical-align: middle;
   line-height: 30px;
@@ -613,7 +595,7 @@ input[type="submit"]:hover {
 
 .peerusername {
   width: 30%;
-  border-right: 1px solid lightgrey;
+  border-right: 1px solid;
 }
 
 .buffer {
@@ -625,12 +607,11 @@ input[type="submit"]:hover {
   height: 2px;
   width: 0%;
   top: -4px;
-  background-color: #3498db;
 }
 
 .time {
   width: 20%;
-  border-left: 1px solid lightgrey;
+  border-left: 1px solid;
 }
 
 #playlist {
@@ -645,10 +626,9 @@ input[type="submit"]:hover {
 
 #addmedia {
   float: left;
-  background-color: #E38B1E;
   color: white;
-  border: 1px solid #B8B8B8;
-  height: 32px;
+  border: 1px solid;
+  height: 31px;
   width: 70px;
   text-align: center;
   vertical-align: middle;
@@ -665,15 +645,14 @@ input[type="submit"]:hover {
 
 #addmediainfo {
   float: left;
-  height: 32px;
-  width: 32px;
+  height: 31px;
+  width: 31px;
   margin-left: 3px;
   line-height: 32px;
   text-align: center;
   vertical-align: middle;
-  background-color: lightgrey;
   cursor: pointer;
-  border: 1px #B8B8B8 solid;
+  border: 1px solid;
 }
 
 .seperator {
@@ -681,7 +660,6 @@ input[type="submit"]:hover {
   width: 100%;
   margin-top: 10px;
   margin-bottom: 10px;
-  background-color: grey;
 }
 
 .mediainfotext {
@@ -692,12 +670,11 @@ input[type="submit"]:hover {
 
 .mediainfotextgrey {
   display: inline-block;
-  color: lightgrey;
 }
 
 #linklogo {
   display: inline-block;
-  background: url('./images/link.png') no-repeat;
+  background: url('./../images/link.png') no-repeat;
   width: 20px;
   height: 20px;
   background-size: 100% 100%;
@@ -712,7 +689,7 @@ input[type="submit"]:hover {
 }
 
 #nicologo {
-  background: url('./images/nicovideo.png') no-repeat;
+  background: url('./../images/nicovideo.png') no-repeat;
   background-size: 100% 100%;
   width: 231px;
   height: 62px;
@@ -745,11 +722,11 @@ input[type="submit"]:hover {
 #addmediainfodiv {
   position: fixed;
   display: none;
-  width: 65%;
+  left: 10%;
+  right: 10%;
   max-height: 60%;
   overflow-y: scroll;
   z-index: 2;
-  background-color: white;
   border: 1px #B8B8B8 solid;
   -moz-box-shadow:5px 5px 5px rgba(0,0,0,0.3);
   -webkit-box-shadow:5px 5px 5px rgba(0,0,0,0.3);
@@ -767,13 +744,14 @@ input[type="submit"]:hover {
   overflow-y: scroll;
   list-style-type: none;
   padding-left: 10px;
+  padding-bottom: 10px;
 }
 
 .plelement {
   width: 99%;
   margin-top: 10px;
   height: 40px;
-  border: 1px solid #B8B8B8;
+  border: 1px solid;
 }
 
 .mediafile {
@@ -791,8 +769,7 @@ input[type="submit"]:hover {
   float: right;
   width: 50px;
   height: 40px;
-  background-color: #FF5656;
-  border-left: 1px solid #B8B8B8;
+  border-left: 1px solid;
   text-align: center;
   vertical-align: middle;
   line-height: 40px;
@@ -804,8 +781,7 @@ input[type="submit"]:hover {
   float: left;
   width: 100px;
   height: 40px;
-  background-color: #BCDAFF;
-  border-right: 1px solid #B8B8B8;
+  border-right: 1px solid;
   text-align: left;
   vertical-align: middle;
   line-height: 40px;
@@ -815,7 +791,6 @@ input[type="submit"]:hover {
 .handle {
   cursor: move;
   font-family: "Droid Sans",sans-serif;
-  color: #555;
   font-size: 22px;
   margin-left: 3px;
   -webkit-user-select: none;   
@@ -829,7 +804,6 @@ input[type="submit"]:hover {
   height: 0;
   border-style: solid;
   border-width: 10px 0 10px 20px;
-  border-color: transparent transparent transparent #000000;
   margin-top: 10px;
   margin-right: 5px;
   display: none;
@@ -845,19 +819,16 @@ input[type="submit"]:hover {
   position: absolute;
   bottom: 0;
   left: 0;
-  background-color: #4863A0;
   text-align: center;
-  color: white;
   vertical-align: middle;
   line-height: 50px;
 }
 
 #footer a {
-  color: #FFFFFF;
   text-decoration: none;
 }
 
-#legal {
+#footer div {
   display: inline-block;
   cursor: pointer;
 }
@@ -868,6 +839,6 @@ input[type="submit"]:hover {
   margin-right: 4px;
   height: 25px;
   width: 25px;
-  background: url('./images/leafcat-avatar.png') no-repeat;
+  background: url(./../images/leafcat-avatar.png) no-repeat;
   background-size: 100% 100%;
 }

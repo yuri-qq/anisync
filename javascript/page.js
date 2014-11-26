@@ -1,10 +1,5 @@
 //ur waifu is shit
 $(function(){
-  function scrollToAnchor(aid){
-    var aTag = $("a[name='"+ aid +"']");
-    $("html,body").animate({scrollTop: aTag.offset().top},"slow");
-  } // scroll to a HTML anchor smoothly
-  
   function sortByKey(array, key) {
     return array.sort(function(a, b) {
       var x = a[key];
@@ -53,17 +48,21 @@ $(function(){
     return ajax;
   } // make async ajax call
   
-  $(".german").click(function(e) {
-    e.preventDefault();
-    scrollToAnchor("german");
-  });
+  var dark = false;	
+  $("#changetheme").click(function() {
+    if(dark) {
+      $("#changetheme").text("Turn off the lights");
+      $('link[rel*=jquery]').remove();
+      dark = false;
+    }
+    else {
+      $("#changetheme").text("Turn on the lights");
+      $('head').append("<link rel='stylesheet jquery' href='style/dark.css' type='text/css' />");
+      dark = true;
+    }
+  }); // switch between light and dark page theme
   
-  $(".english").click(function(e) {
-    e.preventDefault();
-    scrollToAnchor("english");
-  });
-  
-  $("#footer").on("click", "#legal", function(e){
+  $("#footer").on("click", "#legal", function(e) {
     e.stopPropagation();
     $.ajax({url: "legal.html", dataType: "text", success: 
       function(data) {
@@ -73,19 +72,19 @@ $(function(){
     });
   });
   
-  $("#content").on("click", "#addmediainfo", function(e){
+  $("#content").on("click", "#addmediainfo", function(e) {
     e.stopPropagation();
     $("#addmediainfodiv").fadeIn();
   });
   
-  $(document).on("click", "#addmediainfodiv", function(e){
+  $(document).on("click", "#addmediainfodiv", function(e) {
     e.stopPropagation();
   });
   
   $("#joinchanneloverlay, #createchanneloverlay, #checkpassword, #privacypolicy").click(function(e) {
     e.stopPropagation();
   });
-  
+
   $(document).click(function() {
     $("#joinchanneloverlay, #createchanneloverlay, #addmediainfodiv, #privacypolicy").fadeOut();
   });
@@ -234,7 +233,9 @@ $(function(){
       e.preventDefault();
       
       var channelfree;
+      console.log(channelid);
       var clients = $("." + channelid).children(".clients").html().split("/");
+      console.log(clients);
       if(clients[1] - clients[0] > 0) {
         channelfree = true;
       }
@@ -284,8 +285,7 @@ $(function(){
       }
     });
     
-  });
-  
+  }); // showing overlay when joining a channel and validate username
   
   var peer;
   function loadChannel(channelid, channeltitle, password, username) {
@@ -320,6 +320,12 @@ $(function(){
           var length = peers.length;    
           for (var i = 0; i < length; i++) {
             var singlePeer = peer.connect(peers[i]["peerid"])
+            if(peers[i]["moderator"] == 1) {
+              singlePeer.moderator = 1;
+            }
+            else {
+              singlePeer.moderator = 0;
+            }
             connections.push(singlePeer);
           }
           conn = connections;
@@ -394,6 +400,7 @@ $(function(){
         // --- webRTC/PeerJS ---
         peer = new Peer(username, PEER_SERVER);
         peer.on("open", function(id) {
+          $("#chatusers").append("<div class='chatuser " + id + "'>" + id + "</div>");
           $("#userstatistics").append("<div class='statuser " + id + "'><div class='peerusername'>" + id + "</div><div class='buffer'><div class='bufferbar'></div></div><div class='time'></div></div>");
           console.log("CREATED PEER", id);
           getPeers(id);
@@ -402,12 +409,12 @@ $(function(){
           newpeer.fail(function(jqXHR, textStatus, errorThrown) {
             console.log("INSERTING NEW PEER FAILED", errorThrown);
           });
-          updateChatusers();
         });
 
         peer.on("connection", function(receive) {
           receive.on("close", function() {
             console.log("PEER DISCONNECTED", receive.peer);
+            $("#chatusers").children("." + receive.peer).remove();
             $("#userstatistics").children("." + receive.peer).remove();
             var length = conn.length;
             for (var i = 0; i < length; i++) {
@@ -416,7 +423,6 @@ $(function(){
               }
             }
             deletePeer(receive.peer);
-            updateChatusers();
           });
           
           receive.on("data", function(data) {
@@ -480,6 +486,7 @@ $(function(){
           });
             
           receive.on("open", function() {
+            $("#chatusers").append("<div class='chatuser " + receive.peer + "'>" + receive.peer + "</div>");
             $("#userstatistics").append("<div class='statuser " + receive.peer + "'><div class='peerusername'>" + receive.peer + "</div><div class='buffer'><div class='bufferbar'></div></div><div class='time'></div></div>");
             var length = conn.length;
             var connectnew = false;
@@ -511,10 +518,13 @@ $(function(){
                 }
               }
             }
-            updateChatusers();
           });
         });
-          
+        
+        $(window).on('beforeunload', function() { // before the page is closed
+          peer.destroy(); // closing connection to the signalling server gracefully 
+        });
+        
         peer.on("error", function(err) {
           switch(err.type) {
             case "browser-incompatible":
@@ -738,7 +748,7 @@ $(function(){
           if(mediaelements.length === 0) {
             videoplayer.src(videoobj["url"]);
             mediaelements.push({id: nextid, title: videoobj["title"], url: videoobj["url"], playing: true});
-            $(".plelement").first().css({"border-color": "#9ecaed", "box-shadow": "0 0 10px #9ecaed"});
+            $(".plelement").first().css({"box-shadow": "0 0 10px #9ecaed"});
             videoplayer.show();
           }
           else {
@@ -773,7 +783,7 @@ $(function(){
           for(var i = 0; i < length; i++) {
             if(mediaelements[i]["playing"]) {
               mediaelements[i]["playing"] = false;
-              $("." + mediaelements[i]["id"]).css({"border-color": "#B8B8B8", "box-shadow": "none"});
+              $("." + mediaelements[i]["id"]).css({"box-shadow": "none"});
               play = i + 1;
             }
           }
@@ -781,7 +791,7 @@ $(function(){
             play = 0;
           }
           mediaelements[play]["playing"] = true;
-          $("." + mediaelements[play]["id"]).css({"border-color": "#9ecaed", "box-shadow": "0 0 10px #9ecaed"});
+          $("." + mediaelements[play]["id"]).css({"box-shadow": "0 0 10px #9ecaed"});
           videoplayer.currentTime(0);
           videoplayer.src(mediaelements[play]["url"]);
           videoReady = 0;
@@ -793,10 +803,10 @@ $(function(){
             if(mediaelements[i]["id"] === id && mediaelements[i]["playing"] === false) {
               for(var i2 = 0; i2 < length; i2++) {
                 mediaelements[i2]["playing"] = false;
-                $("." + mediaelements[i2]["id"]).css({"border-color": "#B8B8B8", "box-shadow": "none"});
+                $("." + mediaelements[i2]["id"]).css({"box-shadow": "none"});
               }
               mediaelements[i]["playing"] = true;
-              $("." + mediaelements[i]["id"]).css({"border-color": "#9ecaed", "box-shadow": "0 0 10px #9ecaed"});
+              $("." + mediaelements[i]["id"]).css({"box-shadow": "0 0 10px #9ecaed"});
               videoplayer.currentTime(0);
               videoplayer.src(mediaelements[i]["url"]);
               videoReady = 0;
@@ -867,15 +877,6 @@ $(function(){
             sendChat();
           }
         });
-        
-        function updateChatusers() {
-          var usershtml = "<div class='chatuser " + peer["id"] + "'>" + peer["id"] + "</div>";
-          var length = conn.length;
-          for (var i = 0; i < length; i++) {
-            usershtml = usershtml + "<div class='chatuser " + conn[i]["peer"] + "'>" + conn[i]["peer"] + "</div>";
-          }
-          $("#chatusers").html(usershtml);
-        }
         
         function sendChat() {
           var text = $("#chatinput").val();
