@@ -233,9 +233,7 @@ $(function(){
       e.preventDefault();
       
       var channelfree;
-      console.log(channelid);
       var clients = $("." + channelid).children(".clients").html().split("/");
-      console.log(clients);
       if(clients[1] - clients[0] > 0) {
         channelfree = true;
       }
@@ -413,16 +411,18 @@ $(function(){
 
         peer.on("connection", function(receive) {
           receive.on("close", function() {
-            console.log("PEER DISCONNECTED", receive.peer);
-            $("#chatusers").children("." + receive.peer).remove();
-            $("#userstatistics").children("." + receive.peer).remove();
-            var length = conn.length;
-            for (var i = 0; i < length; i++) {
-              if(conn[i]["peer"] === receive.peer) {
-                conn.splice(i, 1);
+            if(!pageunload) { // only remove peers when not closing the page since the close event fires for all peers on page unload/peer.destroy()
+              console.log("PEER DISCONNECTED", receive.peer);
+              $("#chatusers").children("." + receive.peer).remove();
+              $("#userstatistics").children("." + receive.peer).remove();
+              var length = conn.length;
+              for (var i = 0; i < length; i++) {
+                if(conn[i]["peer"] === receive.peer) {
+                  conn.splice(i, 1);
+                }
               }
+              deletePeer(receive.peer);
             }
-            deletePeer(receive.peer);
           });
           
           receive.on("data", function(data) {
@@ -521,7 +521,9 @@ $(function(){
           });
         });
         
+        var pageunload = false;
         $(window).on('beforeunload', function() { // before the page is closed
+          pageunload = true;
           peer.destroy(); // closing connection to the signalling server gracefully 
         });
         
@@ -568,7 +570,7 @@ $(function(){
               break;
           } 
         }); // print WebRTC errors to console
-        
+
         function sendData(peerData) {
           var length = conn.length;
           for (var i = 0; i < length; i++) {
