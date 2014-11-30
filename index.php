@@ -23,13 +23,36 @@
     <link rel="stylesheet" type="text/css" href="style/style.css" />
     <link id="light" rel="stylesheet" type="text/css" href="style/light.css" title="light" />
     <link id="dark" rel="alternate stylesheet" type="text/css" href="style/dark.css" title="dark" />
+    <link rel="stylesheet" type="text/css" href="style/spinner.css" />
   </head>
   <body>
     <div id="wrapper">
-    
       <div id="header">
         <div id="logo">
           <a href="https://sync.grzb.de/"><p id="grzb">GRZB</p><p id="sep">|</p><p id="sync">SYNC</p></a>
+        </div>
+      </div>
+      
+      <div id="loading">
+        <div class="spinner">
+          <div class="spinner-container container1">
+            <div class="circle1"></div>
+            <div class="circle2"></div>
+            <div class="circle3"></div>
+            <div class="circle4"></div>
+          </div>
+          <div class="spinner-container container2">
+            <div class="circle1"></div>
+            <div class="circle2"></div>
+            <div class="circle3"></div>
+            <div class="circle4"></div>
+          </div>
+          <div class="spinner-container container3">
+            <div class="circle1"></div>
+            <div class="circle2"></div>
+            <div class="circle3"></div>
+            <div class="circle4"></div>
+          </div>
         </div>
       </div>
       
@@ -88,7 +111,6 @@
         <div id="description">
           GRZB|SYNC is a website where you watch and listen to media files together with your friends all over the world!
           You can add media files from various sources or with a direct link to the file.
-          To get started just create a channel or register for free to unlock some additional features.
           <div id="createchannel">Create a channel</div>
         </div>
         <div class="clear"></div>

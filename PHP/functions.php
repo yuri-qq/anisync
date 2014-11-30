@@ -17,41 +17,70 @@
     
     return $taken;
   }
-
-  if($_POST['action'] == 'getChannels') {
+  
+  function checkChannel($channel) {
     require_once("config/db.php");
     $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-    $stmt = $db->prepare("SELECT * FROM channels ORDER BY id DESC");
+    $stmt = $db->prepare("SELECT id FROM channels WHERE channelname=?");
+    $stmt->bind_param('s', $channel);
     $stmt->execute();
-    $stmt->bind_result($id, $channelname, $private, $pwhash, $clients, $maxclients, $keepalive);
-    $i = 0;
-    $channels = array();
-    $delete = array();
-    $updatekeepalive = time();
-    while($stmt->fetch()) {
-      if($updatekeepalive - $keepalive < 10) {
-        $channels[$i]['id'] = $id;
-        $channels[$i]['name'] = $channelname;
-        $channels[$i]['private'] = $private;
-        $channels[$i]['clients'] = $clients;
-        $channels[$i]['maxclients'] = $maxclients;
-        $i = $i + 1;
-      }
-      else {
-        $delete[] = $id;
-      }
+    $stmt->store_result();
+    $numrows = $stmt->num_rows;
+    if($numrows < 1) {
+      $taken = false;
     }
-    foreach($delete AS $deleteid) {
-      $stmt = $db->prepare("DELETE FROM channels WHERE id =? LIMIT 1");
-      $stmt->bind_param('i',  $deleteid);
-      $stmt->execute();
-          
-      $stmt = $db->prepare("DELETE FROM peers WHERE channel =?");
-      $stmt->bind_param('i', $deleteid);
-      $stmt->execute();
-    } 
+    else {
+      $taken = true;
+    }
     $stmt->close();
     
+    return $taken;
+  }
+  
+  if($_POST['action'] == 'getChannels') {
+    $oldchannels = json_decode($_POST["oldchannels"], true);
+    require_once("config/db.php");
+    $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+    
+    $newchannels = false;
+    while(!$newchannels) {
+      $stmt = $db->prepare("SELECT * FROM channels ORDER BY id DESC");
+      $stmt->execute();
+      $stmt->bind_result($id, $channelname, $private, $pwhash, $clients, $maxclients, $keepalive);
+      $i = 0;
+      $channels = array();
+      $delete = array();
+      $updatekeepalive = time();
+      while($stmt->fetch()) {
+        if($updatekeepalive - $keepalive < 10) {
+          $channels[$i]['id'] = $id;
+          $channels[$i]['name'] = $channelname;
+          $channels[$i]['private'] = $private;
+          $channels[$i]['clients'] = $clients;
+          $channels[$i]['maxclients'] = $maxclients;
+          $i = $i + 1;
+        }
+        else {
+          $delete[] = $id;
+        }
+      }
+      foreach($delete AS $deleteid) {
+        $stmt = $db->prepare("DELETE FROM channels WHERE id =? LIMIT 1");
+        $stmt->bind_param('i',  $deleteid);
+        $stmt->execute();
+            
+        $stmt = $db->prepare("DELETE FROM peers WHERE channel =?");
+        $stmt->bind_param('i', $deleteid);
+        $stmt->execute();
+      }
+
+      if($channels != $oldchannels || count($delete) > 0) {
+        $newchannels = true;
+      }
+      usleep(500000);
+    }
+
+    $stmt->close();
     print(json_encode($channels));
   }
   
@@ -83,9 +112,10 @@
   }
   
   if($_POST['action'] == 'createChannel') {
-    $username = $_POST['username'];
-    $taken = checkUsername($username);
-    if(!$taken) {
+    $usertaken = checkUsername($_POST['username']);
+    $channeltaken = checkChannel($_POST['channelname']);
+    $return = array();
+    if(!$usertaken && !$channeltaken) {
       require_once("config/db.php");
       $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
@@ -97,6 +127,7 @@
       while($stmt->fetch()) {
         $nextid = $id + 1;
       }
+
       $channelname = htmlentities($_POST['channelname']);
       $maxclients = htmlentities($_POST['maxclients']);
       if(ctype_digit($maxclients)) {
@@ -120,12 +151,16 @@
         $stmt->execute();
         $stmt->close();
         
-        $return = $nextid;
+        $return["id"] = $nextid;
+        $return["usertaken"] = false;
+        $return["channelnametaken"] = false;
       }
     }
     else {
-      $return = false;
+      $return["usertaken"] = $usertaken;
+      $return["channelnametaken"] = $channeltaken;
     }
+    
     echo json_encode($return);
   }
   
@@ -230,22 +265,30 @@
   }
   
   if($_POST['action'] == 'keepalive') {
+    $time_start = microtime(true);
+    $execution_time = 0;
+    
     require_once("config/db.php");
-     
     $channelID = $_POST['channelID'];
-    $updatekeepalive = time();
     $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
     
-    $stmt = $db->prepare("SELECT * FROM peers WHERE channel =?");
-    $stmt->bind_param('i', $channelID);
-    $stmt->execute();
-    $stmt->store_result();
-    $stmt->bind_result($id, $peerid, $channel);
-    $clients = $stmt->num_rows;
+    while($execution_time < 25) {
+      $stmt = $db->prepare("SELECT * FROM peers WHERE channel =?");
+      $stmt->bind_param('i', $channelID);
+      $stmt->execute();
+      $stmt->store_result();
+      $stmt->bind_result($id, $peerid, $channel);
+      $clients = $stmt->num_rows;
+      
+      $updatekeepalive = time();
+      $stmt = $db->prepare("UPDATE channels SET keepalive =?, clients=? WHERE id =?");
+      $stmt->bind_param('iii', $updatekeepalive, $clients, $channelID);
+      $stmt->execute();
 
-    $stmt = $db->prepare("UPDATE channels SET keepalive =?, clients=? WHERE id =?");
-    $stmt->bind_param('iii', $updatekeepalive, $clients, $channelID);
-    $stmt->execute();
+      sleep(1);
+
+      $execution_time = (microtime(true) - $time_start) / 60;
+    }
     
     $stmt->close();
   }

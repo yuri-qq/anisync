@@ -109,17 +109,23 @@ $(function(){
     var serializedData = form.serialize() + "&action=createChannel";
     var createchannel = postAjax("PHP/functions.php", serializedData);
     createchannel.done(function(response) {
-      var channelid = JSON.parse(response);
-      if(channelid !== false) {
-        $("#createchanneloverlay").fadeOut();
-        var username = $("#channelusername").val();
-        var password = $("#channelpassword").val();
-        var channeltitle = $("#channelname").val();
-        if(password === "") {
-          loadChannel(channelid, channeltitle, false, username);
+      var channelinfo = JSON.parse(response);
+      if(!channelinfo["usertaken"]) {
+        if(!channelinfo["channelnametaken"]) {
+          $("#createchanneloverlay").fadeOut();
+          var username = $("#channelusername").val();
+          var password = $("#channelpassword").val();
+          var channeltitle = $("#channelname").val();
+          if(password === "") {
+            loadChannel(channelinfo["id"], channeltitle, false, username);
+          }
+          else {
+            loadChannel(channelinfo["id"], channeltitle, password, username);
+          }
         }
         else {
-          loadChannel(channelid, channeltitle, password, username);
+          $("#systemmsg").html("System message: This channel name is already in use.");
+          $("#systemmsg").fadeIn().delay(3000).fadeOut();
         }
       }
       else {
@@ -134,21 +140,23 @@ $(function(){
   
   var channels;
   var notinchannel = true;
+  var oldchannels = JSON.stringify(new Array());
   (function getChannels() {
-    var getChannelsCall = postAjax("PHP/functions.php", "action=getChannels");
+    var getChannelsCall = postAjax("PHP/functions.php", "action=getChannels&oldchannels=" + oldchannels); // poll until new data is returned
     getChannelsCall.done(function(response) {
+      oldchannels = response;
       channels = JSON.parse(response);
       displayChannels();
     });
     getChannelsCall.fail(function(jqXHR, textStatus, errorThrown) {
-      console.log("GET CHANNELS FAILED: " + errorThrown);
+      console.log("GET CHANNELS FAILED:", errorThrown);
     });
     getChannelsCall.always(function() {
       if(notinchannel) {
-        setTimeout(getChannels, 5000);
+        setTimeout(getChannels, 1000); // start a new POST request
       }
     });
-  }());
+  }()); //invoke function immediately
   
   function displayChannels() {
     if(channels && notinchannel) {
@@ -253,16 +261,18 @@ $(function(){
           
           if(channeltype === "public") {
             if(!joinchannel["username"]) {
+              $("#loading").fadeIn(); // show loading animation while joining channel
               loadChannel(channelid, channeltitle, false, username);
             }
             else {
               $("#systemmsg").html("System message: This username is already in use.");
               $("#systemmsg").fadeIn().delay(3000).fadeOut();
             }
-          }
+          } 
           else {
             if(joinchannel["password"]) {
               if(!joinchannel["username"]) {
+                $("#loading").fadeIn(); // show loading animation while joining channel
                 loadChannel(channelid, channeltitle, password, username);
               }
               else {
@@ -298,6 +308,7 @@ $(function(){
         videoplayer.hide();
         
         $("#channeltitle").text(channeltitle);
+        console.log("INIT");
         $("#mediaelements").sortable({handle: ".handle"});
         $("#mediaelements").on("sortupdate", finishedSorting);
         
@@ -305,7 +316,7 @@ $(function(){
             var data = "channelID=" + channelid + "&action=keepalive";
             var keepalive = postAjax("PHP/functions.php", data);
             keepalive.always(function() {
-              setTimeout(keepAlive, 5000);
+              setTimeout(keepAlive, 1000);
             });
             keepalive.fail(function(jqXHR, textStatus, errorThrown) {
               console.log("FAILED TO KEEP CHANNEL ALIVE", errorThrown);
@@ -374,14 +385,15 @@ $(function(){
             $("#mediaelements").append("<li class='plelement " + mediaelements[i]['id'] + "'><div class='mediafileinfo'><span class='handle'>::</span></div><div class='removemediafile'>X</div><div class='mediafile'></div></li>");
             $("." + mediaelements[i]["id"]).children(".mediafile").text(mediaelements[i]["title"]);
           }
-          $("#mediaelements").sortable("refresh");
-
-          
           if(mediaelements.length) {
             $("." + mediaelements[playing]["id"]).css({"border-color": "#9ecaed", "box-shadow": "0 0 10px #9ecaed"});
           }
+          
+          console.log("REFRESH");
           $("#mediaelements").sortable("refresh");
+          
           console.log("LOADED CHANNEL DATA");
+          $("#loading").fadeOut(); // stop loading animation
         }
         
         function deletePeer(peerid) {
@@ -757,6 +769,8 @@ $(function(){
             mediaelements.push({id: nextid, title: videoobj["title"], url: videoobj["url"], playing: false});
           }
           nextid = nextid + 1;
+          console.log("REFRESH");
+
           $("#mediaelements").sortable("refresh");
         }
         
@@ -770,13 +784,16 @@ $(function(){
               }
               else if(mediaelements.length === 1) {
                 blocked = true;
-                videoplayer.pause();
+                blockload = true;
                 videoplayer.hide();
+                videoplayer.pause();
+                videoplayer.src("javascript/dummy.mp4");
               }
             }
           }
           mediaelements.splice(arraykey, 1);
           $("." + id).remove();
+          console.log("REFRESH");
           $("#mediaelements").sortable("refresh");
         }
         
@@ -795,8 +812,8 @@ $(function(){
           mediaelements[play]["playing"] = true;
           $("." + mediaelements[play]["id"]).css({"box-shadow": "0 0 10px #9ecaed"});
           videoplayer.currentTime(0);
-          videoplayer.src(mediaelements[play]["url"]);
           videoReady = 0;
+          videoplayer.src(mediaelements[play]["url"]);
         }
 
         function playMedia(id) {
@@ -810,15 +827,15 @@ $(function(){
               mediaelements[i]["playing"] = true;
               $("." + mediaelements[i]["id"]).css({"box-shadow": "0 0 10px #9ecaed"});
               videoplayer.currentTime(0);
-              videoplayer.src(mediaelements[i]["url"]);
               videoReady = 0;
+              videoplayer.src(mediaelements[i]["url"]);
             }
           }
         }
     
         function waitForLoaded() {
           videoReady = videoReady + 1;
-          if(videoReady === conn.length + 1 && videoplayer.paused()) {
+          if(videoReady >= conn.length + 1 && videoplayer.paused()) {
             console.log("VIDEO READY", "PLAYING");
             blocked = true;
             videoplayer.play();
@@ -839,6 +856,7 @@ $(function(){
           }
           mediaelements = newOrder;
           $("#mediaelements").html(newHTML);
+          console.log("REFRESH");
           $("#mediaelements").sortable("refresh");
         }
 
