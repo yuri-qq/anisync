@@ -77,7 +77,7 @@
       if($channels != $oldchannels || count($delete) > 0) {
         $newchannels = true;
       }
-      usleep(500000);
+      sleep(1);
     }
 
     $stmt->close();

@@ -15,7 +15,7 @@
     <meta name="page-topic" content="music, video, multimedia" />
     <link href="javascript/video-js/video-js.css" rel="stylesheet" />
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-    <script type="text/javascript" src="https://code.jquery.com/ui/1.11.2/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="javascript/jquery-ui.js"></script>
     <script type="text/javascript" src="javascript/video-js/video.dev.js"></script>
     <script type="text/javascript" src="javascript/peer.js"></script>
     <script type="text/javascript" src="javascript/config.js"></script>

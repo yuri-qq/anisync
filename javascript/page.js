@@ -605,12 +605,12 @@ $(function(){
         });
         
         videoplayer.on("pause", function() {
-          if(!blocked) {
-            var peerData = {
-              action: "PAUSE",
-              time: videoplayer.currentTime()
-            }
-            sendData(peerData);
+          if(!blocked && !videoplayer.ended()) {
+              var peerData = {
+                action: "PAUSE",
+                time: videoplayer.currentTime()
+              }
+              sendData(peerData);
           }
           else {
             blocked = false;
@@ -745,11 +745,8 @@ $(function(){
         videoplayer.on("loadeddata", function(){
           if(!blockload) {
             console.log("READY");
-            var peerData = {
-              action: "READY"
-            }
-            sendData(peerData);
             waitForLoaded();
+            sendData({action: "READY"});
           }
           else {
             blockload = false;
@@ -784,7 +781,6 @@ $(function(){
               }
               else if(mediaelements.length === 1) {
                 blocked = true;
-                blockload = true;
                 videoplayer.hide();
                 videoplayer.pause();
                 videoplayer.src("javascript/dummy.mp4");
@@ -799,21 +795,24 @@ $(function(){
         
         function nextMedia() {
           var length = mediaelements.length;
-          for(var i = 0; i < length; i++) {
-            if(mediaelements[i]["playing"]) {
-              mediaelements[i]["playing"] = false;
-              $("." + mediaelements[i]["id"]).css({"box-shadow": "none"});
-              play = i + 1;
-            }
+          if(length > 0) {
+              for(var i = 0; i < length; i++) {
+                if(mediaelements[i]["playing"]) {
+                  mediaelements[i]["playing"] = false;
+                  $("." + mediaelements[i]["id"]).css({"box-shadow": "none"});
+                  play = i + 1;
+                }
+              }
+              if(play >= mediaelements.length) {
+                play = 0;
+              }
+              mediaelements[play]["playing"] = true;
+              $("." + mediaelements[play]["id"]).css({"box-shadow": "0 0 10px #9ecaed"});
+              blocked = true;
+              videoplayer.pause();
+              videoplayer.currentTime(0);
+              videoplayer.src(mediaelements[play]["url"]);
           }
-          if(play >= mediaelements.length) {
-            play = 0;
-          }
-          mediaelements[play]["playing"] = true;
-          $("." + mediaelements[play]["id"]).css({"box-shadow": "0 0 10px #9ecaed"});
-          videoplayer.currentTime(0);
-          videoReady = 0;
-          videoplayer.src(mediaelements[play]["url"]);
         }
 
         function playMedia(id) {
@@ -826,19 +825,23 @@ $(function(){
               }
               mediaelements[i]["playing"] = true;
               $("." + mediaelements[i]["id"]).css({"box-shadow": "0 0 10px #9ecaed"});
+              blocked = true;
+              videoplayer.pause();
               videoplayer.currentTime(0);
-              videoReady = 0;
               videoplayer.src(mediaelements[i]["url"]);
             }
           }
         }
     
         function waitForLoaded() {
-          videoReady = videoReady + 1;
-          if(videoReady >= conn.length + 1 && videoplayer.paused()) {
-            console.log("VIDEO READY", "PLAYING");
-            blocked = true;
-            videoplayer.play();
+          if(mediaelements.length > 0) {
+            videoReady = videoReady + 1;
+            if(videoReady >= conn.length + 1 && videoplayer.paused()) { // if every user is ready to play the video
+              console.log("VIDEO READY", "PLAYING");
+              blocked = true;
+              videoplayer.play();
+              videoReady = 0;
+            }
           }
         }
         
