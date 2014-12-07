@@ -18,6 +18,32 @@
     return $taken;
   }
   
+  function checkPassword($channelID, $password) {
+    require_once("config/db.php");
+    $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+        
+    $stmt = $db->prepare("SELECT pwhash FROM channels WHERE id=?");
+    $stmt->bind_param('i', $channelID);
+    $stmt->execute();
+    $stmt->store_result();
+    $stmt->bind_result($pwhash);
+    while($stmt->fetch()) {
+      if($pwhash) {
+        if(password_verify($password, $pwhash)) {
+          $pwright = true;
+        }
+        else {
+          $pwright = false;
+        }
+      }
+      else {
+        $pwright = true;
+      }
+    }
+    
+    return $pwright;
+  }
+  
   function checkChannel($channel) {
     require_once("config/db.php");
     $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
@@ -85,27 +111,11 @@
   }
   
   if($_POST['action'] == 'validate') {
-    require_once("config/db.php");
-    
     $channelID = $_POST['channelID'];
     $username = $_POST['username'];
     $password = $_POST['password'];
     
-    $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-    $stmt = $db->prepare("SELECT pwhash FROM channels WHERE id=?");
-    $stmt->bind_param('i', $channelID);
-    $stmt->execute();
-    $stmt->store_result();
-    $stmt->bind_result($pwhash);
-    while($stmt->fetch()) {
-      if(password_verify($password, $pwhash)) {
-        $joinchannel["password"] = true;
-      }
-      else {
-         $joinchannel["password"] = false;
-      }
-    }
-    $stmt->close();
+    $joinchannel["password"] = checkPassword($channelID, $password);
     $joinchannel["username"] = checkUsername($username);
 
     echo json_encode($joinchannel);
@@ -164,70 +174,47 @@
     echo json_encode($return);
   }
   
-  if($_POST['action'] == 'newpeer') {
-    require_once("config/db.php");
+  if($_POST["action"] == "deletechannel") {
+    $channelID = $_POST['channelID'];
+    $password = $_POST['password'];
     
+    if(checkPassword($channelID, $password)) {
+      require_once("config/db.php");
+      $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+      $stmt = $db->prepare("DELETE FROM channels WHERE id =? LIMIT 1");
+      $stmt->bind_param('i', $channelID);
+      $stmt->execute();
+              
+      $stmt = $db->prepare("DELETE FROM peers WHERE channel =?");
+      $stmt->bind_param('i', $channelID);
+      $stmt->execute();
+      $stmt->close();
+    }
+  }
+  
+  if($_POST['action'] == 'newpeer') {
     $peerid = $_POST['peerid'];
     $channelID = $_POST['channelID'];
     $password = $_POST['password'];
-    $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
     
-    $stmt = $db->prepare("SELECT pwhash FROM channels WHERE id=?");
-    $stmt->bind_param('i', $channelID);
-    $stmt->execute();
-    $stmt->store_result();
-    $stmt->bind_result($pwhash);
-    while($stmt->fetch()) {
-      if($pwhash) {
-        if(password_verify($password, $pwhash)) {
-          $pwright = true;
-        }
-        else {
-          $pwright = false;
-        }
-      }
-      else {
-        $pwright = true;
-      }
-    }
-    
-    if($pwright) {
+    if(checkPassword($channelID, $password)) {
+      require_once("config/db.php");
+      $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
       $stmt = $db->prepare("INSERT INTO peers (peerid, channel) VALUES(?, ?)");
       $stmt->bind_param('si', $peerid, $channelID);
       $stmt->execute();
+      $stmt->close();
     }
-    $stmt->close();
   }
   
   if($_POST['action'] == 'getpeers') {
-    require_once("config/db.php");
-    
     $clientpeerid = $_POST['peerid'];
     $channelID = $_POST['channelID'];
     $password = $_POST['password'];
-    
-    $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-    
-    $stmt = $db->prepare("SELECT pwhash FROM channels WHERE id=?");
-    $stmt->bind_param('i', $channelID);
-    $stmt->execute();
-    $stmt->store_result();
-    $stmt->bind_result($pwhash);
-    while($stmt->fetch()) {
-      if($pwhash) {
-        if(password_verify($password, $pwhash)) {
-          $pwright = true;
-        }
-        else {
-          $pwright = false;
-        }
-      }
-      else {
-        $pwright = true;
-      }
-    }
-    
-    if($pwright) {
+
+    if(checkPassword($channelID, $password)) {
+      require_once("config/db.php");
+      $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
       $stmt = $db->prepare("SELECT clients, maxclients FROM channels WHERE id=?");
       $stmt->bind_param('i', $channelID);
       $stmt->execute();
@@ -259,17 +246,16 @@
         $json_con = json_encode($connections);
         echo $json_con;
       }
+      $stmt->close();
     }
-    
-    $stmt->close();
   }
   
   if($_POST['action'] == 'keepalive') {
     $time_start = microtime(true);
     $execution_time = 0;
+    $channelID = $_POST['channelID'];
     
     require_once("config/db.php");
-    $channelID = $_POST['channelID'];
     $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
     
     while($execution_time < 25) {
@@ -294,41 +280,18 @@
   }
   
   if($_POST['action'] == 'deletepeer') {
-    require_once("config/db.php");
-    
     $clientpeerid = $_POST['peerid'];
     $channelID = $_POST['channelID'];
     $password = $_POST['password'];
     
-    $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-
-    $stmt = $db->prepare("SELECT pwhash FROM channels WHERE id=?");
-    $stmt->bind_param('i', $channelID);
-    $stmt->execute();
-    $stmt->store_result();
-    $stmt->bind_result($pwhash);
-    while($stmt->fetch()) {
-      if($pwhash) {
-        if(password_verify($password, $pwhash)) {
-          $pwright = true;
-        }
-        else {
-          $pwright = false;
-        }
-      }
-      else {
-        $pwright = true;
-        
-      }
-    }
-    
-    if($pwright) {
+    if(checkPassword($channelID, $password)) {
+      require_once("config/db.php");
+      $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
       $stmt = $db->prepare("DELETE FROM peers WHERE peerid =? AND channel =? LIMIT 1");
       $stmt->bind_param('si', $clientpeerid, $channelID);
       $stmt->execute();
-    }
-    $stmt->close();
-      
+      $stmt->close();
+    } 
   }
   
   if($_POST['action'] == 'geturl') {

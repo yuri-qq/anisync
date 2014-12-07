@@ -217,6 +217,19 @@ input[type="submit"]:hover {
   box-shadow:5px 5px 5px rgba(0,0,0,0.3);
 }
 
+#download {
+  background-color: #4863A0;
+  border-color: #B8B8B8;
+}
+
+#download:hover {
+  box-shadow: 2px 2px 5px #535353 inset;
+}
+
+#download a {
+  color: #FFFFFF;
+}
+  
 .plelement {
   border-color: #B8B8B8;
 }

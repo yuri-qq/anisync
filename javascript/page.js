@@ -37,12 +37,17 @@ $(function(){
     return arraysEqual(arrayAkey,arrayBkey);
   }
   
-  function postAjax(url, data) {
+  function postAjax(url, data, async) {
+    if(typeof async === "undefined") { 
+      async = true; 
+    }
+    
     var ajax = $.ajax({
       url: url,
       type: "post",
       contentType: "application/x-www-form-urlencoded;charset=UTF-8",
-      data: data
+      data: data,
+      async: async
     });
     
     return ajax;
@@ -77,7 +82,7 @@ $(function(){
     $("#addmediainfodiv").fadeIn();
   });
   
-  $(document).on("click", "#addmediainfodiv", function(e) {
+  $(document).on("click", "#addmediainfodiv, #video_html5_api", function(e) {
     e.stopPropagation();
   });
   
@@ -323,6 +328,11 @@ $(function(){
             });
         }());
         
+        function deleteChannel() {
+          var data = "channelID=" + channelid + "&password=" + password + "&action=deletechannel";
+          postAjax("PHP/functions.php", data, false);
+        }
+        
         var conn = new Array();
         function connectPeers(peers) {
           var connections = new Array();
@@ -375,6 +385,8 @@ $(function(){
               videoplayer.src(data.playlist[i]["url"]);
               videoplayer.load();
               var playing = i;
+              $("#download").children("a").attr("href", data.playlist[i]["url"]).attr("download", data.playlist[i]["title"]);
+              $("#download").fadeIn();
             }
           }
           
@@ -536,6 +548,9 @@ $(function(){
         var pageunload = false;
         $(window).on('beforeunload', function() { // before the page is closed
           pageunload = true;
+          if(conn.length < 1) {
+            deleteChannel();
+          }
           peer.destroy(); // closing connection to the signalling server gracefully 
         });
         
@@ -591,6 +606,10 @@ $(function(){
         } // send data to all connected users
         
         // --- video player controls
+        $(document).on("contextmenu", "#video_html5_api", function() {
+          return false;
+        });
+        
         var blocked = false;
         videoplayer.on("play", function() {
           if(!blocked) {
@@ -638,7 +657,7 @@ $(function(){
             enlarged = true;
           }
         });
-        
+
         // --- playlist ---
         var videoReady = 0;
         var mediaelements = new Array();
@@ -761,6 +780,8 @@ $(function(){
             mediaelements.push({id: nextid, title: videoobj["title"], url: videoobj["url"], playing: true});
             $(".plelement").first().css({"box-shadow": "0 0 10px #9ecaed"});
             videoplayer.show();
+            $("#download").children("a").attr("href", videoobj["url"]).attr("download", videoobj["title"]);
+            $("#download").fadeIn();
           }
           else {
             mediaelements.push({id: nextid, title: videoobj["title"], url: videoobj["url"], playing: false});
@@ -780,6 +801,7 @@ $(function(){
                 nextMedia();
               }
               else if(mediaelements.length === 1) {
+                $("#download").fadeOut();
                 blocked = true;
                 videoplayer.hide();
                 videoplayer.pause();
@@ -812,6 +834,7 @@ $(function(){
               videoplayer.pause();
               videoplayer.currentTime(0);
               videoplayer.src(mediaelements[play]["url"]);
+              $("#download").children("a").attr("href", mediaelements[play]["url"]).attr("download", mediaelements[play]["title"]);
           }
         }
 
@@ -829,6 +852,7 @@ $(function(){
               videoplayer.pause();
               videoplayer.currentTime(0);
               videoplayer.src(mediaelements[i]["url"]);
+              $("#download").children("a").attr("href", mediaelements[i]["url"]).attr("download", mediaelements[i]["title"]);
             }
           }
         }
