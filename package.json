@@ -1,0 +1,30 @@
+{
+  "name": "anisync",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Yurifag",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^0.8.5",
+    "body-parser": "^1.15.0",
+    "compression": "^1.6.1",
+    "connect-redis": "^3.0.2",
+    "express": "^4.13.4",
+    "express-minify": "^0.2.0",
+    "express-session": "^1.13.0",
+    "mongoose": "^4.4.4",
+    "jade": "^1.11.0",
+    "shortid": "^2.2.4",
+    "socket.io": "^1.4.5",
+    "stylus": "^0.53.0",
+    "youtube-dl": "^1.10.5"
+  },
+  "devDependencies": {
+    "morgan": "^1.7.0"
+  },
+  "description": "AniSync - a service to synchronize media playback between browsers."
+}

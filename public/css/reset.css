@@ -1,0 +1,13 @@
+/* disable default video element controls by webkit */
+video::-webkit-media-controls {
+  display: none !important;
+}
+* {
+  margin: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+}
+textarea:focus,
+input:focus {
+  outline: none;
+}

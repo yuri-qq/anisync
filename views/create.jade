@@ -1,0 +1,13 @@
+extends layout
+
+block content
+  form(method='post' action='').centered-form
+    div
+      input(type='text' name='name' placeholder='channel name')
+
+      label
+        input(type='checkbox' name='private')
+        | set a password
+      input(type='password' name='password' placeholder='channel password').hidden
+
+      input(type='submit' value='Create').button

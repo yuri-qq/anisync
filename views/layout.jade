@@ -1,0 +1,31 @@
+doctype html
+html
+  header
+    meta(http-equiv="Content-Type", content="text/html; charset=utf-8")
+    title AniSync α
+    link(rel="shortcut icon", href="/favicon.ico")
+    link(rel="stylesheet", type="text/css", href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css")
+    link(rel="stylesheet", type="text/css", href="https://vjs.zencdn.net/5.7.1/video-js.css")
+    link(rel="stylesheet", type="text/css", href="/css/reset.css")
+    link(rel="stylesheet", type="text/css", href="/css/loader.css")
+    link(rel="stylesheet", type="text/css", href="/css/style.css")
+    link(rel="stylesheet", type="text/css", href="/css/index.css")
+    link(rel="stylesheet", type="text/css", href="/css/channel.css")
+    link(rel="stylesheet", type="text/css", href="/css/playlist.css")
+    link(rel="stylesheet", type="text/css", href="/css/chat.css")
+    link(rel="stylesheet", type="text/css", href="/css/user.css")
+    
+    if data && data.javascripts
+      each script in data.javascripts
+        script(src="#{script}")
+    
+  body
+    #wrapper
+      #header
+        a(href="/") AniSync α
+      #content
+        block content
+      #footer
+        | Copyright © 2016 AniSync α · 
+        a(href="https://github.com/Yurifag/anisync") GitHub · 
+        a(href="/about") About
