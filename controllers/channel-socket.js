@@ -143,7 +143,7 @@ Socket.prototype = {
   },
 
   moveItem: function(data) {
-    Channel.findOne({_id: id}, function(error, channelObject) {
+    Channel.findOne({_id: this.id}, function(error, channelObject) {
       channelObject.playlist.splice(data.newIndex, 0, channelObject.playlist.splice(data.oldIndex, 1)[0]);
       Channel.update({_id: this.id}, {$set: {playlist: channelObject.playlist}}).exec();
     }.bind(this));
