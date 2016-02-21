@@ -53,10 +53,10 @@ var PlaylistControl = React.createClass({
             className: (this.props.inputError && !this.props.disabled ? "error" : ""),
             type: "text",
             placeholder: "paste video or audio url here",
-            value: this.state.value, disabled: this.props.disabled,
+            value: this.state.value,
             onChange: this.handleChange, onKeyUp: this.handleKeyUp,
             onBlur: this.handleFocusLose,
-            disabled: (this.props.moderator ? false : true)
+            disabled: (this.props.moderator ? this.props.disabled : true)
           }),
           React.createElement("button", {id: "playlist_add", className: "button", disabled: this.props.disabled, onClick: this.handleInput}, "add")
         ),
