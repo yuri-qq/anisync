@@ -1,22 +1,17 @@
 #app
   display flex
-  flex-wrap wrap
 
 .left
   min-width 400px
-  flex-basis 70%
+  max-width 70%
   flex-shrink 0
-  flex-grow 1
-
-#video_container
-  background-color black
   flex-grow 1
 
 .vjs-big-play-button
   display none !important
   
 .right
-  flex-basis 30%
+  max-width 30%
   flex-grow 1
 
 #channeltitle
@@ -26,3 +21,19 @@
   overflow hidden
   white-space nowrap
   text-overflow ellipsis
+  
+@media all and (max-width: 900px), all and (orientation: portrait)
+  #content
+    padding 0 10px 80px
+  
+  #app
+    flex-wrap wrap
+  
+  #app .left
+    width 100%
+    max-width 100%
+    
+  #app .right
+    width 100%
+    max-width 100%
+    

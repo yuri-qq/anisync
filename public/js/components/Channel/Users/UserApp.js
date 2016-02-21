@@ -9,6 +9,7 @@ var UserApp = React.createClass({
     socket.on("connected", this.connected);
     socket.on("disconnected", this.disconnected);
     socket.on("updateUser", this.updateUser);
+    socket.on("moderatorUpdate", this.moderatorUpdate);
   },
 
   setUsers: function(data) {
@@ -19,8 +20,19 @@ var UserApp = React.createClass({
         socketId: data[i].socketId,
         time: "0:00",
         bufferProgress: 0,
-        timeProgress: 0
+        timeProgress: 0,
+        moderator: data[i].moderator
       });
+
+      if(data[i].socketId == socket.id) {
+        this.props.setModerator(data[i].moderator);
+        if(data[i].moderator) {
+          this.props.enablePlayer();
+        }
+        else {
+          this.props.disablePlayer();
+        }
+      }
     }
     users = this.state.users.concat(users);
     this.setState({users: users});
@@ -56,13 +68,33 @@ var UserApp = React.createClass({
       }
     }.bind(this));
   },
+  
+  moderatorUpdate: function(data) {
+    var users = this.state.users.slice();
+    users.forEach(function(user, index) {
+      if(user.socketId == data.socketId) {
+        users[index].moderator = data.moderator;
+        this.setState({users: users});
+
+        if(user.socketId == socket.id) {
+          this.props.setModerator(data.moderator);
+          if(data.moderator) {
+            this.props.enablePlayer();
+          }
+          else {
+            this.props.disablePlayer();
+          }
+        }
+      }
+    }.bind(this));
+  },
 
   render: function() {
     return(
       React.createElement("ul", {id: "users"}, 
         this.state.users.map(function(user) {
-          return React.createElement(UserItem, {key: user.socketId, user: user});
-        })
+          return React.createElement(UserItem, {key: user.socketId, socketId: user.socketId, user: user, moderatorUpdate: this.moderatorUpdate, moderator: this.props.moderator});
+        }, this)
       )
     );
   }

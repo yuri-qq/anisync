@@ -4,11 +4,25 @@ var App = React.createClass({
   displayName: "App",
 
   getInitialState: function() {
-    return {playerHeight: 0};
+    return {playerHeight: 0, moderator: false};
   },
 
   componentDidMount: function() {
     videoplayer = videojs("video", {}, this.updateStatus);
+
+    videoplayer.disable = function() {
+      document.getElementsByClassName("vjs-tech")[0].style["pointer-events"] = "none";
+      document.getElementsByClassName("vjs-progress-control")[0].style["pointer-events"] = "none";
+      document.getElementsByClassName("vjs-play-control")[0].style["pointer-events"] = "none";
+      document.getElementsByClassName("vjs-big-play-button")[0].style["pointer-events"] = "none";
+    }
+
+    videoplayer.enable = function() {
+      document.getElementsByClassName("vjs-tech")[0].style["pointer-events"] = "auto";
+      document.getElementsByClassName("vjs-progress-control")[0].style["pointer-events"] = "auto";
+      document.getElementsByClassName("vjs-play-control")[0].style["pointer-events"] = "auto";
+      document.getElementsByClassName("vjs-big-play-button")[0].style["pointer-events"] = "auto";
+    }
 
     //custom events triggered from video.js directly
     //todo: write a plugin so the video.js source doesn't have to be modified
@@ -118,16 +132,36 @@ var App = React.createClass({
     videoplayer.src(this.refs.playlistApp.refs.playlist.state.items[index].url);
   },
 
+  disablePlayer: function() {
+    videoplayer.disable();
+    this.refs.playlistApp.refs.playlist._sortableInstance.option("disabled", true);
+  },
+
+  enablePlayer: function() {
+    videoplayer.enable();
+    this.refs.playlistApp.refs.playlist._sortableInstance.option("disabled", false);
+  },
+
+  setModerator: function(moderator) {
+    this.setState({moderator: moderator});
+  },
+
+  isModerator: function() {
+    for(var i = 0; i < this.refs.userApp.state.users.length; i++) {
+      if(this.refs.userApp.state.users[i].socketId == socket.id) return this.refs.userApp.state.users[i].moderator;
+    }
+  },
+
   render: function() {
     return(
       React.createElement("div", {id: "app"},
         React.createElement("div", {className: "left"},
           React.createElement(VideoApp, {ref: "player"}),
-          React.createElement(PlaylistApp, {ref: "playlistApp", playItem: this.playItem})
+          React.createElement(PlaylistApp, {ref: "playlistApp", playItem: this.playItem, moderator: this.state.moderator})
         ),
         React.createElement("div", {className: "right"},
           React.createElement(ChatApp, {ref: "chatApp", playerHeight: this.state.playerHeight}),
-          React.createElement(UserApp, {ref: "userApp", chatApp: this.refs.chatApp})
+          React.createElement(UserApp, {ref: "userApp", chatApp: this.refs.chatApp, disablePlayer: this.disablePlayer, enablePlayer: this.enablePlayer, moderator: this.state.moderator, setModerator: this.setModerator})
         )
       )
     );

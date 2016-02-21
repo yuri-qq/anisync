@@ -34,15 +34,17 @@ Socket.prototype = {
     this.socket.on("playItem", this.playItem.bind(this));
     this.socket.on("chatMessage", this.chatMessage.bind(this));
     this.socket.on("updateUser", this.updateUser.bind(this));
+    this.socket.on("moderatorUpdate", this.moderatorUpdate.bind(this));
     this.socket.on("disconnect", this.disconnect.bind(this));
 
     Channel.findOne({_id: this.id}, function(error, data) {
+      if(error) return;
       if(!data.private || this.socket.request.session.loggedInId == this.id) {
 
         this.socket.join(this.id);
         console.log(this.socket.client.id + " joined " + id);
 
-        var user = {socketId: this.socket.client.id, username: this.socket.request.session.username};
+        var user = {socketId: this.socket.client.id, username: this.socket.request.session.username, moderator: data.users.length ? false : true};
         this.io.of("/channels").to(this.id).emit("connected", user);
         user.ready = false;
         
@@ -89,69 +91,83 @@ Socket.prototype = {
   },
 
   play: function(time) {
-    Channel.update({_id: this.id}, {playing: true}).exec();
-    this.socket.to(this.id).emit("play", time);
+    this.isModerator(function() {
+      Channel.update({_id: this.id}, {playing: true}).exec();
+      this.socket.to(this.id).emit("play", time);
+    }.bind(this));
   },
 
   pause: function(time) {
-    Channel.update({_id: this.id}, {playing: false}).exec();
-    this.socket.to(this.id).emit("pause", time);
+    this.isModerator(function() {
+      Channel.update({_id: this.id}, {playing: false}).exec();
+      this.socket.to(this.id).emit("pause", time);
+    }.bind(this));
   },
 
   seeked: function(time) {
-    this.socket.to(this.id).emit("seeked", time);
+    this.isModerator(function() {
+      this.socket.to(this.id).emit("seeked", time);
+    }.bind(this));
   },
 
   addItem: function(data) {
-    var args = [];
-    if(data.url.indexOf("youtube.com") > -1 && this.config.youtubedlProxy.host && this.config.youtubedlProxy.port) args = args.concat(["--proxy", this.config.youtubedlProxy.host + ":" + this.config.youtubedlProxy.port]);
-    if(!data.addPlaylist) args = args.concat(["--playlist-end", "1"]);
+    this.isModerator(function() {
+      var args = [];
+      if(data.url.indexOf("youtube.com") > -1 && this.config.youtubedlProxy.host && this.config.youtubedlProxy.port) args = args.concat(["--proxy", this.config.youtubedlProxy.host + ":" + this.config.youtubedlProxy.port]);
+      if(!data.addPlaylist) args = args.concat(["--playlist-end", "1"]);
 
-    youtubedl.getInfo(data.url, args, {maxBuffer: 1024000 * 5}, function(error, media) {
-      if(!error) {
-        if(Object.prototype.toString.call(media) !== "[object Array]") {
-          media = [media];
-        }
+      youtubedl.getInfo(data.url, args, {maxBuffer: 1024000 * 5}, function(error, media) {
+        if(!error) {
+          if(Object.prototype.toString.call(media) !== "[object Array]") {
+            media = [media];
+          }
 
-        var files = [];
-        if(data.addPlaylist) {
-          media.forEach(function(file) {
-            files.push({title: file.title, url: file.url});
-          });
+          var files = [];
+          if(data.addPlaylist) {
+            media.forEach(function(file) {
+              files.push({title: file.title, url: file.url});
+            });
+          }
+          else {
+            files[0] = {title: media[0].title, url: media[0].url};
+          }
+
+          Channel.findOneAndUpdate({_id: this.id}, {$push: {playlist: {$each: files}}}, {upsert: true, new: true}, function(error, data) {
+            files.forEach(function(file, index) {
+              files[index].id = data.playlist[data.playlist.length - files.length + index].id;
+            });
+            this.io.of("/channels").to(this.id).emit("addItem", files);
+          }.bind(this));
         }
         else {
-          files[0] = {title: media[0].title, url: media[0].url};
+          console.log(error);
+          this.socket.emit("addItem", {error: error});
         }
-
-        Channel.findOneAndUpdate({_id: this.id}, {$push: {playlist: {$each: files}}}, {upsert: true, new: true}, function(error, data) {
-          files.forEach(function(file, index) {
-            files[index].id = data.playlist[data.playlist.length - files.length + index].id;
-          });
-          this.io.of("/channels").to(this.id).emit("addItem", files);
-        }.bind(this));
-      }
-      else {
-        console.log(error);
-        this.socket.emit("addItem", {error: error});
-      }
+      }.bind(this));
     }.bind(this));
   },
 
   removeItem: function(data) {
-    Channel.update({_id: this.id}, {$pull: {playlist: {_id: data.id}}}).exec();
-    this.socket.to(this.id).emit("removeItem", data.index);
+    this.isModerator(function() {
+      Channel.update({_id: this.id}, {$pull: {playlist: {_id: data.id}}}).exec();
+      this.socket.to(this.id).emit("removeItem", data.index);
+    }.bind(this));
   },
 
   moveItem: function(data) {
-    Channel.findOne({_id: this.id}, function(error, channelObject) {
-      channelObject.playlist.splice(data.newIndex, 0, channelObject.playlist.splice(data.oldIndex, 1)[0]);
-      Channel.update({_id: this.id}, {$set: {playlist: channelObject.playlist}}).exec();
+    this.isModerator(function() {
+      Channel.findOne({_id: this.id}, function(error, channelObject) {
+        channelObject.playlist.splice(data.newIndex, 0, channelObject.playlist.splice(data.oldIndex, 1)[0]);
+        Channel.update({_id: this.id}, {$set: {playlist: channelObject.playlist}}).exec();
+      }.bind(this));
+      this.socket.to(this.id).emit("moveItem", {oldIndex: data.oldIndex, newIndex: data.newIndex});
     }.bind(this));
-    this.socket.to(this.id).emit("moveItem", {oldIndex: data.oldIndex, newIndex: data.newIndex});
   },
 
   playItem: function(index) {
-    this.socket.to(this.id).emit("playItem", index);
+    this.isModerator(function() {
+      this.socket.to(this.id).emit("playItem", index);
+    }.bind(this));
   },
 
   chatMessage: function(text) {
@@ -161,6 +177,23 @@ Socket.prototype = {
   updateUser: function(data) {
     data.socketId = this.socket.client.id;
     this.io.of("/channels").to(this.id).emit("updateUser", data);
+  },
+
+  moderatorUpdate: function(data) {
+    this.isModerator(function() {
+      Channel.findOneAndUpdate({"users.socketId": data.socketId}, {$set: {"users.$.moderator": data.moderator}}).exec();
+      this.io.of("/channels").to(this.id).emit("moderatorUpdate", data);
+    }.bind(this));
+  },
+
+  isModerator: function(callback) {
+    Channel.findOne({_id: this.id}, function(error, data) {
+      data.users.forEach(function(user) {
+        if(this.socket.client.id == user.socketId && user.moderator) {
+          callback(true);
+        }
+      }.bind(this));
+    }.bind(this));
   },
 
   disconnect: function() {
@@ -173,6 +206,17 @@ Socket.prototype = {
           Channel.remove({_id: this.id}, function(error) {
             this.io.of("/index").emit("removeChannel", this.id);
           }.bind(this));
+        }
+        else {
+          var noModerator = true;
+          for(var i = 0; i < data.users.length; i++) {
+            if(data.users[i].moderator) noModerator = false;
+          }
+          if(noModerator) {
+            data = {socketId: data.users[0].socketId, moderator: true};
+            Channel.findOneAndUpdate({"users.socketId": data.socketId}, {$set: {"users.$.moderator": data.moderator}}).exec();
+            this.io.of("/channels").to(this.id).emit("moderatorUpdate", data);
+          }
         }
       }.bind(this));
     }.bind(this));

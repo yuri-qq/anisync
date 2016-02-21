@@ -29,9 +29,11 @@ var Playlist = React.createClass({
   },
 
   onRemoveItem: function(event) {
-    var index = parseInt(event.target.parentNode.dataset.index);
-    socket.emit("removeItem", {id: event.target.parentNode.id, index: index});
-    this.removeItem(index);
+    if(this.props.moderator) {
+      var index = parseInt(event.target.parentNode.dataset.index);
+      socket.emit("removeItem", {id: event.target.parentNode.id, index: index});
+      this.removeItem(index);
+    }
   },
 
   removeItem: function(removeIndex) {
@@ -70,9 +72,11 @@ var Playlist = React.createClass({
   },
 
   clickedItem: function(event) {
-    var index = parseInt(event.target.parentNode.dataset.index);
-    socket.emit("playItem", index);
-    this.playItem(index);
+    if(this.props.moderator) {
+      var index = parseInt(event.target.parentNode.dataset.index);
+      socket.emit("playItem", index);
+      this.playItem(index);
+    }
   },
 
   playItem: function(index) {
@@ -100,7 +104,9 @@ var Playlist = React.createClass({
   },
 
   handleEnd: function(event) {
-    socket.emit("moveItem", {oldIndex: event.oldIndex, newIndex: event.newIndex});
+    if(this.props.moderator) {
+      socket.emit("moveItem", {oldIndex: event.oldIndex, newIndex: event.newIndex});
+    }
   },
 
   selected: function() {
@@ -120,7 +126,7 @@ var Playlist = React.createClass({
             playlistItem: playlistItem,
             onRemoveItem: this.onRemoveItem,
             clickedItem: this.clickedItem,
-            index: index,
+            index: index
           }
 
           if(playlistItem.selected) options.className = "selected";

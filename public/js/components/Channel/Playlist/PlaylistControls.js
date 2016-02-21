@@ -36,14 +36,28 @@ var PlaylistControl = React.createClass({
     return(
       React.createElement("div", {id: "playlist-controls"},
         React.createElement("label", null, 
-          React.createElement("input", {type: "checkbox", checked: this.state.addPlaylist, onChange: this.handleCheckboxChange}),
+          React.createElement("input", {
+            type: "checkbox",
+            checked: this.state.addPlaylist,
+            onChange: this.handleCheckboxChange,
+            disabled: (this.props.moderator ? false : true)
+          }),
           React.createElement("span", null, "add a playlist")
         ),
         React.createElement("div", {className: "la-ball-clip-rotate la-dark " + (this.props.disabled ? "" : "hidden")},
           React.createElement("div", null) 
         ),
         React.createElement("div", {className: "input-button"},
-          React.createElement("input", {id: "media_url", className: (this.props.inputError && !this.props.disabled ? "error" : ""), type: "text", placeholder: "paste video or audio url here", value: this.state.value, disabled: this.props.disabled, onChange: this.handleChange, onKeyUp: this.handleKeyUp, onBlur: this.handleFocusLose}),
+          React.createElement("input", {
+            id: "media_url",
+            className: (this.props.inputError && !this.props.disabled ? "error" : ""),
+            type: "text",
+            placeholder: "paste video or audio url here",
+            value: this.state.value, disabled: this.props.disabled,
+            onChange: this.handleChange, onKeyUp: this.handleKeyUp,
+            onBlur: this.handleFocusLose,
+            disabled: (this.props.moderator ? false : true)
+          }),
           React.createElement("button", {id: "playlist_add", className: "button", disabled: this.props.disabled, onClick: this.handleInput}, "add")
         ),
         React.createElement("div", {className: "error " + (!this.props.inputError || this.props.disabled ? "hidden" : "")}, "No compatible video or audio files found")

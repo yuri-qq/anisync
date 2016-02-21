@@ -5,6 +5,7 @@ var Schema = mongoose.Schema;
 var userSchema = new Schema({
   username: String,
   socketId: String,
+  moderator: Boolean,
   ready: Boolean
 });
 
