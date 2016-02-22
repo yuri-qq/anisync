@@ -1,5 +1,12 @@
 extends layout
 
+block append scripts
+  script(src="/js/components/Index/ChannelList/ChannelControls.js")
+  script(src="/js/components/Index/ChannelList/ChannelItem.js")
+  script(src="/js/components/Index/ChannelList/ChannelListApp.js")
+  script(src="/js/components/Index/App.js")
+  script(src="/js/index.js")
+
 block content
   #controls
     .forms

@@ -1,6 +1,6 @@
 doctype html
 html
-  header
+  head
     meta(http-equiv="Content-Type", content="text/html; charset=utf-8")
     title AniSync α
     link(rel="shortcut icon", href="/favicon.ico")
@@ -14,11 +14,11 @@ html
     link(rel="stylesheet", type="text/css", href="/css/playlist.css")
     link(rel="stylesheet", type="text/css", href="/css/chat.css")
     link(rel="stylesheet", type="text/css", href="/css/user.css")
-    
-    if data && data.javascripts
-      each script in data.javascripts
-        script(src="#{script}")
-    
+    block scripts
+      script(src="https://cdn.socket.io/socket.io-1.4.5.js")
+      script(src="https://fb.me/react-0.14.7.min.js")
+      script(src="https://fb.me/react-dom-0.14.7.js")
+
   body
     #wrapper
       #header

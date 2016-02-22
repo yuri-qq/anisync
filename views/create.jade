@@ -1,5 +1,8 @@
 extends layout
 
+block append scripts
+  script(src="/js/create.js")
+
 block content
   form(method='post' action='').centered-form
     div
