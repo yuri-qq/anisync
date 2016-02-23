@@ -38,17 +38,18 @@ Socket.prototype = {
     this.socket.on("disconnect", this.disconnect.bind(this));
 
     Channel.findOne({_id: this.id}, function(error, data) {
-      if(error) return;
+      if(error || !data) return;
       if(!data.private || this.socket.request.session.loggedInId == this.id) {
 
         this.socket.join(this.id);
         console.log(this.socket.client.id + " joined " + id);
 
+        //assume first user who joins is channel creator
         var user = {socketId: this.socket.client.id, username: this.socket.request.session.username, moderator: data.users.length ? false : true};
         this.io.of("/channels").to(this.id).emit("connected", user);
-        user.ready = false;
-        
-        Channel.findOneAndUpdate({_id: this.id}, {$push: {users: user}}, {upsert: true, new: true}, function(error, data) {
+
+        //remove expiration time of channel
+        Channel.findOneAndUpdate({_id: this.id}, {$push: {users: user}, $set: {createdAt: null}}, {upsert: true, new: true}, function(error, data) {
           this.socket.emit("setup", data);
 
           if(data.users.length == 1) {

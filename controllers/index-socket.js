@@ -17,7 +17,9 @@ function Socket(socket, io) {
   console.log(this.socket.client.id + " connected");
 
   this.socket.on("setUsername", this.setUsername.bind(this));
-  Channel.find({}, this.setChannels.bind(this));
+
+  //find non empty channels
+  Channel.find({users: {$exists: true, $ne: []}}, this.setChannels.bind(this));
 }
 
 Socket.prototype = {

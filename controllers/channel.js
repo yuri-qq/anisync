@@ -1,14 +1,25 @@
 var Channel = require('../models/channel');
 
 module.exports.form = function(req, res) {
-  res.render("create");
+  res.render("create", {username: req.session.username ? true : false});
 };
 
 module.exports.create = function(req, res) {
+  if(!req.session.username) req.session.username = req.body.username;
   var private = req.body.private == 'on' ? true : false;
+  
+  var errors = {};
+  if(!req.session.username) errors.username = true;
+  if(!req.body.channelname) errors.channelname = true;
+  if(private && !req.body.password) errors.password = true;
+
+  if(Object.keys(errors).length) {
+    res.render("create", {username: req.session.username ? true : false, private: private, password: req.body.password, errors: errors});
+    return;
+  }
 
   var data = {
-    name: req.body.name,
+    name: req.body.channelname,
     playing: false,
     private: private,
     users: [],
@@ -33,7 +44,7 @@ module.exports.join = function(req, res, next) {
 
     if(!data) return next();
 
-    var errors = [];
+    var errors = {};
 
     if(!req.session.username) req.session.username = req.body.username;
 
@@ -46,7 +57,7 @@ module.exports.join = function(req, res, next) {
           req.session.loggedInId = req.params.id;
         }
         else {
-          errors.push("wrongPassword");
+          errors.password = true;
         }
         renderView();
       });
@@ -57,7 +68,7 @@ module.exports.join = function(req, res, next) {
         res.render("channel", {data: {name: data.name}});
       }
       else {
-        res.render("join", {data: {private: data.private, username: req.session.username ? true : false, errors: errors}});
+        res.render("join", {private: data.private, username: req.session.username ? true : false, errors: errors});
       }
     }
 

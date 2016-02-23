@@ -3,13 +3,12 @@ extends layout
 block content
   form(method="post" action="").centered-form
     div
-      if !data.username
+      if !username
         input(type="text" name="username" id="username_input" placeholder="username" required)
 
-      if data.private
-        input(type="password" name="password" id="password" placeholder="password" required)
-        each error in data.errors
-          if error == "wrongPassword"
-            div(class="error") Wrong Password. Please try again.
+      if private
+        input(type="password" name="password" id="password" placeholder="password" class= errors && errors.password ? "error" : "" required)
+        if errors.password
+          div(class="error") Wrong Password. Please try again.
           
       input(type="submit" value="join").button

@@ -4,13 +4,16 @@ block append scripts
   script(src="/js/create.js")
 
 block content
-  form(method='post' action='').centered-form
+  form(method="post" action="").centered-form
     div
-      input(type='text' name='name' placeholder='channel name')
+      if !username
+        input(type="text" name="username" placeholder="username" class= errors && errors.username ? "error" : "")
+
+      input(type="text" name="channelname" placeholder="channel name" class= errors && errors.channelname ? "error" : "")
 
       label
-        input(type='checkbox' name='private')
+        input(type="checkbox" name="private" checked= private ? "checked" : undefined)
         | set a password
-      input(type='password' name='password' placeholder='channel password').hidden
+      input(type="password" name="password" placeholder="channel password" value= password ? password : "" class= errors && errors.password ? "error" : private ? "" : "hidden")
 
-      input(type='submit' value='Create').button
+      input(type="submit" value="Create").button

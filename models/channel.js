@@ -16,7 +16,8 @@ var channelSchema = new Schema({
   private: Boolean,
   password: String,
   users: [userSchema],
-  playlist: [playlistItemSchema]
+  playlist: [playlistItemSchema],
+  createdAt: {type: Date, expires: 10, default: Date.now} //expire after 10 seconds (if no user joins)
 });
 
 channelSchema.set("toObject", {virtuals: true});

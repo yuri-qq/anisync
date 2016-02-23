@@ -6,7 +6,7 @@ var userSchema = new Schema({
   username: String,
   socketId: String,
   moderator: Boolean,
-  ready: Boolean
+  ready: {type: Boolean, default: false}
 });
 
 userSchema.set("toObject", {virtuals: true});
