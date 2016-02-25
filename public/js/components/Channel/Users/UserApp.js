@@ -91,10 +91,17 @@ var UserApp = React.createClass({
 
   render: function() {
     return(
-      React.createElement("ul", {id: "users"}, 
-        this.state.users.map(function(user) {
-          return React.createElement(UserItem, {key: user.socketId, socketId: user.socketId, user: user, moderatorUpdate: this.moderatorUpdate, moderator: this.props.moderator});
-        }, this)
+      React.createElement("div", {id: "users-app"},
+        React.createElement("div", {id: "users-header"},
+          React.createElement("span", {className: "moderator"}, "mod"),
+          React.createElement("span", {className: "username"}, "username"),
+          React.createElement("span", {className: "time"}, "time")
+        ),
+        React.createElement("ul", {id: "users"}, 
+          this.state.users.map(function(user) {
+            return React.createElement(UserItem, {key: user.socketId, socketId: user.socketId, user: user, moderatorUpdate: this.moderatorUpdate, moderator: this.props.moderator});
+          }, this)
+        )
       )
     );
   }

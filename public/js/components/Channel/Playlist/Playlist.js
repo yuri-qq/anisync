@@ -29,9 +29,10 @@ var Playlist = React.createClass({
   },
 
   onRemoveItem: function(event) {
+    console.log(event);
     if(this.props.moderator) {
-      var index = parseInt(event.target.parentNode.dataset.index);
-      socket.emit("removeItem", {id: event.target.parentNode.id, index: index});
+      var index = parseInt(event.currentTarget.parentNode.dataset.index);
+      socket.emit("removeItem", {id: event.currentTarget.parentNode.id, index: index});
       this.removeItem(index);
     }
   },
@@ -50,9 +51,12 @@ var Playlist = React.createClass({
       });
     }
     else if(items.length == 0) {
+      videoplayer.reset();
+      /*
       videoplayer.pause();
       videoplayer.currentTime(0);
       videoplayer.src('');
+      */
     }
     else if(removeIndex == selected) {
       items[selected].selected = true;

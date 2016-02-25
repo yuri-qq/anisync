@@ -38,7 +38,9 @@ Socket.prototype = {
     this.socket.on("disconnect", this.disconnect.bind(this));
 
     Channel.findOne({_id: this.id}, function(error, data) {
-      if(error || !data) return;
+      if(error) throw error;
+      if(!data) throw new Error("No channel found");
+
       if(!data.private || this.socket.request.session.loggedInId == this.id) {
 
         this.socket.join(this.id);
@@ -50,6 +52,8 @@ Socket.prototype = {
 
         //remove expiration time of channel
         Channel.findOneAndUpdate({_id: this.id}, {$push: {users: user}, $set: {createdAt: null}}, {upsert: true, new: true}, function(error, data) {
+          if(error) throw error;
+
           this.socket.emit("setup", data);
 
           if(data.users.length == 1) {
@@ -75,6 +79,8 @@ Socket.prototype = {
 
   ready: function() {
     Channel.findOneAndUpdate({"users.socketId": this.socket.client.id}, {$set: {"users.$.ready": true}}, {new: true}, function(error, data) {
+      if(error) throw error;
+
       var ready = 0;
       data.users.forEach(function(user) {
         if(user.ready) {
@@ -134,6 +140,8 @@ Socket.prototype = {
           }
 
           Channel.findOneAndUpdate({_id: this.id}, {$push: {playlist: {$each: files}}}, {upsert: true, new: true}, function(error, data) {
+            if(error) throw error;
+
             files.forEach(function(file, index) {
               files[index].id = data.playlist[data.playlist.length - files.length + index].id;
             });
@@ -158,6 +166,8 @@ Socket.prototype = {
   moveItem: function(data) {
     this.isModerator(function() {
       Channel.findOne({_id: this.id}, function(error, channelObject) {
+        if(error) throw error;
+
         channelObject.playlist.splice(data.newIndex, 0, channelObject.playlist.splice(data.oldIndex, 1)[0]);
         Channel.update({_id: this.id}, {$set: {playlist: channelObject.playlist}}).exec();
       }.bind(this));
@@ -189,6 +199,8 @@ Socket.prototype = {
 
   isModerator: function(callback) {
     Channel.findOne({_id: this.id}, function(error, data) {
+      if(error) throw error;
+
       data.users.forEach(function(user) {
         if(this.socket.client.id == user.socketId && user.moderator) {
           callback(true);
@@ -200,11 +212,17 @@ Socket.prototype = {
   disconnect: function() {
     this.socket.to(this.id).emit("disconnected", {socketId: this.socket.client.id, username: this.socket.request.session.username});
     Channel.update({_id: this.id}, {$pull: {users: {socketId: this.socket.client.id}}}, function(error, data) {
+      if(error) throw error;
+
       this.io.of("/index").emit("decrementUsercount", this.id);
 
       Channel.findOne({_id: this.id}, function(error, data) {
+        if(error) throw error;
+
         if(data.users.length == 0) {
           Channel.remove({_id: this.id}, function(error) {
+            if(error) throw error;
+            
             this.io.of("/index").emit("removeChannel", this.id);
           }.bind(this));
         }

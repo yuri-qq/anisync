@@ -1,6 +1,30 @@
-#users
-  margin-top 20px
+#users-app
   margin-left 10px
+
+
+#users-header
+  margin-top 20px
+  width 100%
+  height 32px
+  line-height 32px
+  display flex
+  text-align center
+  
+#users-header .moderator
+  display inline-block
+  width 60px
+
+#users-header .username
+  display inline-block
+  width 100%
+  border-right 1px solid
+  border-left 1px solid
+
+#users-header .time
+  display inline-block
+  width 60px
+  padding-left 8px
+  
 
 #users li
   list-style-type none
@@ -15,20 +39,22 @@
   line-height 30px
 
 #users .user .flex .moderator
-  width 40px
+  width 60px
   line-height 32px
-  border-right 1px solid #424242
   text-align center
   cursor default
   &:hover span.prev-star:before
     color #ffc107
     content "\f005"
     cursor pointer
-    
 
 #users .user .flex .username
   height 100%
   width 100%
+  flex-basis 100%
+  border-left 1px solid #424242
+  border-right 1px solid #424242
+  padding-left 5px
   text-align center
   vertical-align middle
   overflow hidden
@@ -39,7 +65,6 @@
   height 100%
   width 60px
   line-height 32px
-  border-left 1px solid #424242
   padding-left 8px
 
 #users .user .progress

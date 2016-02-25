@@ -90,7 +90,7 @@ var App = React.createClass({
     status.time = Math.floor(videoplayer.currentTime() / 60) + ":" + ("0" + Math.floor(videoplayer.currentTime()) % 60).slice(-2);
 
     socket.emit("updateUser", status);
-    setTimeout(this.updateStatus, 500);
+    setTimeout(this.updateStatus, 400);
   },
 
   play: function(time) {

@@ -4,7 +4,7 @@ module.exports.form = function(req, res) {
   res.render("create", {username: req.session.username ? true : false});
 };
 
-module.exports.create = function(req, res) {
+module.exports.create = function(req, res, next) {
   if(!req.session.username) req.session.username = req.body.username;
   var private = req.body.private == 'on' ? true : false;
   
@@ -31,7 +31,8 @@ module.exports.create = function(req, res) {
   var newChannel = Channel(data);
 
   newChannel.save(function(error, channel) {
-    if(error) return;
+    if(error) return next(error);
+    if(!data) return next(new Error("No channel found"));
 
     req.session.loggedInId = channel.id;
     res.redirect('/channel/' + channel.id);
@@ -41,8 +42,7 @@ module.exports.create = function(req, res) {
 module.exports.join = function(req, res, next) {
   Channel.findOne({"_id": req.params.id}, function(error, data) {
     if(error) return next(error);
-
-    if(!data) return next();
+    if(!data) return next(new Error("No channels found"));
 
     var errors = {};
 

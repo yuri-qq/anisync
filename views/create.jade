@@ -7,9 +7,9 @@ block content
   form(method="post" action="").centered-form
     div
       if !username
-        input(type="text" name="username" placeholder="username" class= errors && errors.username ? "error" : "")
+        input(type="text" name="username" placeholder="username" required="required" class= errors && errors.username ? "error" : "")
 
-      input(type="text" name="channelname" placeholder="channel name" class= errors && errors.channelname ? "error" : "")
+      input(type="text" name="channelname" placeholder="channel name" required="required" class= errors && errors.channelname ? "error" : "")
 
       label
         input(type="checkbox" name="private" checked= private ? "checked" : undefined)

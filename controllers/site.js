@@ -9,6 +9,6 @@ module.exports.index = function(req, res) {
   res.render("index", {data: {username: username}});
 };
 
-module.exports.about = function(req, res) {
-  res.render("about");
+module.exports.policy = function(req, res) {
+  res.render("policy");
 };

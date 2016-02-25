@@ -58,7 +58,7 @@ app.use(sessionMiddleware);
 site = require("./controllers/site");
 channel = require("./controllers/channel");
 app.all("/", site.index);
-app.all("/about", site.about);
+app.all("/policy", site.policy);
 app.get("/create", channel.form);
 app.post("/create", channel.create);
 app.all("/channel/:id", channel.join);
@@ -71,6 +71,7 @@ app.use(function(req, res) {
 
 //handle 500
 app.use(function(error, req, res, next){
+  console.log(error);
   res.status(500);
   res.render("500.jade", {title:"500: Internal Server Error", error: error});
 });
