@@ -10,7 +10,7 @@ var VideoApp = React.createClass({
 
   render: function() {
     return (
-      React.createElement("div", {ref: "video"})
+      React.createElement("div", {id: "video-app", ref: "video"})
     );
   }
 });

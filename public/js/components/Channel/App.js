@@ -4,7 +4,7 @@ var App = React.createClass({
   displayName: "App",
 
   getInitialState: function() {
-    return {playerHeight: 0, moderator: false};
+    return {moderator: false};
   },
 
   componentDidMount: function() {
@@ -39,13 +39,6 @@ var App = React.createClass({
     socket.on("setup", this.setup);
     socket.on("requestTime", this.pushTime);
     socket.emit("join", window.location.href.split("/").pop());
-
-    this.updatePlayerHeight();
-    window.addEventListener("resize", this.updatePlayerHeight);
-  },
-
-  updatePlayerHeight: function() {
-    this.setState({playerHeight: this.refs.player.refs.video.clientHeight});
   },
 
   setup: function(data) {
@@ -155,14 +148,10 @@ var App = React.createClass({
   render: function() {
     return(
       React.createElement("div", {id: "app"},
-        React.createElement("div", {className: "left"},
-          React.createElement(VideoApp, {ref: "player"}),
-          React.createElement(PlaylistApp, {ref: "playlistApp", playItem: this.playItem, moderator: this.state.moderator})
-        ),
-        React.createElement("div", {className: "right"},
-          React.createElement(ChatApp, {ref: "chatApp", playerHeight: this.state.playerHeight}),
-          React.createElement(UserApp, {ref: "userApp", chatApp: this.refs.chatApp, disablePlayer: this.disablePlayer, enablePlayer: this.enablePlayer, moderator: this.state.moderator, setModerator: this.setModerator})
-        )
+        React.createElement(VideoApp, {ref: "player"}),
+        React.createElement(ChatApp, {ref: "chatApp"}),
+        React.createElement(PlaylistApp, {ref: "playlistApp", playItem: this.playItem, moderator: this.state.moderator}),
+        React.createElement(UserApp, {ref: "userApp", chatApp: this.refs.chatApp, disablePlayer: this.disablePlayer, enablePlayer: this.enablePlayer, moderator: this.state.moderator, setModerator: this.setModerator})
       )
     );
   }

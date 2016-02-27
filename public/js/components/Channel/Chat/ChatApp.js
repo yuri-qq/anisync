@@ -38,7 +38,7 @@ var ChatApp = React.createClass({
 
   render: function() {
     return(
-      React.createElement("div", {id: "chat-app", style: {height: this.props.playerHeight}}, 
+      React.createElement("div", {id: "chat-app"}, 
         React.createElement("div", {ref: "chatWindow", id: "chat"}, 
           this.state.messages.map(function(message, index) {
             return React.createElement(ChatMessage, {key: index, info: message.info, username: message.username, text: message.text});

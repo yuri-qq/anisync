@@ -42,7 +42,7 @@ var PlaylistApp = React.createClass({
 
   render: function() {
     return(
-      React.createElement("div", null,
+      React.createElement("div", {id: "playlist-app"},
         React.createElement(PlaylistControl, {ref: "playlistControl", disabled: this.state.disableInput, inputError: this.state.inputError, handleInput: this.handleInput, moderator: this.props.moderator}),
         React.createElement(Playlist, {ref: "playlist", playItem: this.props.playItem, moderator: this.props.moderator})
       )
