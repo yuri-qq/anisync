@@ -28,7 +28,8 @@ Socket.prototype = {
     this.socket.on("play", this.play.bind(this));
     this.socket.on("pause", this.pause.bind(this));
     this.socket.on("seeked", this.seeked.bind(this));
-    this.socket.on("addItem", this.addItem.bind(this));
+    this.socket.on("addItems", this.addItems.bind(this));
+    this.socket.on("loadPlaylist", this.loadPlaylist.bind(this));
     this.socket.on("removeItem", this.removeItem.bind(this));
     this.socket.on("moveItem", this.moveItem.bind(this));
     this.socket.on("playItem", this.playItem.bind(this));
@@ -77,20 +78,22 @@ Socket.prototype = {
     this.socket.to(this.id).emit("pushTime", data);
   },
 
+  //if all users in a channel have loaded metadata of selected video, start playing it
   ready: function() {
     Channel.findOneAndUpdate({"users.socketId": this.socket.client.id}, {$set: {"users.$.ready": true}}, {new: true}, function(error, data) {
       if(error) throw error;
 
       var ready = 0;
-      data.users.forEach(function(user) {
-        if(user.ready) {
+      for(var i = 0; i < data.users.length; i++) {
+        if(data.users[i].ready) {
           ready++;
         }
-      });
+      }
+
       if(ready == data.users.length) {
-        data.users.forEach(function(user) {
-          Channel.update({"users.socketId": user.socketId}, {$set: {"users.$.ready": false}}).exec();
-        });
+        for(var i = 0; i < data.users.length; i++) {
+          Channel.update({"users.socketId": data.users[i].socketId}, {$set: {"users.$.ready": false}}).exec();
+        }
         this.io.of("/channels").to(this.id).emit("play", 0);
         Channel.update({_id: this.id}, {playing: true}).exec();
       }
@@ -117,9 +120,11 @@ Socket.prototype = {
     }.bind(this));
   },
 
-  addItem: function(data) {
+  addItems: function(data) {
     this.isModerator(function() {
       var args = [];
+
+      //route traffic to youtube through http proxy to circumvent IP blocks
       if(data.url.indexOf("youtube.com") > -1 && this.config.youtubedlProxy.host && this.config.youtubedlProxy.port) args = args.concat(["--proxy", this.config.youtubedlProxy.host + ":" + this.config.youtubedlProxy.port]);
       if(!data.addPlaylist) args = args.concat(["--playlist-end", "1"]);
 
@@ -131,27 +136,52 @@ Socket.prototype = {
 
           var files = [];
           if(data.addPlaylist) {
-            media.forEach(function(file) {
-              files.push({title: file.title, url: file.url});
-            });
+            for(var i = 0; i < media.length; i++) {
+              files.push({url: media[i].url, webpage: media[i].webpage_url, title: media[i].title});
+            }
           }
           else {
-            files[0] = {title: media[0].title, url: media[0].url};
+            files[0] = {url: media[0].url, webpage: media[0].webpage_url, title: media[0].title};
           }
 
           Channel.findOneAndUpdate({_id: this.id}, {$push: {playlist: {$each: files}}}, {upsert: true, new: true}, function(error, data) {
             if(error) throw error;
 
-            files.forEach(function(file, index) {
-              files[index].id = data.playlist[data.playlist.length - files.length + index].id;
-            });
-            this.io.of("/channels").to(this.id).emit("addItem", files);
+            for(var i = 0; i < files.length; i++) {
+              files[i].id = data.playlist[data.playlist.length - files.length + i].id;
+            }
+            this.io.of("/channels").to(this.id).emit("addItems", files);
           }.bind(this));
         }
         else {
           console.log(error);
-          this.socket.emit("addItem", {error: error});
+          this.socket.emit("addItems", {error: error});
         }
+      }.bind(this));
+    }.bind(this));
+  },
+
+  //if video url (potentially) expired fetch a new one from the webpage
+  refreshItem: function(id) {
+    Channel.findOne({"playlist._id": id}, function(error, data) {
+      if(error) throw error;
+
+      console.log(data);
+      youtubedl.getInfo(data.url, {}, {maxBuffer: 1024000 * 5}, function(error, media) {
+        if(error) throw error;
+
+        Channel.findOneAndUpdate({"playlist._id": id}, {$set: {"playlist.$.url": media.url}}).exec();
+        this.io.of("/channels").to(this.id).emit("refreshItem", {id: id, url: media.url});
+      }.bind(this));
+    }.bind(this));
+  },
+
+  loadPlaylist: function(items) {
+    this.isModerator(function() {
+      Channel.findOneAndUpdate({_id: this.id}, {$set: {playlist: items}}, {upsert: true, new: true}, function(error, data) {
+        if(error) throw error;
+
+        this.io.of("/channels").to(this.id).emit("loadPlaylist", data.playlist);
       }.bind(this));
     }.bind(this));
   },
@@ -201,11 +231,11 @@ Socket.prototype = {
     Channel.findOne({_id: this.id}, function(error, data) {
       if(error) throw error;
 
-      data.users.forEach(function(user) {
-        if(this.socket.client.id == user.socketId && user.moderator) {
-          callback(true);
+      for(var i = 0; i < data.users.length; i++) {
+        if(this.socket.client.id == data.users[i].socketId && data.users[i].moderator) {
+          callback();
         }
-      }.bind(this));
+      }
     }.bind(this));
   },
 

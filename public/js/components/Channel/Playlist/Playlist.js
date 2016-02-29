@@ -16,16 +16,13 @@ var Playlist = React.createClass({
     socket.on("playItem", this.playItem);
   },
 
-  setItems: function(items) {
-    this.setState({items: items});
-  },
-
   addItems: function(data) {
     var items = this.state.items.concat(data);
     var previousState = this.state.items.length;
     if(previousState == 0) items[0].selected = true;
-    this.setState({items: items});
-    if(previousState == 0) this.props.playItem(0);
+    this.setState({items: items}, function() {
+      if(previousState == 0) this.props.playItem(0);
+    });
   },
 
   onRemoveItem: function(event) {
@@ -90,6 +87,7 @@ var Playlist = React.createClass({
     var items = this.state.items.slice();
     var selected = this.selected();
     var nextIndex = selected + 1;
+
     if(items.length <= nextIndex) {
       nextIndex = 0;
     }

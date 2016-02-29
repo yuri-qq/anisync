@@ -1,5 +1,5 @@
-var PlaylistControl = React.createClass({
-  displayName: "PlaylistControl",
+var PlaylistControls = React.createClass({
+  displayName: "PlaylistControls",
 
   getInitialState: function() {
     return {value: "", addPlaylist: false};
@@ -34,13 +34,12 @@ var PlaylistControl = React.createClass({
 
   render: function() {
     return(
-      React.createElement("div", {id: "playlist-controls"},
+      React.createElement("div", {id: "playlist-controls", className: (this.props.moderator ? "" : "hidden")},
         React.createElement("label", null, 
           React.createElement("input", {
             type: "checkbox",
             checked: this.state.addPlaylist,
-            onChange: this.handleCheckboxChange,
-            disabled: (this.props.moderator ? false : true)
+            onChange: this.handleCheckboxChange
           }),
           React.createElement("span", null, "add a playlist")
         ),
@@ -54,13 +53,15 @@ var PlaylistControl = React.createClass({
             type: "text",
             placeholder: "paste video or audio url here",
             value: this.state.value,
-            onChange: this.handleChange, onKeyUp: this.handleKeyUp,
+            onChange: this.handleChange,
+            onKeyUp: this.handleKeyUp,
             onBlur: this.handleFocusLose,
-            disabled: (this.props.moderator ? this.props.disabled : true)
+            disabled: this.props.disabled
           }),
           React.createElement("button", {id: "playlist_add", className: "button", disabled: this.props.disabled, onClick: this.handleInput}, "add")
         ),
-        React.createElement("div", {className: "error " + (!this.props.inputError || this.props.disabled ? "hidden" : "")}, "No compatible video or audio files found")
+        React.createElement("div", {className: "error " + (!this.props.inputError || this.props.disabled ? "hidden" : "")}, "No compatible video or audio files found"),
+        React.createElement(PlaylistLoader, {channelId: this.props.channelId, getPlaylist: this.props.getPlaylist})
       )
     );
   }

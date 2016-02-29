@@ -4,7 +4,7 @@ var App = React.createClass({
   displayName: "App",
 
   getInitialState: function() {
-    return {moderator: false};
+    return {moderator: false, channelId: window.location.href.split("/").pop()};
   },
 
   componentDidMount: function() {
@@ -31,6 +31,7 @@ var App = React.createClass({
     videoplayer.on("clickedProgressbar", this.clickedProgressbar);
 
     videoplayer.on("ended", this.ended);
+    videoplayer.on("error", this.error);
     
     socket.on("joinSetup", function() { socket.emit("joinSetup"); });
     socket.on("play", this.play);
@@ -38,13 +39,13 @@ var App = React.createClass({
     socket.on("seeked", this.seeked); 
     socket.on("setup", this.setup);
     socket.on("requestTime", this.pushTime);
-    socket.emit("join", window.location.href.split("/").pop());
+    socket.emit("join", this.state.channelId);
   },
 
   setup: function(data) {
     if(data.users.length > 0) this.refs.userApp.setUsers(data.users);
     if(data.playlist.length > 0) {
-      this.refs.playlistApp.refs.playlist.setItems(data.playlist);
+      this.refs.playlistApp.refs.playlist.setState({items: data.playlist});
       socket.on("pushTime", this.receiveTime);
       socket.emit("getTime");
     }
@@ -59,7 +60,7 @@ var App = React.createClass({
 
     var items = this.refs.playlistApp.refs.playlist.state.items.slice();
     items[data.selected].selected = true;
-    this.refs.playlistApp.refs.playlist.setItems(items);
+    this.refs.playlistApp.refs.playlist.setState({items: items});
 
     videoplayer.src(this.refs.playlistApp.refs.playlist.state.items[data.selected].url);
     videoplayer.on("loadedmetadata", function() {
@@ -143,6 +144,10 @@ var App = React.createClass({
     for(var i = 0; i < this.refs.userApp.state.users.length; i++) {
       if(this.refs.userApp.state.users[i].socketId == socket.id) return this.refs.userApp.state.users[i].moderator;
     }
+  },
+
+  error: function(error) {
+    console.log(error);
   },
 
   render: function() {

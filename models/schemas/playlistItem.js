@@ -4,6 +4,7 @@ var Schema = mongoose.Schema;
 
 var playlistItemSchema = new Schema({
   url: String,
+  webpage: String,
   title: String
 });
 

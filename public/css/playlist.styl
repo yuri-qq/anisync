@@ -1,5 +1,4 @@
 #playlist-controls
-  height 61px
   margin-top 10px
   margin-bottom 10px
   
@@ -7,7 +6,7 @@
   display inline-block
   margin-bottom 3px
 
-#playlist-controls input
+#playlist-controls input, #playlist-controls select
   flex-grow 1
 
 #playlist-controls input:disabled
@@ -21,10 +20,29 @@
   cursor default
   &:hover
     background-color grey
+    
+#playlist-controls #loader
+  margin-top 15px
+  
+#playlist-controls #loader .input-button
+  margin-top 5px
+  width 400px
+
+#playlist-controls .load
+  width 50px
+  
+#playlist-controls .remove
+  width 70px
+  
+#playlist-controls .save
+  width 120px
 
 #playlist
   flex-grow 1
   margin-top 30px
+  padding 5px
+  overflow-y scroll
+  max-height 488px
 
 #playlist li
   width 100%
