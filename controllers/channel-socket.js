@@ -41,7 +41,7 @@ Socket.prototype = {
 
     Channel.findOne({_id: this.id}, function(error, data) {
       if(error) throw error;
-      if(!data) throw new Error("No channel found");
+      if(!data) return;
 
       if(!data.private || this.socket.request.session.loggedInId == this.id) {
 
