@@ -4,7 +4,7 @@ var App = React.createClass({
   displayName: "App",
 
   getInitialState: function() {
-    return {moderator: false, channelId: window.location.href.split("/").pop()};
+    return {moderator: false, channelId: window.location.href.split("/").pop(), lastErrorId: ""};
   },
 
   componentDidMount: function() {
@@ -146,8 +146,25 @@ var App = React.createClass({
     }
   },
 
-  error: function(error) {
-    console.log(error);
+  error: function(e) {
+    var error = videoplayer.error();
+    //error code 4: video not supported (or video url expired etc.)
+    if(error.code === 4) {
+      var items = this.refs.playlistApp.refs.playlist.state.items.slice();
+      var i = this.refs.playlistApp.refs.playlist.selected();
+      var id = items[i].id;
+      //don't try to get a new url for a video twice in a row
+      if(id !== this.state.lastErrorId) {
+        this.setState({lastErrorId: id});
+        items[i].refreshing = true;
+        socket.emit("refreshItem", id);
+      }
+      else {
+        //video url threw same error again, refreshing failed
+        items[i].error = true;
+      }
+      this.refs.playlistApp.refs.playlist.setState({items: items});
+    }
   },
 
   render: function() {

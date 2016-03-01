@@ -32,6 +32,7 @@ Socket.prototype = {
     this.socket.on("loadPlaylist", this.loadPlaylist.bind(this));
     this.socket.on("removeItem", this.removeItem.bind(this));
     this.socket.on("moveItem", this.moveItem.bind(this));
+    this.socket.on("refreshItem", this.refreshItem.bind(this));
     this.socket.on("playItem", this.playItem.bind(this));
     this.socket.on("chatMessage", this.chatMessage.bind(this));
     this.socket.on("updateUser", this.updateUser.bind(this));
@@ -62,8 +63,8 @@ Socket.prototype = {
             this.io.of("/index").emit("addChannel", channel);
             return;
           }
-
           this.io.of("/index").emit("incrementUsercount", this.id);
+
         }.bind(this));
 
       }
@@ -163,16 +164,28 @@ Socket.prototype = {
 
   //if video url (potentially) expired fetch a new one from the webpage
   refreshItem: function(id) {
-    Channel.findOne({"playlist._id": id}, function(error, data) {
-      if(error) throw error;
+    Channel.findOne({_id: this.id}, function(error, data) {
+      //only allow a single client to trigger a refresh
+      if(this.socket.client.id === data.users[0].socketId) {
+        Channel.findOne({"playlist._id": id}, {"playlist.$": 1}, function(error, data) {
+          if(error) throw error;
 
-      console.log(data);
-      youtubedl.getInfo(data.url, {}, {maxBuffer: 1024000 * 5}, function(error, media) {
-        if(error) throw error;
+          var args = [];
+          if(data.playlist[0].webpage.indexOf("youtube.com") > -1 && this.config.youtubedlProxy.host && this.config.youtubedlProxy.port) args = args.concat(["--proxy", this.config.youtubedlProxy.host + ":" + this.config.youtubedlProxy.port]);
+          youtubedl.getInfo(data.playlist[0].webpage, args, {maxBuffer: 1024000 * 5}, function(error, media) {
+            var data = {id: id};
+            if(!error) {
+              Channel.findOneAndUpdate({"playlist._id": id}, {$set: {"playlist.$.url": media.url}}).exec();
+              data.url = media.url;
+            }
+            else {
+              data.error = true;
+            }
+            this.io.of("/channels").to(this.id).emit("refreshItem", data);
 
-        Channel.findOneAndUpdate({"playlist._id": id}, {$set: {"playlist.$.url": media.url}}).exec();
-        this.io.of("/channels").to(this.id).emit("refreshItem", {id: id, url: media.url});
-      }.bind(this));
+          }.bind(this));
+        }.bind(this));
+      }
     }.bind(this));
   },
 

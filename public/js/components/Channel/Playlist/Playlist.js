@@ -120,12 +120,12 @@ var Playlist = React.createClass({
           var options = {
             key: playlistItem.id,
             playlistItem: playlistItem,
-            onRemoveItem: this.onRemoveItem,
-            clickedItem: this.clickedItem,
-            index: index
+            onRemoveItem: (playlistItem.refreshing ? false : this.onRemoveItem),
+            clickedItem: (playlistItem.refreshing ? false : this.clickedItem),
+            index: index,
+            refreshing: playlistItem.refreshing,
+            className: (playlistItem.selected ? "selected " : "") + (playlistItem.refreshing ? "refreshing " : "") + (playlistItem.error ? "error" : "")
           }
-
-          if(playlistItem.selected) options.className = "selected";
 
           return(
             React.createElement(PlaylistItem, options)

@@ -21,6 +21,9 @@
   &:hover
     background-color grey
     
+#playlist-controls .la-ball-clip-rotate
+  margin 4px 0 0 8px
+    
 #playlist-controls #loader
   margin-top 15px
   
@@ -39,7 +42,7 @@
 
 #playlist
   flex-grow 1
-  margin-top 30px
+  margin 30px 0 20px 0
   padding 5px
   overflow-y scroll
   max-height 488px
@@ -55,7 +58,21 @@
   margin-bottom 8px
   list-style-type none
   overflow hidden
+  transition all 0.3s ease 0s
 
+#playlist li.refreshing
+  cursor default
+  background-color #727272
+  
+#playlist .la-ball-clip-rotate
+  margin 4px 8px 0 8px
+  position relative
+  float left
+  color #FFFFFF
+  
+#playlist li.error
+  background-color #FF6E6E
+  
 #playlist li .drag
   text-align center
   color #FFFFFF
