@@ -1,4 +1,4 @@
-var Channel = require("../models/channel");
+﻿var Channel = require("../models/channel");
 var youtubedl = require("youtube-dl");
 
 function ChannelSocketController(io, config) {
@@ -121,43 +121,80 @@ Socket.prototype = {
     }.bind(this));
   },
 
-  addItems: function(data) {
-    this.isModerator(function() {
-      var args = [];
+  getMedia: function(url, addPlaylist, callback) {
+    var args = [];
 
-      //route traffic to youtube through http proxy to circumvent IP blocks
-      if(data.url.indexOf("youtube.com") > -1 && this.config.youtubedlProxy.host && this.config.youtubedlProxy.port) args = args.concat(["--proxy", this.config.youtubedlProxy.host + ":" + this.config.youtubedlProxy.port]);
-      if(!data.addPlaylist) args = args.concat(["--playlist-end", "1"]);
+    //route traffic to youtube through http proxy to circumvent IP blocks
+    if(url.indexOf("youtube.com") > -1 && this.config.youtubedlProxy.host && this.config.youtubedlProxy.port) args = args.concat(["--proxy", this.config.youtubedlProxy.host + ":" + this.config.youtubedlProxy.port]);
+    if(!addPlaylist) args = args.concat(["--playlist-end", "1"]);
 
-      youtubedl.getInfo(data.url, args, {maxBuffer: 1024000 * 5}, function(error, media) {
-        if(!error) {
-          if(Object.prototype.toString.call(media) !== "[object Array]") {
-            media = [media];
-          }
+    youtubedl.getInfo(url, args, {maxBuffer: 1024000 * 5}, function(error, media) {
+      if(!error) {
+        if(Object.prototype.toString.call(media) !== "[object Array]") {
+          media = [media];
+        }
 
-          var files = [];
-          if(data.addPlaylist) {
-            for(var i = 0; i < media.length; i++) {
-              files.push({url: media[i].url, webpage: media[i].webpage_url, title: media[i].title});
+        var files = [];
+        
+        for(var i = 0; i < media.length; i++) {
+          var formats = [];
+          if(media[i].formats) {
+            for(var i2 = 0; i2 < media[i].formats.length; i2++) {
+              if(media[i].formats[i2].format_note != "DASH video" && media[i].formats[i2].format_note != "DASH audio") {
+                if((media[i].formats[i2].ext == "mp4" || media[i].formats[i2].ext == "webm")) {
+                  formats.push({
+                    type: "video/" + media[i].formats[i2].ext,
+                    src: media[i].formats[i2].url,
+                    res: media[i].formats[i2].height,
+                    label: media[i].formats[i2].height + "p"
+                  });
+                }
+                else if(media[i].formats[i2].ext == "mp3" || media[i].formats[i2].ext == "ogg") {
+                  formats.push({
+                    type: "audio/" + media[i].formats[i2].ext,
+                    src: media[i].formats[i2].url,
+                    label: "audio"
+                  });
+                }
+              }
             }
           }
           else {
-            files[0] = {url: media[0].url, webpage: media[0].webpage_url, title: media[0].title};
+            formats.push({
+              src: media[i].url,
+              label: (media[i].height ? media[i].height + "p" : "unknown")
+            });
           }
+          formats.reverse();
 
-          Channel.findOneAndUpdate({_id: this.id}, {$push: {playlist: {$each: files}}}, {upsert: true, new: true}, function(error, data) {
-            if(error) throw error;
+          if(!formats.length) return callback(true);
 
-            for(var i = 0; i < files.length; i++) {
-              files[i].id = data.playlist[data.playlist.length - files.length + i].id;
-            }
-            this.io.of("/channels").to(this.id).emit("addItems", files);
-          }.bind(this));
+          files.push({formats: formats, webpage: media[i].webpage_url, title: media[i].title});
+          return callback(false, files);
         }
-        else {
-          console.log(error);
+      }
+      else {
+        return callback(true);
+      }
+    });
+  },
+
+  addItems: function(data) {
+    this.isModerator(function() {
+      this.getMedia(data.url, data.addPlaylist, function(error, files) {
+        if(error) {
           this.socket.emit("addItems", {error: error});
+          return;
         }
+
+        Channel.findOneAndUpdate({_id: this.id}, {$push: {playlist: {$each: files}}}, {upsert: true, new: true}, function(error, data) {
+          if(error) throw error;
+
+          for(var i = 0; i < files.length; i++) {
+            files[i].id = data.playlist[data.playlist.length - files.length + i].id;
+          }
+          this.io.of("/channels").to(this.id).emit("addItems", files);
+        }.bind(this));
       }.bind(this));
     }.bind(this));
   },
@@ -170,19 +207,14 @@ Socket.prototype = {
         Channel.findOne({"playlist._id": id}, {"playlist.$": 1}, function(error, data) {
           if(error) throw error;
 
-          var args = [];
-          if(data.playlist[0].webpage.indexOf("youtube.com") > -1 && this.config.youtubedlProxy.host && this.config.youtubedlProxy.port) args = args.concat(["--proxy", this.config.youtubedlProxy.host + ":" + this.config.youtubedlProxy.port]);
-          youtubedl.getInfo(data.playlist[0].webpage, args, {maxBuffer: 1024000 * 5}, function(error, media) {
-            var data = {id: id};
-            if(!error) {
-              Channel.findOneAndUpdate({"playlist._id": id}, {$set: {"playlist.$.url": media.url}}).exec();
-              data.url = media.url;
-            }
-            else {
-              data.error = true;
-            }
+          this.getMedia(data.playlist[0].webpage, false, function(error, files) {
+            var data = {
+              id: id,
+              error: error,
+              formats: files[0].formats
+            };
+            if(!error) Channel.findOneAndUpdate({"playlist._id": id}, {$set: {"playlist.$.formats": files[0].formats}}).exec();
             this.io.of("/channels").to(this.id).emit("refreshItem", data);
-
           }.bind(this));
         }.bind(this));
       }
@@ -256,11 +288,13 @@ Socket.prototype = {
     this.socket.to(this.id).emit("disconnected", {socketId: this.socket.client.id, username: this.socket.request.session.username});
     Channel.update({_id: this.id}, {$pull: {users: {socketId: this.socket.client.id}}}, function(error, data) {
       if(error) throw error;
-
+      if(!data) return;
+      
       this.io.of("/index").emit("decrementUsercount", this.id);
 
       Channel.findOne({_id: this.id}, function(error, data) {
         if(error) throw error;
+        if(!data) return;
 
         if(data.users.length == 0) {
           Channel.remove({_id: this.id}, function(error) {

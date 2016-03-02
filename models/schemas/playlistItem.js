@@ -3,7 +3,7 @@ var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
 var playlistItemSchema = new Schema({
-  url: String,
+  formats: Array,
   webpage: String,
   title: String
 });

@@ -1,5 +1,6 @@
 /node_modules/
 config.json
+*.fuse_hidden*
 *.key
 *.crt
 *.css

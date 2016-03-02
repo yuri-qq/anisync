@@ -8,7 +8,13 @@ var App = React.createClass({
   },
 
   componentDidMount: function() {
-    videoplayer = videojs("video", {}, this.updateStatus);
+    videoplayer = videojs("video", {
+      plugins: {
+        videoJsResolutionSwitcher: {
+          default: "low"
+        }
+      }
+    }, this.updateStatus);
 
     videoplayer.disable = function() {
       document.getElementsByClassName("vjs-tech")[0].style["pointer-events"] = "none";
@@ -30,6 +36,7 @@ var App = React.createClass({
     videoplayer.on("clickedPause", this.clickedPause);
     videoplayer.on("clickedProgressbar", this.clickedProgressbar);
 
+    videoplayer.on("resolutionchange", this.resolutionchange);
     videoplayer.on("ended", this.ended);
     videoplayer.on("error", this.error);
     
@@ -62,7 +69,7 @@ var App = React.createClass({
     items[data.selected].selected = true;
     this.refs.playlistApp.refs.playlist.setState({items: items});
 
-    videoplayer.src(this.refs.playlistApp.refs.playlist.state.items[data.selected].url);
+    videoplayer.updateSrc(this.refs.playlistApp.refs.playlist.state.items[data.selected].formats);
     videoplayer.on("loadedmetadata", function() {
       videoplayer.off("loadedmetadata");
       videoplayer.currentTime(data.currentTime);
@@ -123,7 +130,7 @@ var App = React.createClass({
       socket.emit("ready");
     });
 
-    videoplayer.src(this.refs.playlistApp.refs.playlist.state.items[index].url);
+    videoplayer.updateSrc(this.refs.playlistApp.refs.playlist.state.items[index].formats);
   },
 
   disablePlayer: function() {
@@ -134,6 +141,22 @@ var App = React.createClass({
   enablePlayer: function() {
     videoplayer.enable();
     this.refs.playlistApp.refs.playlist._sortableInstance.option("disabled", false);
+  },
+
+  // set "high" as default resolution if 720p or greater is selected
+  resolutionchange: function() {
+    var currentResolution = videoplayer.currentResolution();
+    for (var i = currentResolution.sources.length - 1; i >= 0; i--) {
+      if(currentResolution.label === currentResolution.sources[i].label) {
+        if(currentResolution.sources[i].res >= 720) {
+          var options = {default: "high"}; 
+        }
+        else {
+          var options = {default: "low"}; 
+        }
+        videoplayer.videoJsResolutionSwitcher(options);
+      }
+    }
   },
 
   setModerator: function(moderator) {
