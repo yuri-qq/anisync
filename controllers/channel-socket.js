@@ -170,8 +170,8 @@ Socket.prototype = {
           if(!formats.length) return callback(true);
 
           files.push({formats: formats, webpage: media[i].webpage_url, title: media[i].title});
-          return callback(false, files);
         }
+        return callback(false, files);
       }
       else {
         return callback(true);
