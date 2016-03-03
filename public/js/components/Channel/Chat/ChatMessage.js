@@ -12,8 +12,11 @@ var ChatMessage = React.createClass({
     else {
       return(
         React.createElement("div", {className: "message"},
-          React.createElement("div", {className: "username"}, this.props.username + ":"),
-          React.createElement("div", {className: "text"}, this.props.text)
+          React.createElement("div", {className: "header"},
+            React.createElement("span", {className: "time"}, "[" + this.props.time + "]"),
+            React.createElement("span", {className: "username"}, this.props.username + ":")
+          ),
+          React.createElement(Linkify, {className: "text", urls: this.props.urls}, this.props.text)
         )
       );
     }

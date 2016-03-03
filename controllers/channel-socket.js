@@ -1,5 +1,7 @@
 ﻿var Channel = require("../models/channel");
 var youtubedl = require("youtube-dl");
+var linkify = require("linkify-it")();
+linkify.tlds(require("tlds")); 
 
 function ChannelSocketController(io, config) {
   if(!(this instanceof ChannelSocketController)) return new ChannelSocketController(io, config);
@@ -257,7 +259,8 @@ Socket.prototype = {
   },
 
   chatMessage: function(text) {
-    this.io.of("/channels").to(this.id).emit("chatMessage", {username: this.socket.request.session.username, text: text});
+    var matches = linkify.match(text);
+    this.io.of("/channels").to(this.id).emit("chatMessage", {username: this.socket.request.session.username, text: text, urls: matches});
   },
 
   updateUser: function(data) {

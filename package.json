@@ -16,14 +16,16 @@
     "express": "^4.13.4",
     "express-minify": "^0.2.0",
     "express-session": "^1.13.0",
-    "mongoose": "^4.4.4",
     "jade": "^1.11.0",
+    "jstransformer-marked": "^1.0.1",
+    "linkify-it": "^1.2.0",
+    "marked": "^0.3.5",
+    "mongoose": "^4.4.4",
     "shortid": "^2.2.4",
     "socket.io": "^1.4.5",
     "stylus": "^0.53.0",
-    "youtube-dl": "^1.10.5",
-    "marked": "^0.3.5",
-    "jstransformer-marked": "^1.0.1"
+    "tlds": "^1.96.0",
+    "youtube-dl": "^1.10.5"
   },
   "devDependencies": {
     "morgan": "^1.7.0"

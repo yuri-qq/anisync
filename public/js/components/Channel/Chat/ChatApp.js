@@ -9,10 +9,6 @@ var ChatApp = React.createClass({
     socket.on("chatMessage", this.chatMessage);
   },
 
-  componentWillReceiveProps: function(nextProps) {
-    this.props.users
-  },
-
   handleInput: function(input) {
     socket.emit("chatMessage", input);
   },
@@ -27,11 +23,13 @@ var ChatApp = React.createClass({
 
   chatMessage: function(message) {
     message.info = false;
+    var date = new Date();
+    message.time = date.getHours() + ":" + date.getMinutes();
     this.appendMessage(message)
   },
 
   appendMessage: function(message) {
-    var messages = this.state.messages.concat([{info: message.info, username: message.username, text: message.text}]);
+    var messages = this.state.messages.concat([message]);
     this.setState({messages: messages});
     this.refs.chatWindow.scrollTop = this.refs.chatWindow.scrollHeight;
   },
@@ -41,7 +39,7 @@ var ChatApp = React.createClass({
       React.createElement("div", {id: "chat-app"}, 
         React.createElement("div", {ref: "chatWindow", id: "chat"}, 
           this.state.messages.map(function(message, index) {
-            return React.createElement(ChatMessage, {key: index, info: message.info, username: message.username, text: message.text});
+            return React.createElement(ChatMessage, {key: index, info: message.info, username: message.username, text: message.text, urls: message.urls, time: message.time});
           })
         ),
         React.createElement(ChatControls, {handleInput: this.handleInput})
