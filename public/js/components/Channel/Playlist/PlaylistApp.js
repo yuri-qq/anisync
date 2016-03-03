@@ -38,7 +38,7 @@ var PlaylistApp = React.createClass({
       if(items[i].id == data.id) {
         items[i].refreshing = false;
         if(!data.error) {
-          items[i].url = data.url;
+          items[i].formats = data.formats;
           items[i].error = false;
         }
         else {
