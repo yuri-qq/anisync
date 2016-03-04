@@ -46,6 +46,7 @@ var App = React.createClass({
     socket.on("seeked", this.seeked); 
     socket.on("setup", this.setup);
     socket.on("requestTime", this.pushTime);
+    socket.on("loadPlaylist", this.loadPlaylist);
     socket.emit("join", this.state.channelId);
   },
 
@@ -129,17 +130,17 @@ var App = React.createClass({
   },
 
   playItem: function(index) {
-    videoplayer.currentTime(0);
     this.setState({canplaythrough: false});
 
+    var self = this;
     //wait until video can be played without having to buffer and report to server that the client is ready
     videoplayer.one("canplaythrough", function() {
       //limit ready emit to one time only (videoplayer.one() unexpectedly fires multiple times)
-      if(!this.state.canplaythrough) {
-        this.setState({canplaythrough: true});
+      if(!self.state.canplaythrough) {
+        self.setState({canplaythrough: true});
         socket.emit("ready");
       }
-    }.bind(this));
+    });
 
     videoplayer.updateSrc(this.refs.playlistApp.refs.playlist.state.items[index].formats);
   },

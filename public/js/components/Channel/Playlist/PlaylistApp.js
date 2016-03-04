@@ -10,7 +10,6 @@ var PlaylistApp = React.createClass({
     socket.on("removeItem",this.removeItem);
     socket.on("moveItem", this.moveItem);
     socket.on("refreshItem", this.refreshItem);
-    socket.on("loadPlaylist", this.loadPlaylist);
   },
 
   addItems: function(data) {
