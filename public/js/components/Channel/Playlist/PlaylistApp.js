@@ -68,13 +68,6 @@ var PlaylistApp = React.createClass({
     return this.refs.playlist.state.items;
   },
 
-  loadPlaylist: function(items) {
-    items[0].selected = true;
-    this.refs.playlist.setState({items: items}, function() {
-      this.props.playItem(0);
-    });
-  },
-
   render: function() {
     return(
       React.createElement("div", {id: "playlist-app"},

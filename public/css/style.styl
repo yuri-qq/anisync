@@ -60,7 +60,7 @@ input[type=submit]
   font-size 16px
   font-family 'Exo 2', sans-serif
 
-.button
+button
   height 40px
   border none
   text-align center;
@@ -79,8 +79,12 @@ input[type=submit]
 .input-button
   display flex
   
-.input-button .button
+.input-button input
+  flex-grow 1
+
+.input-button button
   width 50px
+  flex-shrink 0
 
 .seperator
   height 1px

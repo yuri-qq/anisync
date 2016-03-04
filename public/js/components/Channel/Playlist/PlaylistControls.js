@@ -58,7 +58,7 @@ var PlaylistControls = React.createClass({
             onBlur: this.handleFocusLose,
             disabled: this.props.disabled
           }),
-          React.createElement("button", {id: "playlist_add", className: "button", disabled: this.props.disabled, onClick: this.handleInput}, "add")
+          React.createElement("button", {id: "playlist_add", disabled: this.props.disabled, onClick: this.handleInput}, "add")
         ),
         React.createElement("div", {className: "error " + (!this.props.inputError || this.props.disabled ? "hidden" : "")}, "No compatible video or audio files found"),
         React.createElement(PlaylistLoader, {channelId: this.props.channelId, getPlaylist: this.props.getPlaylist})

@@ -97,7 +97,14 @@ Socket.prototype = {
         for(var i = 0; i < data.users.length; i++) {
           Channel.update({"users.socketId": data.users[i].socketId}, {$set: {"users.$.ready": false}}).exec();
         }
-        this.io.of("/channels").to(this.id).emit("play", 0);
+
+        /*
+          start synced playback, assume clients are at 0:00 
+          and don't set it explicitly before playing to not reset the player's ready state
+          which would cause the playing video to stay at 0:00 (tested in Firefox)
+        */
+        this.io.of("/channels").to(this.id).emit("play");
+
         Channel.update({_id: this.id}, {playing: true}).exec();
       }
     }.bind(this));
@@ -176,6 +183,7 @@ Socket.prototype = {
         return callback(false, files);
       }
       else {
+        console.log(error);
         return callback(true);
       }
     });

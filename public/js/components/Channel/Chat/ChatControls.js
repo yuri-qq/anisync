@@ -24,7 +24,7 @@ var ChatControls = React.createClass({
     return(
       React.createElement("div", {className: "input-button"},
         React.createElement("input", {type: "text", placeholder: "type a message", value: this.state.value, onChange: this.handleChange, onKeyUp: this.handleKeyUp}),
-        React.createElement("button", {className: "button", disabled: this.props.disabled, onClick: this.handleInput}, "send")
+        React.createElement("button", {disabled: this.props.disabled, onClick: this.handleInput}, "send")
       )
     );
   }

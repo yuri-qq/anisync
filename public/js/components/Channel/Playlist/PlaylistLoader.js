@@ -50,12 +50,12 @@ var PlaylistLoader = React.createClass({
               return React.createElement("option", {value: value}, value);
             })
           ),
-          React.createElement("button", {className: "button load", onClick: this.load}, "load"),
-          React.createElement("button", {className: "button remove", onClick: this.remove}, "remove")
+          React.createElement("button", {className: "load", onClick: this.load}, "load"),
+          React.createElement("button", {className: "remove", onClick: this.remove}, "remove")
         ),
         React.createElement("div", {className: "input-button"},
           React.createElement("input", {type: "text", value: this.state.value, onChange: this.handleInput}),
-          React.createElement("button", {className: "button save", onClick: this.save}, "save/add")
+          React.createElement("button", {className: "save", onClick: this.save}, "save/add")
         )
       )
     );

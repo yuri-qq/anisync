@@ -4,7 +4,7 @@ var App = React.createClass({
   displayName: "App",
 
   getInitialState: function() {
-    return {moderator: false, channelId: window.location.href.split("/").pop(), lastErrorId: ""};
+    return {moderator: false, channelId: window.location.href.split("/").pop(), lastErrorId: "", canplaythrough: false};
   },
 
   componentDidMount: function() {
@@ -59,7 +59,11 @@ var App = React.createClass({
   },
 
   pushTime: function() {
-    socket.emit("pushTime", {selected: this.refs.playlistApp.refs.playlist.selected(), currentTime: videoplayer.currentTime(), playing: !videoplayer.paused()});
+    socket.emit("pushTime", {
+      selected: this.refs.playlistApp.refs.playlist.selected(),
+      currentTime: videoplayer.currentTime(),
+      playing: !videoplayer.paused()
+    });
   },
 
   receiveTime: function(data) {
@@ -95,7 +99,7 @@ var App = React.createClass({
   },
 
   play: function(time) {
-    videoplayer.currentTime(time);
+    if(typeof time !== "undefined") videoplayer.currentTime(time);
     videoplayer.play();
   },
 
@@ -125,10 +129,17 @@ var App = React.createClass({
   },
 
   playItem: function(index) {
-    videoplayer.on("loadedmetadata", function() {
-      videoplayer.off("loadedmetadata");
-      socket.emit("ready");
-    });
+    videoplayer.currentTime(0);
+    this.setState({canplaythrough: false});
+
+    //wait until video can be played without having to buffer and report to server that the client is ready
+    videoplayer.one("canplaythrough", function() {
+      //limit ready emit to one time only (videoplayer.one() unexpectedly fires multiple times)
+      if(!this.state.canplaythrough) {
+        this.setState({canplaythrough: true});
+        socket.emit("ready");
+      }
+    }.bind(this));
 
     videoplayer.updateSrc(this.refs.playlistApp.refs.playlist.state.items[index].formats);
   },
@@ -169,6 +180,15 @@ var App = React.createClass({
     }
   },
 
+  loadPlaylist: function(items) {
+    videoplayer.pause();
+    items[0].selected = true;
+    this.setState({lastErrorId: ""});
+    this.refs.playlistApp.refs.playlist.setState({items: items}, function() {
+      this.playItem(0);
+    });
+  },
+
   error: function(e) {
     var error = videoplayer.error();
     //error code 4: video not supported (or video url expired etc.)
@@ -196,7 +216,14 @@ var App = React.createClass({
         React.createElement(VideoApp, {ref: "player"}),
         React.createElement(ChatApp, {ref: "chatApp"}),
         React.createElement(PlaylistApp, {ref: "playlistApp", playItem: this.playItem, moderator: this.state.moderator}),
-        React.createElement(UserApp, {ref: "userApp", chatApp: this.refs.chatApp, disablePlayer: this.disablePlayer, enablePlayer: this.enablePlayer, moderator: this.state.moderator, setModerator: this.setModerator})
+        React.createElement(UserApp, {
+          ref: "userApp",
+          chatApp: this.refs.chatApp,
+          disablePlayer: this.disablePlayer,
+          enablePlayer: this.enablePlayer,
+          moderator: this.state.moderator,
+          setModerator: this.setModerator
+        })
       )
     );
   }
