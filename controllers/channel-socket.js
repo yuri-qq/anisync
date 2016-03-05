@@ -133,7 +133,7 @@ class Socket {
   seeked(time) {
     var self = this;
     this.isModerator(function() {
-      this.socket.to(self.id).emit("seeked", time);
+      self.socket.to(self.id).emit("seeked", time);
     });
   }
 
