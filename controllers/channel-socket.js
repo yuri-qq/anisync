@@ -33,6 +33,7 @@ class Socket {
       this.socket.on("chatMessage", (text) => this.chatMessage(text));
       this.socket.on("updateUser", (data) => this.updateUser(data));
       this.socket.on("moderatorUpdate", (data) => this.moderatorUpdate(data));
+      this.socket.on("kickban", (data) => this.kickban(data));
       this.socket.on("disconnect", () => this.disconnect());
       this.join(id);
     });
@@ -44,7 +45,7 @@ class Socket {
       if(error) throw error;
       if(!data) return;
 
-      if(!data.private || self.socket.request.session.loggedInId == self.id) {
+      if((!data.private || self.socket.request.session.loggedInId === self.id) && data.bannedIPs.indexOf(self.socket.handshake.address) === -1) {
 
         self.socket.join(self.id);
         console.log(self.socket.client.id + " joined " + id);
@@ -248,6 +249,25 @@ class Socket {
         }
       }
     });
+  }
+
+  kickban(data) {
+    var self = this;
+    this.isModerator(function() {
+      var socket = self.io.nsps["/channels"].sockets["/channels#" + data.socketId];
+      if(socket) {
+        if(data.ban) Channel.update({_id: self.id}, {$push: {bannedIPs: socket.handshake.address}}).exec();
+        data.username = self.getUsername(data.socketId);
+        self.io.of("/channels").to(self.id).emit("kickban", data);
+        socket.disconnect();
+      }
+    });
+  }
+
+  getUsername(id) {
+    var socket = this.io.nsps["/channels"].sockets["/channels#" + id];
+    if(socket) return socket.request.session.username;
+    return false;
   }
 
   disconnect() {

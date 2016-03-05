@@ -7,6 +7,7 @@ var ChatApp = React.createClass({
 
   componentDidMount: function() {
     socket.on("chatMessage", this.chatMessage);
+    socket.on("kickban", this.kickban);
   },
 
   handleInput: function(input) {
@@ -25,7 +26,12 @@ var ChatApp = React.createClass({
     message.info = false;
     var date = new Date();
     message.time = ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
-    this.appendMessage(message)
+    this.appendMessage(message);
+  },
+
+  kickban: function(data) {
+    if(data.socketId == socket.id) window.location = window.location + (data.ban ? "/banned" : "/kicked");
+    this.appendMessage({info: true, username: data.username, text: (data.ban ? "was banned" : "was kicked")});
   },
 
   appendMessage: function(message) {

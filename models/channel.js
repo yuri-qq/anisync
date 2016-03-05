@@ -17,6 +17,7 @@ var channelSchema = new Schema({
   password: String,
   users: [userSchema],
   playlist: [playlistItemSchema],
+  bannedIPs: [String],
   createdAt: {type: Date, expires: 10, default: Date.now} //expire after 10 seconds (if no user joins)
 });
 

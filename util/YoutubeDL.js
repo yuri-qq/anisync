@@ -1,14 +1,14 @@
 "use strict";
-var app = require("../app")
-var config = require("../config.json")[app.get("env")];
 var youtubedl = require("youtube-dl");
+var app = require("../app")
+const CONFIG = require("../config.json")[app.get("env")];
 
 class YoutubeDL {
   static getMedia(url, addPlaylist, callback) {
     var args = [];
 
     //route traffic to youtube through http proxy to circumvent IP blocks
-    if(url.indexOf("youtube.com") > -1 && config.youtubedlProxy.host && config.youtubedlProxy.port) args = args.concat(["--proxy", config.youtubedlProxy.host + ":" + config.youtubedlProxy.port]);
+    if(url.indexOf("youtube.com") > -1 && CONFIG.youtubedlProxy.host && CONFIG.youtubedlProxy.port) args = args.concat(["--proxy", CONFIG.youtubedlProxy.host + ":" + CONFIG.youtubedlProxy.port]);
     if(!addPlaylist) args = args.concat(["--playlist-end", "1"]);
 
     youtubedl.getInfo(url, args, {maxBuffer: 1024000 * 5}, function(error, media) {

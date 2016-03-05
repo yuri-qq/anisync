@@ -89,6 +89,10 @@ var UserApp = React.createClass({
     }.bind(this));
   },
 
+  kickban: function(socketId, ban) {
+    socket.emit("kickban", {socketId: socketId, ban: ban});
+  },
+
   render: function() {
     return(
       React.createElement("div", {id: "users-app"},
@@ -99,7 +103,14 @@ var UserApp = React.createClass({
         ),
         React.createElement("ul", {id: "users"}, 
           this.state.users.map(function(user) {
-            return React.createElement(UserItem, {key: user.socketId, socketId: user.socketId, user: user, moderatorUpdate: this.moderatorUpdate, moderator: this.props.moderator});
+            return React.createElement(UserItem, {
+              key: user.socketId,
+              socketId: user.socketId,
+              user: user,
+              moderatorUpdate: this.moderatorUpdate,
+              moderator: this.props.moderator,
+              kickban: this.kickban
+          });
           }, this)
         )
       )

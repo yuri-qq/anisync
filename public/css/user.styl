@@ -8,19 +8,18 @@
   
 #users-header .moderator
   display inline-block
-  width 60px
+  min-width 40px
 
 #users-header .username
   display inline-block
   width 100%
-  border-right 1px solid
   border-left 1px solid
 
 #users-header .time
   display inline-block
   width 60px
-  padding-left 8px
-  
+  flex-shrink 0
+  border-left 1px solid
 
 #users li
   list-style-type none
@@ -35,7 +34,8 @@
   line-height 30px
 
 #users .user .flex .moderator
-  width 60px
+  width 40px
+  flex-shrink 0
   line-height 32px
   text-align center
   cursor default
@@ -47,9 +47,7 @@
 #users .user .flex .username
   height 100%
   width 100%
-  flex-basis 100%
   border-left 1px solid #424242
-  border-right 1px solid #424242
   padding-left 5px
   text-align center
   vertical-align middle
@@ -57,9 +55,24 @@
   white-space nowrap
   text-overflow ellipsis
 
+#users .user .flex .mod-buttons
+  flex-shrink 0
+  padding-left 5px
+  padding-right 5px
+  border-left 1px solid #424242
+  
+#users .user .flex .mod-buttons>span
+  width 32px
+  height 100%
+  display inline-block
+  text-align center
+  cursor pointer
+
 #users .user .flex .time
+  border-left 1px solid #424242
   height 100%
   width 60px
+  flex-shrink 0
   line-height 32px
   padding-left 8px
 

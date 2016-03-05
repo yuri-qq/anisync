@@ -9,6 +9,14 @@ var UserItem = React.createClass({
     if(this.props.socketId != socket.id) socket.emit("moderatorUpdate", data);
   },
 
+  handleKick: function() {
+    this.props.kickban(this.props.user.socketId, false);
+  },
+
+  handleBan: function() {
+    this.props.kickban(this.props.user.socketId, true);
+  },
+
   render: function() {
     return(
       React.createElement("li", {className: "user"},
@@ -17,6 +25,17 @@ var UserItem = React.createClass({
             React.createElement("span", {className: "fa " + (this.props.user.moderator ? "fa-star" : (this.props.moderator ? "prev-star" : ""))})
           ),
           React.createElement("div", {className: "username"}, this.props.user.username),
+          React.createElement("div", {className: "mod-buttons " + (this.props.user.socketId == socket.id || !this.props.moderator ? "hidden" : "")},
+            React.createElement("span", {onClick: this.handleKick},
+              React.createElement("span", {className: "fa fa-user-times"})
+            ),
+            React.createElement("span", {onClick: this.handleBan},
+              React.createElement("span", {className: "fa-stack"},
+                React.createElement("span", {className: "fa fa-user fa-stack-1x"}),
+                React.createElement("span", {className: "fa fa-ban fa-stack-2x text-danger"})
+              )
+            )
+          ),
           React.createElement("div", {className: "time"}, this.props.user.time)
         ),
         React.createElement("div", {className: "progress"},

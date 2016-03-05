@@ -39,14 +39,24 @@ module.exports.create = function(req, res, next) {
   });
 };
 
-module.exports.join = function(req, res, next) {
-  Channel.findOne({"_id": req.params.id}, function(error, data) {
+function getChannel(id, next, callback) {
+  Channel.findOne({"_id": id}, function(error, data) {
     if(error) return next(error);
     if(!data) return next();
+    callback(data);
+  });
+}
 
+module.exports.join = function(req, res, next) {
+  getChannel(req.params.id, next, function(data) {
     var errors = {};
 
     if(!req.session.username) req.session.username = req.body.username;
+
+    if(data.bannedIPs.indexOf(req.connection.remoteAddress) > -1) {
+      res.redirect("/channel/" + data.id + "/banned");
+      return;
+    }
 
     if(!data.private || req.session.loggedInId == req.params.id || !req.body.password) {
       renderView();
@@ -72,5 +82,17 @@ module.exports.join = function(req, res, next) {
       }
     }
 
+  });
+};
+
+module.exports.kicked = function(req, res, next) {
+  getChannel(req.params.id, next, function(data) {
+    res.render("banned", {text: "kicked", channelname: data.name});
+  });
+};
+
+module.exports.banned = function(req, res, next) {
+  getChannel(req.params.id, next, function(data) {
+    res.render("banned", {text: "banned", channelname: data.name});
   });
 };

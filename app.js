@@ -9,16 +9,16 @@ var compression = require("compression");
 var minify = require("express-minify");
 var express = require("express");
 var app = module.exports = express();
-var config = require("./config.json")[app.get("env")];
+const CONFIG = require("./config.json")[app.get("env")];
 var http = require("http");
 var https = require("https").Server({
-  key: fs.readFileSync(config.certificate.key),
-  cert: fs.readFileSync(config.certificate.cert)
+  key: fs.readFileSync(CONFIG.certificate.key),
+  cert: fs.readFileSync(CONFIG.certificate.cert)
 }, app);
 var io = require("socket.io")(https);
 
 // database connection
-mongoose.connect("mongodb://" + config.mongodb.host + ":" + config.mongodb.port + "/" + config.mongodb.database, {user: config.mongodb.user, pass: config.mongodb.password}, function() {
+mongoose.connect("mongodb://" + CONFIG.mongodb.host + ":" + CONFIG.mongodb.port + "/" + CONFIG.mongodb.database, {user: CONFIG.mongodb.user, pass: CONFIG.mongodb.password}, function() {
   mongoose.connection.db.dropDatabase(); //delete database with temp data
 });
 
@@ -46,8 +46,8 @@ app.use(function(req, res, next) {
 });
 
 var sessionMiddleware = session({
-  store: new RedisStore({host: config.redis.host, port: config.redis.port}),
-  secret: config.sessionSecret,
+  store: new RedisStore({host: CONFIG.redis.host, port: CONFIG.redis.port}),
+  secret: CONFIG.sessionSecret,
   resave: false,
   saveUninitialized: true,
   cookie: {
@@ -67,6 +67,8 @@ app.all("/policy", site.policy);
 app.get("/create", channel.form);
 app.post("/create", channel.create);
 app.all("/channel/:id", channel.join);
+app.all("/channel/:id/kicked", channel.kicked);
+app.all("/channel/:id/banned", channel.banned);
 
 //handle 404
 app.use(function(req, res) {
@@ -82,7 +84,7 @@ app.use(function(error, req, res, next){
 });
 
 //start server
-https.listen(config.web.httpsPort, config.web.host, function() {
+https.listen(CONFIG.web.httpsPort, CONFIG.web.host, function() {
   console.log("Server listening on https://%s:%s", https.address().address, https.address().port);
 });
 
@@ -90,7 +92,7 @@ https.listen(config.web.httpsPort, config.web.host, function() {
 http.createServer(function (req, res) {
   res.writeHead(301, {"Location": "https://" + req.headers["host"] + req.url});
   res.end();
-}).listen(config.web.httpPort, config.web.host);
+}).listen(CONFIG.web.httpPort, CONFIG.web.host);
 
 //pass express session middleware to socket.io to access user session data
 io.use(function(socket, next) { 
