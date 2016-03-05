@@ -8,9 +8,13 @@ var VideoApp = React.createClass({
     this.refs.video.appendChild(video);
   },
 
+  contextMenu: function(event) {
+    event.preventDefault();
+  },
+
   render: function() {
     return (
-      React.createElement("div", {id: "video-app", ref: "video"})
+      React.createElement("div", {id: "video-app", ref: "video", onContextMenu: this.contextMenu})
     );
   }
 });

@@ -8,7 +8,7 @@ var mongoose = require("mongoose");
 var compression = require("compression");
 var minify = require("express-minify");
 var express = require("express");
-var app = express();
+var app = module.exports = express();
 var config = require("./config.json")[app.get("env")];
 var http = require("http");
 var https = require("https").Server({
@@ -48,8 +48,13 @@ app.use(function(req, res, next) {
 var sessionMiddleware = session({
   store: new RedisStore({host: config.redis.host, port: config.redis.port}),
   secret: config.sessionSecret,
-  resave: true,
-  saveUninitialized: true
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    secure: true,
+    maxAge: 31536000000,
+    expires: new Date(Date.now() + 31536000000)
+  }
 });
 
 app.use(sessionMiddleware);
@@ -92,5 +97,5 @@ io.use(function(socket, next) {
   sessionMiddleware(socket.request, socket.request.res, next);
 });
 
-index_socket = require("./controllers/index-socket")(io);
-channel_socket = require("./controllers/channel-socket")(io, config);
+var indexSocket = require("./controllers/index-socket")(io);
+var channelSocket = require("./controllers/channel-socket")(io);

@@ -24,7 +24,7 @@ var ChatApp = React.createClass({
   chatMessage: function(message) {
     message.info = false;
     var date = new Date();
-    message.time = date.getHours() + ":" + date.getMinutes();
+    message.time = ("0" + date.getHours()).slice(-2) + ":" + ("0" + date.getMinutes()).slice(-2);
     this.appendMessage(message)
   },
 
@@ -36,11 +36,13 @@ var ChatApp = React.createClass({
 
   render: function() {
     return(
-      React.createElement("div", {id: "chat-app"}, 
-        React.createElement("div", {ref: "chatWindow", id: "chat"}, 
-          this.state.messages.map(function(message, index) {
-            return React.createElement(ChatMessage, {key: index, info: message.info, username: message.username, text: message.text, urls: message.urls, time: message.time});
-          })
+      React.createElement("div", {id: "chat-app"},
+        React.createElement("div", {ref: "chatWindow", id: "chat-wrapper"},
+          React.createElement("div", {id: "chat"}, 
+            this.state.messages.map(function(message, index) {
+              return React.createElement(ChatMessage, {key: index, info: message.info, username: message.username, text: message.text, urls: message.urls, time: message.time});
+            })
+          )
         ),
         React.createElement(ChatControls, {handleInput: this.handleInput})
       )

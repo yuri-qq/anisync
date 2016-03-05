@@ -1,46 +1,42 @@
+"use strict";
 var Channel = require("../models/channel");
 
 function IndexSocketController(io) {
   if(!(this instanceof IndexSocketController)) return new IndexSocketController(io);
 
   this.io = io;
-
-  this.io.of("/index").on("connection", Socket.bind(this));
+  this.io.of("/index").on("connection", (socket) => new Socket(socket));
 }
 
-function Socket(socket, io) {
-  if(!(this instanceof Socket)) return new Socket(socket, this.io);
+class Socket {
+  constructor(socket) {
+    this.socket = socket;
 
-  this.io = io;
-  this.socket = socket;
+    console.log(this.socket.client.id + " connected");
 
-  console.log(this.socket.client.id + " connected");
+    this.socket.on("setUsername", (username) => this.setUsername(username));
+    this.socket.on("disconnect", () => this.disconnect());
 
-  this.socket.on("setUsername", this.setUsername.bind(this));
+    //find non empty channels
+    Channel.find({users: {$exists: true, $ne: []}}, (error, channels) => this.setChannels(error, channels));
+  }
 
-  //find non empty channels
-  Channel.find({users: {$exists: true, $ne: []}}, this.setChannels.bind(this));
-}
-
-Socket.prototype = {
-  setUsername: function(username) {
+  setUsername(username) {
     this.socket.request.session.username = username;
     this.socket.request.session.save();
-  },
+  }
 
-  setChannels: function(error, channels) {
+  setChannels(error, channels) {
     channels.forEach(function(channel, index) {
       channels[index] = channel.toIndex();
     });
 
     this.socket.emit("setChannels", channels);
-  },
+  }
 
-  disconnect: function() {
+  disconnect() {
     console.log(this.socket.client.id +  " disconnected");
   }
-};
-
-Socket.prototype.contructor = Socket;
+}
 
 module.exports = IndexSocketController;

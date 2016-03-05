@@ -8,13 +8,17 @@ var App = React.createClass({
   },
 
   componentDidMount: function() {
+    var self = this;
     videoplayer = videojs("video", {
       plugins: {
         videoJsResolutionSwitcher: {
           default: "low"
         }
       }
-    }, this.updateStatus);
+    }, function() {
+      videoplayer.volume(localStorage.volume ? JSON.parse(localStorage.volume) : 1.0);
+      self.updateStatus();
+    });
 
     videoplayer.disable = function() {
       document.getElementsByClassName("vjs-tech")[0].style["pointer-events"] = "none";
@@ -36,6 +40,7 @@ var App = React.createClass({
     videoplayer.on("clickedPause", this.clickedPause);
     videoplayer.on("clickedProgressbar", this.clickedProgressbar);
 
+    videoplayer.on("volumechange", this.volumechange);
     videoplayer.on("resolutionchange", this.resolutionchange);
     videoplayer.on("ended", this.ended);
     videoplayer.on("error", this.error);
@@ -153,6 +158,10 @@ var App = React.createClass({
   enablePlayer: function() {
     videoplayer.enable();
     this.refs.playlistApp.refs.playlist._sortableInstance.option("disabled", false);
+  },
+
+  volumechange: function() {
+    localStorage.setItem("volume", JSON.stringify(videoplayer.volume()));
   },
 
   // set "high" as default resolution if 720p or greater is selected
