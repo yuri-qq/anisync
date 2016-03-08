@@ -24,7 +24,18 @@
       "host": "localhost",
       "port": 8118
     },
-    "sessionSecret": "changeme"
+    "sessionSecret": "changeme",
+    "google": {
+      "analytics": {
+        "enabled": false,
+        "trackingID": ""
+      },
+      "adsense": {
+        "enabled": false,
+        "adSlot": "",
+        "adClient": ""
+      }
+    }
   },
   "production": {
     "web" : {
@@ -51,6 +62,17 @@
       "host": "localhost",
       "port": 8118
     },
-    "sessionSecret": "changeme"
+    "sessionSecret": "changeme",
+    "google": {
+      "analytics": {
+        "enabled": true,
+        "trackingID": "UA-XXXXXXXX-X"
+      },
+      "adsense": {
+        "enabled": true,
+        "adSlot": "XXXXXXXXXX",
+        "adClient": "ca-pub-XXXXXXXXXXXXXXXX"
+      }
+    }
   }
 }
