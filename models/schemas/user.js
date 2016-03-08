@@ -5,8 +5,9 @@ var Schema = mongoose.Schema;
 var userSchema = new Schema({
   username: String,
   socketId: String,
-  moderator: Boolean,
-  ready: {type: Boolean, default: false}
+  moderator: {type: Boolean, default: false},
+  ready: {type: Boolean, default: false},
+  ended: {type: Boolean, default: false}
 });
 
 userSchema.set("toObject", {virtuals: true});

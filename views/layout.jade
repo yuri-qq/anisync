@@ -16,6 +16,8 @@ html
     link(rel="stylesheet", type="text/css", href="/css/chat.css")
     link(rel="stylesheet", type="text/css", href="/css/user.css")
     block scripts
+      if google.analytics.enabled
+        include analytics
       script(src="https://cdn.socket.io/socket.io-1.4.5.js")
       script(src="https://fb.me/react-0.14.7.min.js")
       script(src="https://fb.me/react-dom-0.14.7.js")

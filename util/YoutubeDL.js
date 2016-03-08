@@ -44,6 +44,7 @@ class YoutubeDL {
           }
           else {
             formats.push({
+              type: "application/octet-stream",
               src: media[i].url,
               label: (media[i].height ? media[i].height + "p" : "unknown")
             });

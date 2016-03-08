@@ -14,7 +14,12 @@ module.exports.create = function(req, res, next) {
   if(private && !req.body.password) errors.password = true;
 
   if(Object.keys(errors).length) {
-    res.render("create", {username: req.session.username ? true : false, private: private, password: req.body.password, errors: errors});
+    res.render("create", {
+      username: req.session.username ? true : false,
+      private: private,
+      password: req.body.password,
+      errors: errors
+    });
     return;
   }
 

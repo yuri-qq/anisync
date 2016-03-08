@@ -20,6 +20,7 @@ class Socket {
       this.id = id;
       this.socket.on("getTime", () => this.getTime());
       this.socket.on("pushTime", (data) => this.pushTime(data));
+      this.socket.on("ended", () => this.ended());
       this.socket.on("ready", () => this.ready());
       this.socket.on("play", (time) => this.play(time));
       this.socket.on("pause", (time) => this.pause(time));
@@ -83,34 +84,45 @@ class Socket {
     this.socket.to(this.id).emit("pushTime", data);
   }
 
-    //if all users in a channel have loaded metadata of selected video, start playing it
-  ready() {
+  setEventBool(eventName, callback) {
     var self = this;
-    Channel.findOneAndUpdate({"users.socketId": this.socket.client.id}, {$set: {"users.$.ready": true}}, {new: true}, function(error, data) {
+    var query = {};
+    query["users.$." + eventName] = true;
+    Channel.findOneAndUpdate({"users.socketId": this.socket.client.id}, {$set: query}, {new: true}, function(error, data) {
       if(error) throw error;
 
-      var ready = 0;
+
+      var count = 0;
       for(var i = 0; i < data.users.length; i++) {
-        if(data.users[i].ready) {
-          ready++;
+        if(data.users[i][eventName]) {
+          count++;
         }
       }
 
-      if(ready == data.users.length) {
+      if(count === data.users.length) {
         for(var i = 0; i < data.users.length; i++) {
-          Channel.update({"users.socketId": data.users[i].socketId}, {$set: {"users.$.ready": false}}).exec();
+          query["users.$." + eventName] = false;
+          Channel.update({"users.socketId": data.users[i].socketId}, {$set: query}).exec();
         }
-
-        
-        /*  
-          start synced playback, assume clients are at 0:00 
-          and don't set it explicitly before playing to not reset the player's ready state
-          which would cause the playing video to stay at 0:00 (tested in Firefox)
-        */
-        self.io.of("/channels").to(self.id).emit("play");
-
-        Channel.update({_id: self.id}, {playing: true}).exec();
+        callback();
       }
+
+    });
+  }
+
+  ended() {
+    var self = this;
+    this.setEventBool("ended", function() {
+      self.io.of("/channels").to(self.id).emit("nextItem");
+    });
+  }
+
+  //if all users in a channel have loaded enough data of selected video, start playing it
+  ready() {
+    var self = this;
+    this.setEventBool("ready", function() {
+      self.io.of("/channels").to(self.id).emit("play", 0);
+      Channel.update({_id: self.id}, {playing: true}).exec();
     });
   }
 

@@ -30,6 +30,14 @@
       if(typeof customSourcePicker === 'function'){
         return customSourcePicker(player, sources, label);
       }
+
+      //no playable sources, throw error
+      if(!sources) {
+        player.reset();
+        player.error({code: -1, message: player.localize(player.options_.notSupportedMessage)});
+        return;
+      }
+
       return player.src(sources.map(function(src) {
         return {src: src.src, type: src.type, res: src.res};
       }));
@@ -237,6 +245,9 @@
           type: {}
         };
         src.map(function(source) {
+          //check if video type is supported by player
+          if(player.canPlayType(source.type) == "" && src.type !== "application/octet-stream") return;
+
           initResolutionKey(resolutions, 'label', source);
           initResolutionKey(resolutions, 'res', source);
           initResolutionKey(resolutions, 'type', source);

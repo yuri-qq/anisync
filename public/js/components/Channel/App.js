@@ -16,7 +16,7 @@ var App = React.createClass({
         }
       }
     }, function() {
-      videoplayer.volume(localStorage.volume ? JSON.parse(localStorage.volume) : 1.0);
+      videoplayer.volume(typeof localStorage.volume !== "undefined" ? JSON.parse(localStorage.volume) : 1);
       self.updateStatus();
     });
 
@@ -131,7 +131,7 @@ var App = React.createClass({
   },
 
   ended: function() {
-    this.refs.playlistApp.refs.playlist.nextItem();
+    socket.emit("ended");
   },
 
   playItem: function(index) {
@@ -201,7 +201,20 @@ var App = React.createClass({
 
   error: function(e) {
     var error = videoplayer.error();
-    //error code 4: video not supported (or video url expired etc.)
+
+    //video mime type known, but no source supported by this browser
+    if(error.code === -1) {
+      //"fake" ready event so video starts playing for other clients
+      socket.emit("ready");
+      var items = this.refs.playlistApp.refs.playlist.state.items.slice();
+      items[this.refs.playlistApp.refs.playlist.selected()].error = true;
+      this.refs.playlistApp.refs.playlist.setState({items: items}, function() {
+        //"fake" ended event, so the playlist switches to the next video when video ended
+        socket.emit("ended");
+      });
+    }
+
+    //video not supported (or video url expired, not available etc.)
     if(error.code === 4) {
       var items = this.refs.playlistApp.refs.playlist.state.items.slice();
       var i = this.refs.playlistApp.refs.playlist.selected();
@@ -210,6 +223,7 @@ var App = React.createClass({
       if(id !== this.state.lastErrorId) {
         this.setState({lastErrorId: id});
         items[i].refreshing = true;
+        //try to get a new video url in case current video url expired
         socket.emit("refreshItem", id);
       }
       else {

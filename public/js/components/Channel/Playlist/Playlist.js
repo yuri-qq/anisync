@@ -14,6 +14,7 @@ var Playlist = React.createClass({
 
   componentDidMount: function() {
     socket.on("playItem", this.playItem);
+    socket.on("nextItem", this.nextItem);
   },
 
   addItems: function(data) {
@@ -75,12 +76,12 @@ var Playlist = React.createClass({
   },
 
   playItem: function(index) {
-    this.props.playItem(index);
-
     var items = this.state.items.slice();
     items[this.selected()].selected = false;
     items[index].selected = true;
-    this.setState({items: items});
+    this.setState({items: items}, function() {
+      this.props.playItem(index);
+    });
   },
 
   nextItem: function() {
@@ -94,9 +95,9 @@ var Playlist = React.createClass({
 
     items[selected].selected = false;
     items[nextIndex].selected = true;
-    this.setState({items: items});
-
-    this.props.playItem(nextIndex);
+    this.setState({items: items}, function() {
+      this.props.playItem(nextIndex);
+    });
   },
 
   handleEnd: function(event) {

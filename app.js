@@ -22,6 +22,7 @@ mongoose.connect("mongodb://" + CONFIG.mongodb.host + ":" + CONFIG.mongodb.port 
   mongoose.connection.db.dropDatabase(); //delete database with temp data
 });
 
+app.locals = CONFIG;
 if(app.get("env") == "production") {
   app.use(compression());
   app.use(minify({cache: __dirname + "/public/cache/"}));
