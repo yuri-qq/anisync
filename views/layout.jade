@@ -18,6 +18,8 @@ html
     block scripts
       if google.analytics.enabled
         include analytics
+      if piwik.enabled
+        include piwik
       script(src="https://cdn.socket.io/socket.io-1.4.5.js")
       script(src="https://fb.me/react-0.14.7.min.js")
       script(src="https://fb.me/react-dom-0.14.7.js")
