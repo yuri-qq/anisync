@@ -35,6 +35,11 @@
         "adSlot": "",
         "adClient": ""
       }
+    },
+    "piwik": {
+      "enabled": false,
+      "url": "",
+      "siteId": 1
     }
   },
   "production": {
@@ -65,14 +70,19 @@
     "sessionSecret": "changeme",
     "google": {
       "analytics": {
-        "enabled": true,
+        "enabled": false,
         "trackingID": "UA-XXXXXXXX-X"
       },
       "adsense": {
-        "enabled": true,
+        "enabled": false,
         "adSlot": "XXXXXXXXXX",
         "adClient": "ca-pub-XXXXXXXXXXXXXXXX"
       }
+    },
+    "piwik": {
+      "enabled": false,
+      "url": "",
+      "siteId": 1
     }
   }
 }
