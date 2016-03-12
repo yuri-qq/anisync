@@ -4,7 +4,12 @@ var App = React.createClass({
   displayName: "App",
 
   getInitialState: function() {
-    return {moderator: false, channelId: window.location.href.split("/").pop(), lastErrorId: "", canplaythrough: false};
+    return {
+      moderator: false,
+      channelId: window.location.href.split("/").pop(),
+      lastErrorId: "",
+      canplaythrough: false
+    };
   },
 
   componentDidMount: function() {
@@ -18,27 +23,24 @@ var App = React.createClass({
     }, function() {
       videoplayer.volume(typeof localStorage.volume !== "undefined" ? JSON.parse(localStorage.volume) : 1);
       self.updateStatus();
+      this.disableControls = function() {
+        this.tech_.el().style["pointer-events"] = "none";
+        this.controlBar.progressControl.el().style["pointer-events"] = "none";
+        this.controlBar.playToggle.el().style["pointer-events"] = "none";
+        this.bigPlayButton.el().style["pointer-events"] = "none";
+      }
+
+      this.enableControls = function() {
+        this.tech_.el().style["pointer-events"] = "auto";
+        this.controlBar.progressControl.el().style["pointer-events"] = "auto";
+        this.controlBar.playToggle.el().style["pointer-events"] = "auto";
+        this.bigPlayButton.el().style["pointer-events"] = "auto";
+      }
     });
 
-    videoplayer.disable = function() {
-      document.getElementsByClassName("vjs-tech")[0].style["pointer-events"] = "none";
-      document.getElementsByClassName("vjs-progress-control")[0].style["pointer-events"] = "none";
-      document.getElementsByClassName("vjs-play-control")[0].style["pointer-events"] = "none";
-      document.getElementsByClassName("vjs-big-play-button")[0].style["pointer-events"] = "none";
-    }
-
-    videoplayer.enable = function() {
-      document.getElementsByClassName("vjs-tech")[0].style["pointer-events"] = "auto";
-      document.getElementsByClassName("vjs-progress-control")[0].style["pointer-events"] = "auto";
-      document.getElementsByClassName("vjs-play-control")[0].style["pointer-events"] = "auto";
-      document.getElementsByClassName("vjs-big-play-button")[0].style["pointer-events"] = "auto";
-    }
-
-    //custom events triggered from video.js directly
-    //todo: write a plugin so the video.js source doesn't have to be modified
-    videoplayer.on("clickedPlay", this.clickedPlay);
-    videoplayer.on("clickedPause", this.clickedPause);
-    videoplayer.on("clickedProgressbar", this.clickedProgressbar);
+    videoplayer.tech_.on("click", this.togglePlay);
+    videoplayer.controlBar.playToggle.on("click", this.togglePlay);
+    videoplayer.controlBar.progressControl.seekBar.on("mouseup", this.clickedProgressbar);
 
     videoplayer.on("volumechange", this.volumechange);
     videoplayer.on("resolutionchange", this.resolutionchange);
@@ -118,12 +120,13 @@ var App = React.createClass({
     videoplayer.currentTime(time);
   },
 
-  clickedPlay: function() {
-    socket.emit("play", videoplayer.currentTime());
-  },
-
-  clickedPause: function() {
-    socket.emit("pause", videoplayer.currentTime());
+  togglePlay: function() {
+    if(videoplayer.paused()) {
+      socket.emit("pause", videoplayer.currentTime());
+    }
+    else {
+      socket.emit("play", videoplayer.currentTime());
+    }
   },
 
   clickedProgressbar: function() {
@@ -151,12 +154,12 @@ var App = React.createClass({
   },
 
   disablePlayer: function() {
-    videoplayer.disable();
+    videoplayer.disableControls();
     this.refs.playlistApp.refs.playlist._sortableInstance.option("disabled", true);
   },
 
   enablePlayer: function() {
-    videoplayer.enable();
+    videoplayer.enableControls();
     this.refs.playlistApp.refs.playlist._sortableInstance.option("disabled", false);
   },
 

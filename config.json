@@ -2,12 +2,18 @@
   "development": {
     "web" : {
       "host": "localhost",
-      "httpPort": 80,
-      "httpsPort": 443
-    },
-    "certificate": {
-      "key": "",
-      "cert": ""
+      "http": {
+        "port": 80
+      },
+      "https": {
+        "enabled": false,
+        "hsts": true,
+        "port": 443,
+        "certificate": {
+          "key": "",
+          "cert": ""
+        }
+      }
     },
     "mongodb": {
       "host": "localhost",
@@ -16,13 +22,14 @@
       "user": "",
       "password": ""
     },
-    "redis": {
-      "host": "localhost",
-      "port": 6379
-    },
-    "youtubedlProxy": {
-      "host": "localhost",
-      "port": 8118
+    "youtubedl": {
+      "maxBuffer": 4096,
+      "proxy": {
+        "enabled": false,
+        "domains": ["youtube.com"],
+        "host": "localhost",
+        "port": 8118
+      }
     },
     "sessionSecret": "changeme",
     "google": {
@@ -33,7 +40,7 @@
       "adsense": {
         "enabled": false,
         "adSlot": "",
-        "adClient": ""
+        "adClient": "" 
       }
     },
     "piwik": {
@@ -45,12 +52,18 @@
   "production": {
     "web" : {
       "host": "localhost",
-      "httpPort": 80,
-      "httpsPort": 443
-    },
-    "certificate": {
-      "key": "",
-      "cert": ""
+      "http": {
+        "port": 80
+      },
+      "https": {
+        "enabled": false,
+        "hsts": true,
+        "port": 443,
+        "certificate": {
+          "key": "",
+          "cert": ""
+        }
+      }
     },
     "mongodb": {
       "host": "localhost",
@@ -59,24 +72,25 @@
       "user": "",
       "password": ""
     },
-    "redis": {
-      "host": "localhost",
-      "port": 6379
-    },
-    "youtubedlProxy": {
-      "host": "localhost",
-      "port": 8118
+    "youtubedl": {
+      "maxBuffer": 4096,
+      "proxy": {
+        "enabled": false,
+        "domains": ["youtube.com"],
+        "host": "localhost",
+        "port": 8118
+      }
     },
     "sessionSecret": "changeme",
     "google": {
       "analytics": {
         "enabled": false,
-        "trackingID": "UA-XXXXXXXX-X"
+        "trackingID": ""
       },
       "adsense": {
         "enabled": false,
-        "adSlot": "XXXXXXXXXX",
-        "adClient": "ca-pub-XXXXXXXXXXXXXXXX"
+        "adSlot": "",
+        "adClient": "" 
       }
     },
     "piwik": {

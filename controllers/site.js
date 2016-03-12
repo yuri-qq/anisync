@@ -6,7 +6,7 @@ module.exports.index = function(req, res) {
     var username = "";
   }
 
-  res.render("index", {data: {username: username}});
+  res.render("index", {username: username});
 };
 
 module.exports.policy = function(req, res) {

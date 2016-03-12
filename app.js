@@ -1,29 +1,36 @@
 var fs = require("fs");
-var path = require("path");
 var stylus = require("stylus");
 var bodyParser = require("body-parser");
 var session = require("express-session");
-var RedisStore = require("connect-redis")(session);
+var MongoStore = require('connect-mongo')(session);
 var mongoose = require("mongoose");
-var compression = require("compression");
-var minify = require("express-minify");
 var express = require("express");
 var app = module.exports = express();
-const CONFIG = require("./config.json")[app.get("env")];
-var http = require("http");
-var https = require("https").Server({
-  key: fs.readFileSync(CONFIG.certificate.key),
-  cert: fs.readFileSync(CONFIG.certificate.cert)
-}, app);
-var io = require("socket.io")(https);
+var config = require("./config.json")[app.get("env")];
+app.locals = config;
+var http = require("http").Server(app);
+http.listen(config.web.http.port, config.web.host);
+if(config.web.https.enabled) {
+  var https = require("https").Server({
+    key: fs.readFileSync(config.web.https.certificate.key),
+    cert: fs.readFileSync(config.web.https.certificate.cert)
+  }, app);
+  https.listen(config.web.https.port, config.web.host);
+  var io = require("socket.io")(https);
+}
+else {
+  var io = require("socket.io")(http);
+}
 
 // database connection
-mongoose.connect("mongodb://" + CONFIG.mongodb.host + ":" + CONFIG.mongodb.port + "/" + CONFIG.mongodb.database, {user: CONFIG.mongodb.user, pass: CONFIG.mongodb.password}, function() {
-  mongoose.connection.db.dropDatabase(); //delete database with temp data
+var Channel = require("./models/channel");
+mongoose.connect("mongodb://" + config.mongodb.host + ":" + config.mongodb.port + "/" + config.mongodb.database, {user: config.mongodb.user, pass: config.mongodb.password}, function() {
+  Channel.remove({}).exec();
 });
 
-app.locals = CONFIG;
 if(app.get("env") == "production") {
+  var compression = require("compression");
+  var minify = require("express-minify");
   app.use(compression());
   app.use(minify({cache: __dirname + "/public/cache/"}));
 }
@@ -38,17 +45,28 @@ app.set("view engine", "jade");
 app.use(stylus.middleware({src: __dirname + "/public", compile: function(str, path) {
   return stylus(str).set("filename", path);
 }}));
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(__dirname + "/public"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
+//redirect to https if enabled
 app.use(function(req, res, next) {
-  res.header("Strict-Transport-Security", "max-age=31536000; includeSubdomains");
+  if(!req.connection.encrypted && config.web.https.enabled) {
+    res.writeHead(301, {"Location": "https://" + req.headers["host"] + req.url});
+    res.end();
+  }
+  else {
+    return next();
+  }
+});
+//send HSTS header
+app.use(function(req, res, next) {
+  if(config.web.https.enabled && config.web.https.hsts) res.header("Strict-Transport-Security", "max-age=31536000; includeSubdomains");
   return next();
 });
 
 var sessionMiddleware = session({
-  store: new RedisStore({host: CONFIG.redis.host, port: CONFIG.redis.port}),
-  secret: CONFIG.sessionSecret,
+  store: new MongoStore({mongooseConnection: mongoose.connection}),
+  secret: config.sessionSecret,
   resave: false,
   saveUninitialized: true,
   cookie: {
@@ -60,9 +78,18 @@ var sessionMiddleware = session({
 
 app.use(sessionMiddleware);
 
+//pass express session middleware to socket.io to access user session data
+io.use(function(socket, next) { 
+  sessionMiddleware(socket.request, socket.request.res, next);
+});
+
+//socket.io controllers
+var indexSocket = require("./controllers/index-socket")(io);
+var channelSocket = require("./controllers/channel-socket")(io);
+
 //routes
-site = require("./controllers/site");
-channel = require("./controllers/channel");
+var site = require("./controllers/site");
+var channel = require("./controllers/channel");
 app.all("/", site.index);
 app.all("/policy", site.policy);
 app.get("/create", channel.form);
@@ -83,22 +110,3 @@ app.use(function(error, req, res, next){
   res.status(500);
   res.render("500.jade", {title:"500: Internal Server Error", error: error});
 });
-
-//start server
-https.listen(CONFIG.web.httpsPort, CONFIG.web.host, function() {
-  console.log("Server listening on https://%s:%s", https.address().address, https.address().port);
-});
-
-//redirect all unencrypted traffic
-http.createServer(function (req, res) {
-  res.writeHead(301, {"Location": "https://" + req.headers["host"] + req.url});
-  res.end();
-}).listen(CONFIG.web.httpPort, CONFIG.web.host);
-
-//pass express session middleware to socket.io to access user session data
-io.use(function(socket, next) { 
-  sessionMiddleware(socket.request, socket.request.res, next);
-});
-
-var indexSocket = require("./controllers/index-socket")(io);
-var channelSocket = require("./controllers/channel-socket")(io);

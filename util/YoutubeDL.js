@@ -1,17 +1,26 @@
 "use strict";
 var youtubedl = require("youtube-dl");
 var app = require("../app")
-const CONFIG = require("../config.json")[app.get("env")];
+var config = require("../config.json")[app.get("env")];
 
 class YoutubeDL {
   static getMedia(url, addPlaylist, callback) {
     var args = [];
 
-    //route traffic to youtube through http proxy to circumvent IP blocks
-    if(url.indexOf("youtube.com") > -1 && CONFIG.youtubedlProxy.host && CONFIG.youtubedlProxy.port) args = args.concat(["--proxy", CONFIG.youtubedlProxy.host + ":" + CONFIG.youtubedlProxy.port]);
+    //route traffic through http proxy (e.g. to circumvent IP blocks)
+    if(config.youtubedl.proxy.enabled) {
+      if(config.youtubedl.proxy.domains.length == 0) args = args.concat(["--proxy", config.youtubedl.proxy.host + ":" + config.youtubedl.proxy.port]);
+      for(var i = config.youtubedl.proxy.domains.length - 1; i >= 0; i--) {
+        if(url.indexOf(config.youtubedl.proxy.domains[i]) > -1) {
+          args = args.concat(["--proxy", config.youtubedl.proxy.host + ":" + config.youtubedl.proxy.port]);
+          break;
+        }
+      }
+    }
     if(!addPlaylist) args = args.concat(["--playlist-end", "1"]);
 
-    youtubedl.getInfo(url, args, {maxBuffer: 1024000 * 5}, function(error, media) {
+    //maxBuffer in KB
+    youtubedl.getInfo(url, args, {maxBuffer: config.youtubedl.maxBuffer * 1000}, function(error, media) {
       if(!error) {
         if(Object.prototype.toString.call(media) !== "[object Array]") {
           media = [media];
