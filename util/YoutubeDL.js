@@ -32,7 +32,7 @@ class YoutubeDL {
           var formats = [];
           if(media[i].formats) {
             for(var i2 = 0; i2 < media[i].formats.length; i2++) {
-              if(media[i].formats[i2].format_note != "DASH video" && media[i].formats[i2].format_note != "DASH audio") {
+              if(media[i].formats[i2].format_note != "DASH video" && media[i].formats[i2].format_note != "DASH audio" && media[i].formats[i2].acodec != "none") {
                 if((media[i].formats[i2].ext == "mp4" || media[i].formats[i2].ext == "webm")) {
                   formats.push({
                     type: "video/" + media[i].formats[i2].ext,
@@ -52,8 +52,14 @@ class YoutubeDL {
             }
           }
           else {
+            //unknown format
             formats.push({
-              type: "application/octet-stream",
+              type: "video/mp4",
+              src: media[i].url,
+              label: (media[i].height ? media[i].height + "p" : "unknown")
+            }, 
+            {
+              type: "video/webm",
               src: media[i].url,
               label: (media[i].height ? media[i].height + "p" : "unknown")
             });
