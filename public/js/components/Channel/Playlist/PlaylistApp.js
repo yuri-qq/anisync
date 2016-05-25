@@ -2,7 +2,10 @@ var PlaylistApp = React.createClass({
   displayName: "PlaylistApp",
 
   getInitialState: function() {
-    return {disableInput: false, inputError: false};
+    return {
+      disableInput: false,
+      inputError: false
+    };
   },
 
   componentDidMount: function() {
@@ -71,7 +74,7 @@ var PlaylistApp = React.createClass({
     return(
       React.createElement("div", {id: "playlist-app"},
         React.createElement(PlaylistControls, {ref: "playlistControls", getPlaylist: this.getPlaylist, disabled: this.state.disableInput, inputError: this.state.inputError, handleInput: this.handleInput, moderator: this.props.moderator}),
-        React.createElement(Playlist, {ref: "playlist", playItem: this.props.playItem, moderator: this.props.moderator})
+        React.createElement(Playlist, {ref: "playlist", app: this.props.app, playItem: this.props.playItem, moderator: this.props.moderator})
       )
     );
   }

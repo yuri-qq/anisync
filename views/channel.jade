@@ -1,6 +1,8 @@
 extends layout
 
 block append scripts
+  script.
+    var init = {name: "#{data.name}"};
   script(src="//vjs.zencdn.net/5.8.0/video.min.js")
   script(src="/js/lib/videojs-resolution-switcher.js")
   script(src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.4.2/Sortable.min.js")
@@ -21,5 +23,4 @@ block append scripts
   script(src="/js/channel.js")
 
 block content
-  #channeltitle #{data.name}
   #app-mount

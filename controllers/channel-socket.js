@@ -35,6 +35,7 @@ class Socket {
       this.socket.on("updateUser", (data) => this.updateUser(data));
       this.socket.on("moderatorUpdate", (data) => this.moderatorUpdate(data));
       this.socket.on("kickban", (data) => this.kickban(data));
+      this.socket.on("editChannelName", (newName) => this.editChannelName(newName));
       this.socket.on("disconnect", () => this.disconnect());
       this.join(id);
     });
@@ -173,8 +174,10 @@ class Socket {
   removeItem(data) {
     var self = this;
     this.isModerator(function() {
-      Channel.update({_id: self.id}, {$pull: {playlist: {_id: data.id}}}).exec();
-      self.socket.to(self.id).emit("removeItem", data.index);
+      Channel.update({_id: self.id}, {$pull: {playlist: {_id: data.id}}}, function(error) {
+        if(error) throw error;
+        self.socket.to(self.id).emit("removeItem", data.index);
+      });
     });
   }
 
@@ -280,6 +283,17 @@ class Socket {
     var socket = this.io.nsps["/channels"].sockets["/channels#" + id];
     if(socket) return socket.request.session.username;
     return false;
+  }
+
+  editChannelName(newName) {
+    var self = this;
+    this.isModerator(function() {
+      if(newName) {
+        Channel.update({_id: self.id}, {$set: {name: newName}}).exec();
+        self.io.of("/channels").to(self.id).emit("updateChannelName", newName);
+        self.io.of("/index").emit("updateChannelName", {id: self.id, newName: newName});
+      }
+    });
   }
 
   disconnect() {

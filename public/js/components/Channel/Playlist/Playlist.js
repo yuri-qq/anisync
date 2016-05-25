@@ -9,7 +9,9 @@ var Playlist = React.createClass({
   },
 
   getInitialState: function() {
-    return {items: []};
+    return {
+      items: []
+    };
   },
 
   componentDidMount: function() {
@@ -28,8 +30,8 @@ var Playlist = React.createClass({
 
   onRemoveItem: function(event) {
     if(this.props.moderator) {
-      var index = parseInt(event.currentTarget.parentNode.dataset.index);
-      socket.emit("removeItem", {id: event.currentTarget.parentNode.id, index: index});
+      var index = parseInt(event.currentTarget.parentNode.parentNode.dataset.index);
+      socket.emit("removeItem", {id: event.currentTarget.parentNode.parentNode.id, index: index});
       this.removeItem(index);
     }
   },
@@ -48,6 +50,7 @@ var Playlist = React.createClass({
       });
     }
     else if(items.length == 0) {
+      this.props.app.setState({item: null});
       videoplayer.reset();
     }
     else if(removeIndex == selected) {
@@ -69,7 +72,7 @@ var Playlist = React.createClass({
 
   clickedItem: function(event) {
     if(this.props.moderator) {
-      var index = parseInt(event.target.parentNode.dataset.index);
+      var index = parseInt(event.target.parentNode.parentNode.dataset.index);
       socket.emit("playItem", index);
       this.playItem(index);
     }

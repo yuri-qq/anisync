@@ -72,27 +72,42 @@
   
 #playlist li.error
   background-color #FF6E6E
-  
+
+#playlist .wrapper
+  display flex
+
 #playlist li .drag
   text-align center
   color #FFFFFF
   background-color #727272
   height 40px
   width 50px
-  float left
   cursor move
   user-select none
   -moz-user-select none
+  flex-shrink 0
 
 #playlist li .title
   height 100%
+  width 100%
+  padding-left 5px
+  padding-right 5px
   overflow hidden
   white-space nowrap
   text-overflow ellipsis
-  margin-left 50px
-  margin-right 50px
   text-align center
   cursor pointer
+  
+#playlist li .icon
+  color #424242
+  text-align center
+  height 40px
+  width 40px
+  cursor pointer
+  flex-shrink 0
+  
+#playlist li .icon span:hover
+  color #563B8F
 
 #playlist li .remove
   text-align center
@@ -100,8 +115,8 @@
   background-color #727272
   height 40px
   width 50px
-  float right
   cursor pointer
+  flex-shrink 0
 
 #playlist .selected
   box-shadow 0 0 0 3px #563B8F

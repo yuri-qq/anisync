@@ -1,5 +1,4 @@
 var socket = io.connect("/channels");
-
 var App = React.createClass({
   displayName: "App",
 
@@ -7,8 +6,11 @@ var App = React.createClass({
     return {
       moderator: false,
       channelId: window.location.href.split("/").pop(),
+      name: init.name,
+      onFocusName: "",
       lastErrorId: "",
-      canplaythrough: false
+      canplaythrough: false,
+      item: null
     };
   },
 
@@ -54,6 +56,7 @@ var App = React.createClass({
     socket.on("setup", this.setup);
     socket.on("requestTime", this.pushTime);
     socket.on("loadPlaylist", this.loadPlaylist);
+    socket.on("updateChannelName", this.updateChannelName);
     socket.emit("join", this.state.channelId);
   },
 
@@ -81,6 +84,7 @@ var App = React.createClass({
     items[data.selected].selected = true;
     this.refs.playlistApp.refs.playlist.setState({items: items});
 
+    this.setState({item: this.refs.playlistApp.refs.playlist.state.items[data.selected]});
     videoplayer.updateSrc(this.refs.playlistApp.refs.playlist.state.items[data.selected].formats);
     videoplayer.on("loadedmetadata", function() {
       videoplayer.off("loadedmetadata");
@@ -138,7 +142,7 @@ var App = React.createClass({
   },
 
   playItem: function(index) {
-    this.setState({canplaythrough: false});
+    this.setState({canplaythrough: false, item: this.refs.playlistApp.refs.playlist.state.items[index]});
 
     var self = this;
     //wait until video can be played without having to buffer and report to server that the client is ready
@@ -237,20 +241,81 @@ var App = React.createClass({
     }
   },
 
+  updateChannelName: function(newName) {
+    this.setState({name: newName});
+  },
+
+  saveName: function() {
+    this.setState({onFocusName: this.state.name});
+  },
+
+  handleChange: function(event) {
+    this.setState({name: event.target.value});
+  },
+
+  handleKeyUp: function(event) {
+    if(event.key === "Enter") {
+      event.target.blur();
+    }
+  },
+
+  handleInput: function(event) {
+    if(this.state.name) {
+      socket.emit("editChannelName", this.state.name);
+    }
+    else {
+      this.setState({name: this.state.onFocusName});
+    }
+  },
+
   render: function() {
     return(
       React.createElement("div", {id: "app"},
-        React.createElement(VideoApp, {ref: "player"}),
-        React.createElement(ChatApp, {ref: "chatApp"}),
-        React.createElement(PlaylistApp, {ref: "playlistApp", playItem: this.playItem, moderator: this.state.moderator}),
-        React.createElement(UserApp, {
-          ref: "userApp",
-          chatApp: this.refs.chatApp,
-          disablePlayer: this.disablePlayer,
-          enablePlayer: this.enablePlayer,
-          moderator: this.state.moderator,
-          setModerator: this.setModerator
-        })
+        React.createElement("input", {
+          type: "text",
+          id: "channelName",
+          name: "channelName",
+          value: this.state.name,
+          disabled: this.state.moderator ? "" : "disabled",
+          onFocus: this.saveName,
+          onChange: this.handleChange,
+          onKeyUp: this.handleKeyUp,
+          onBlur: this.handleInput
+        }),
+        React.createElement("div", {id: "nowPlaying"},
+          React.createElement("div", {className: "title " + (this.state.item ? "" : "invisible")},
+            React.createElement("span", {className: "pretext"}, this.state.item ? "Now playing: " : ""),
+            React.createElement("span", null, this.state.item ? this.state.item.title : "")
+          ),
+          React.createElement("a", {
+              className: "icon " + (this.state.item ? "" : "hidden"),
+              href: this.state.item ? this.state.item.webpage : "",
+              target: "_blank"
+            },
+            React.createElement("span", {className: "fa fa-external-link"})
+          ),
+          React.createElement("a", {
+              className: "icon " + (this.state.item ? "" : "hidden"),
+              href: this.state.item ? this.state.item.formats[0].src : "",
+              download: "download",
+              target: "_blank"
+            },
+            React.createElement("span", {className: "fa fa-download"})
+          )
+        ),
+        React.createElement("div", {id: "channel"},
+          React.createElement(VideoApp, {ref: "player"}),
+          React.createElement(ChatApp, {ref: "chatApp"}),
+          React.createElement(PlaylistApp, {ref: "playlistApp", app: this, playItem: this.playItem, moderator: this.state.moderator}),
+          React.createElement(UserApp, {
+            ref: "userApp",
+            chatApp: this.refs.chatApp,
+            disablePlayer: this.disablePlayer,
+            enablePlayer: this.enablePlayer,
+            moderator: this.state.moderator,
+            setModerator: this.setModerator
+          })
+        )
       )
     );
   }

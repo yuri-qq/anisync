@@ -1,15 +1,42 @@
-#channeltitle
-  padding 10px
+.vjs-big-play-button
+  display none !important
+
+#channelName
+  color #ffffff
+  margin-top 5px
+  padding-left 5px
   width 100%
   font-size 25px
   overflow hidden
   white-space nowrap
   text-overflow ellipsis
+  background transparent
+  border none
+  &:focus
+    background-color rgba(0, 0, 0, 0.3)
 
-.vjs-big-play-button
-  display none !important
+#nowPlaying
+  display flex
+  padding-left 5px
+  margin-bottom 5px
+  height 19px
+  overflow hidden
+  white-space nowrap
+  text-overflow ellipsis
 
-#app
+#nowPlaying .title
+  padding-right 5px
+  border-right 1px solid #ffffff
+
+#nowPlaying .pretext
+  color #bbbbbb
+
+#nowPlaying .icon
+  margin-left 10px
+  &:hover
+    color #ad85ff
+
+#channel
   display flex
   flex-wrap wrap
   

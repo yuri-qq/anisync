@@ -197,6 +197,7 @@
         player.controlBar.resolutionSwitcher.dispose = function(){
           this.parentNode.removeChild(this);
         };
+
         return setSourcesSanitized(player, choosen.sources, choosen.label);
       };
 
@@ -246,7 +247,7 @@
         };
         src.map(function(source) {
           //check if video type is supported by player
-          if(player.canPlayType(source.type) == "" && src.type !== "application/octet-stream") return;
+          if(player.canPlayType(source.type) == "") return;
 
           initResolutionKey(resolutions, 'label', source);
           initResolutionKey(resolutions, 'res', source);
@@ -256,6 +257,7 @@
           appendSourceToKey(resolutions, 'res', source);
           appendSourceToKey(resolutions, 'type', source);
         });
+
         return resolutions;
       }
 

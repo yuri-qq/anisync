@@ -12,6 +12,7 @@ var ChannelListApp = React.createClass({
     socket.on("removeChannel", this.removeChannel);
     socket.on("incrementUsercount", this.incrementUsercount);
     socket.on("decrementUsercount", this.decrementUsercount);
+    socket.on("updateChannelName", this.updateChannelName);
   },
 
   addChannel: function(channel) {
@@ -58,6 +59,18 @@ var ChannelListApp = React.createClass({
 
   fullCheckboxChange: function(event) {
     this.setState({showFull: event.target.checked});
+  },
+
+  updateChannelName: function(data) {
+    console.log(data, this.state.channels);
+    var channels = this.state.channels.slice();
+    for (var i = channels.length - 1; i >= 0; i--) {
+      if(channels[i].id == data.id) {
+        channels[i].name = data.newName;
+        this.setState({channels: channels});
+        break;
+      }
+    }
   },
 
   render: function() {
