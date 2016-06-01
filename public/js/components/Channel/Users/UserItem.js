@@ -1,5 +1,18 @@
-var UserItem = React.createClass({
+init.components.channel.UserItem = React.createClass({
   displayName: "UserItem",
+  propTypes: {
+    socketId: React.PropTypes.string.isRequired,
+    user: React.PropTypes.shape({
+      username: React.PropTypes.string.isRequired,
+      socketId: React.PropTypes.string.isRequired,
+      time: React.PropTypes.string.isRequired,
+      bufferProgress: React.PropTypes.number.isRequired,
+      timeProgress: React.PropTypes.number.isRequired,
+      moderator: React.PropTypes.bool.isRequired
+    }).isRequired,
+    kickban: React.PropTypes.func.isRequired,
+    moderator: React.PropTypes.bool.isRequired
+  },
 
   handleClick: function() {
     var data = {

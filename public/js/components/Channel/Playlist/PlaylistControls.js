@@ -1,5 +1,16 @@
-var PlaylistControls = React.createClass({
+init.components.channel.PlaylistControls = React.createClass({
   displayName: "PlaylistControls",
+  propTypes: {
+    disabled: React.PropTypes.bool.isRequired,
+    handleInput: React.PropTypes.func.isRequired,
+    moderator: React.PropTypes.bool.isRequired,
+    inputError: React.PropTypes.bool.isRequired,
+    channelId: React.PropTypes.string.isRequired,
+    getPlaylist: React.PropTypes.func.isRequired,
+    repeat: React.PropTypes.bool.isRequired,
+    repeatToggle: React.PropTypes.func.isRequired,
+    shufflePlaylist: React.PropTypes.func.isRequired
+  },
 
   getInitialState: function() {
     return {value: "", addPlaylist: false};
@@ -58,10 +69,25 @@ var PlaylistControls = React.createClass({
             onBlur: this.handleFocusLose,
             disabled: this.props.disabled
           }),
-          React.createElement("button", {id: "playlist_add", disabled: this.props.disabled, onClick: this.handleInput}, "add")
+          React.createElement("button", {
+            id: "playlist_add",
+            disabled: this.props.disabled,
+            onClick: this.handleInput
+          }, "add")
         ),
         React.createElement("div", {className: "error " + (!this.props.inputError || this.props.disabled ? "hidden" : "")}, "No compatible video or audio files found"),
-        React.createElement(PlaylistLoader, {channelId: this.props.channelId, getPlaylist: this.props.getPlaylist})
+        React.createElement("div", {className: "wrapper"},
+          React.createElement(init.components.channel.PlaylistLoader, {
+            channelId: this.props.channelId,
+            getPlaylist: this.props.getPlaylist
+          }),
+          React.createElement(init.components.channel.PlaylistButton, {
+            ref: "playlistButton",
+            repeat: this.props.repeat,
+            repeatToggle: this.props.repeatToggle,
+            shufflePlaylist: this.props.shufflePlaylist
+          })
+        )
       )
     );
   }

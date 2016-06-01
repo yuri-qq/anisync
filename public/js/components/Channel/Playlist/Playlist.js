@@ -1,5 +1,12 @@
-var Playlist = React.createClass({
+init.components.channel.Playlist = React.createClass({
   displayName: "Playlist",
+  propTypes: {
+    playItem: React.PropTypes.func.isRequired,
+    moderator: React.PropTypes.bool.isRequired,
+    videoplayer: React.PropTypes.object.isRequired,
+    repeat: React.PropTypes.bool.isRequired,
+    setItem: React.PropTypes.func.isRequired
+  },
 
   mixins: [SortableMixin],
 
@@ -17,6 +24,7 @@ var Playlist = React.createClass({
   componentDidMount: function() {
     socket.on("playItem", this.playItem);
     socket.on("nextItem", this.nextItem);
+    socket.on("shufflePlaylist", this.setPlaylist);
   },
 
   addItems: function(data) {
@@ -50,8 +58,8 @@ var Playlist = React.createClass({
       });
     }
     else if(items.length == 0) {
-      this.props.app.setState({item: null});
-      videoplayer.reset();
+      this.props.setItem(null);
+      this.props.videoplayer.reset();
     }
     else if(removeIndex == selected) {
       items[selected].selected = true;
@@ -92,8 +100,13 @@ var Playlist = React.createClass({
     var selected = this.selected();
     var nextIndex = selected + 1;
 
-    if(items.length <= nextIndex) {
-      nextIndex = 0;
+    if(items.length === nextIndex) {
+      if(this.props.repeat) {
+        nextIndex = 0;
+      }
+      else {
+        return;
+      }
     }
 
     items[selected].selected = false;
@@ -117,6 +130,17 @@ var Playlist = React.createClass({
     }
   },
 
+  shufflePlaylist: function() {
+    if(this.props.moderator) {
+      var items = this.state.items.shuffle();
+      socket.emit("shufflePlaylist", items);
+    }
+  },
+
+  setPlaylist: function(playlist) {
+    this.setState({items: playlist});
+  },
+
   render: function() {
     return(
       React.createElement("ul", {id: "playlist"},
@@ -132,7 +156,7 @@ var Playlist = React.createClass({
           }
 
           return(
-            React.createElement(PlaylistItem, options)
+            React.createElement(init.components.channel.PlaylistItem, options)
           );
         }, this)
       )

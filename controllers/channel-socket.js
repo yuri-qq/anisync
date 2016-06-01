@@ -7,9 +7,8 @@ linkify.tlds(require("tlds"));
 function ChannelSocketController(io) {
   if(!(this instanceof ChannelSocketController)) return new ChannelSocketController(io);
 
-  io.of("/channels").on("connection", (socket) => new Socket(io, socket));
+  io.of("/channel").on("connection", (socket) => new Socket(io, socket));
 }
-
 
 class Socket {
   constructor(io, socket) {
@@ -36,6 +35,8 @@ class Socket {
       this.socket.on("moderatorUpdate", (data) => this.moderatorUpdate(data));
       this.socket.on("kickban", (data) => this.kickban(data));
       this.socket.on("editChannelName", (newName) => this.editChannelName(newName));
+      this.socket.on("setRepeat", (bool) => this.setRepeat(bool));
+      this.socket.on("shufflePlaylist", (playlist) => this.shufflePlaylist(playlist));
       this.socket.on("disconnect", () => this.disconnect());
       this.join(id);
     });
@@ -47,7 +48,7 @@ class Socket {
       if(error) throw error;
       if(!data) return;
 
-      if((!data.private || self.socket.request.session.loggedInId === self.id) && data.bannedIPs.indexOf(self.socket.handshake.address) === -1) {
+      if((!data.secured || self.socket.request.session.loggedInId === self.id) && data.bannedIPs.indexOf(self.socket.handshake.address) === -1) {
 
         self.socket.join(self.id);
         console.log(self.socket.client.id + " joined " + id);
@@ -58,7 +59,7 @@ class Socket {
           username: self.socket.request.session.username,
           moderator: data.users.length ? false : true
         };
-        self.io.of("/channels").to(self.id).emit("connected", user);
+        self.io.of("/channel").to(self.id).emit("connected", user);
 
         //remove expiration time of channel
         Channel.findOneAndUpdate({_id: self.id}, {$push: {users: user}, $set: {createdAt: null}}, {upsert: true, new: true}, function(error, data) {
@@ -86,22 +87,21 @@ class Socket {
   }
 
   setEventBool(eventName, callback) {
-    var self = this;
     var query = {};
     query["users.$." + eventName] = true;
     Channel.findOneAndUpdate({"users.socketId": this.socket.client.id}, {$set: query}, {new: true}, function(error, data) {
       if(error) throw error;
 
-
+      var i;
       var count = 0;
-      for(var i = 0; i < data.users.length; i++) {
+      for(i = 0; i < data.users.length; i++) {
         if(data.users[i][eventName]) {
           count++;
         }
       }
 
       if(count === data.users.length) {
-        for(var i = 0; i < data.users.length; i++) {
+        for(i = 0; i < data.users.length; i++) {
           query["users.$." + eventName] = false;
           Channel.update({"users.socketId": data.users[i].socketId}, {$set: query}).exec();
         }
@@ -114,7 +114,7 @@ class Socket {
   ended() {
     var self = this;
     this.setEventBool("ended", function() {
-      self.io.of("/channels").to(self.id).emit("nextItem");
+      self.io.of("/channel").to(self.id).emit("nextItem");
     });
   }
 
@@ -122,7 +122,7 @@ class Socket {
   ready() {
     var self = this;
     this.setEventBool("ready", function() {
-      self.io.of("/channels").to(self.id).emit("play", 0);
+      self.io.of("/channel").to(self.id).emit("play", 0);
       Channel.update({_id: self.id}, {playing: true}).exec();
     });
   }
@@ -165,7 +165,7 @@ class Socket {
           for(var i = 0; i < files.length; i++) {
             files[i].id = data.playlist[data.playlist.length - files.length + i].id;
           }
-          self.io.of("/channels").to(self.id).emit("addItems", files);
+          self.io.of("/channel").to(self.id).emit("addItems", files);
         });
       });
     });
@@ -207,10 +207,10 @@ class Socket {
             var data = {
               id: id,
               error: error,
-              formats: files[0].formats
+              formats: files ? files[0].formats : []
             };
             if(!error) Channel.findOneAndUpdate({"playlist._id": id}, {$set: {"playlist.$.formats": files[0].formats}}).exec();
-            self.io.of("/channels").to(self.id).emit("refreshItem", data);
+            self.io.of("/channel").to(self.id).emit("refreshItem", data);
           });
         });
       }
@@ -230,26 +230,29 @@ class Socket {
       Channel.findOneAndUpdate({_id: self.id}, {$set: {playlist: items}}, {upsert: true, new: true}, function(error, data) {
         if(error) throw error;
 
-        self.io.of("/channels").to(self.id).emit("loadPlaylist", data.playlist);
+        self.io.of("/channel").to(self.id).emit("loadPlaylist", data.playlist);
       });
     });
   }
 
   chatMessage(text) {
+    if(text.length > 1000) {
+      return;
+    }
     var matches = linkify.match(text);
-    this.io.of("/channels").to(this.id).emit("chatMessage", {username: this.socket.request.session.username, text: text, urls: matches});
+    this.io.of("/channel").to(this.id).emit("chatMessage", {username: this.socket.request.session.username, text: text, urls: matches});
   }
 
   updateUser(data) {
     data.socketId = this.socket.client.id;
-    this.io.of("/channels").to(this.id).emit("updateUser", data);
+    this.io.of("/channel").to(this.id).emit("updateUser", data);
   }
 
   moderatorUpdate(data) {
     var self = this;
     this.isModerator(function() {
       Channel.findOneAndUpdate({"users.socketId": data.socketId}, {$set: {"users.$.moderator": data.moderator}}).exec();
-      self.io.of("/channels").to(self.id).emit("moderatorUpdate", data);
+      self.io.of("/channel").to(self.id).emit("moderatorUpdate", data);
     });
   }
 
@@ -269,18 +272,18 @@ class Socket {
   kickban(data) {
     var self = this;
     this.isModerator(function() {
-      var socket = self.io.nsps["/channels"].sockets["/channels#" + data.socketId];
+      var socket = self.io.nsps["/channel"].sockets["/channel#" + data.socketId];
       if(socket) {
         if(data.ban) Channel.update({_id: self.id}, {$push: {bannedIPs: socket.handshake.address}}).exec();
         data.username = self.getUsername(data.socketId);
-        self.io.of("/channels").to(self.id).emit("kickban", data);
+        self.io.of("/channel").to(self.id).emit("kickban", data);
         socket.disconnect();
       }
     });
   }
 
   getUsername(id) {
-    var socket = this.io.nsps["/channels"].sockets["/channels#" + id];
+    var socket = this.io.nsps["/channel"].sockets["/channel#" + id];
     if(socket) return socket.request.session.username;
     return false;
   }
@@ -290,9 +293,25 @@ class Socket {
     this.isModerator(function() {
       if(newName) {
         Channel.update({_id: self.id}, {$set: {name: newName}}).exec();
-        self.io.of("/channels").to(self.id).emit("updateChannelName", newName);
+        self.io.of("/channel").to(self.id).emit("updateChannelName", newName);
         self.io.of("/index").emit("updateChannelName", {id: self.id, newName: newName});
       }
+    });
+  }
+
+  setRepeat(bool) {
+    var self = this;
+    this.isModerator(function() {
+      self.io.of("/channel").to(self.id).emit("setRepeat", bool);
+      Channel.update({_id: self.id}, {$set: {repeat: bool}}).exec();
+    });
+  }
+
+  shufflePlaylist(playlist) {
+    var self = this;
+    this.isModerator(function() {
+      self.io.of("/channel").to(self.id).emit("shufflePlaylist", playlist);
+      Channel.update({_id: self.id}, {$set: {playlist: playlist}}).exec();
     });
   }
 
@@ -325,7 +344,7 @@ class Socket {
           if(noModerator) {
             data = {socketId: data.users[0].socketId, moderator: true};
             Channel.findOneAndUpdate({"users.socketId": data.socketId}, {$set: {"users.$.moderator": data.moderator}}).exec();
-            self.io.of("/channels").to(self.id).emit("moderatorUpdate", data);
+            self.io.of("/channel").to(self.id).emit("moderatorUpdate", data);
           }
         }
       });

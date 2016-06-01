@@ -27,6 +27,10 @@ input[type=text], input[type=password]
     transition all 0.3s ease 0s
     border-color #563B8F
 
+.characters-left
+  font-size 14px
+  text-align right
+
 select
   border 0
   outline none
@@ -46,6 +50,9 @@ input[type=text].error, input[type=password].error
 div.error
   margin-top 4px
   font-size 14px
+  color #FF6E6E
+
+.warning
   color #FF6E6E
 
 input[type=checkbox]
@@ -79,15 +86,21 @@ button, .button
 .input-button
   display flex
   
-.input-button input
+.input-button div, input
   flex-grow 1
 
 .input-button button
   width 50px
   flex-shrink 0
+
+.negative-margin
+  margin-bottom -17px
   
 .text-danger
   color #D9534F
+  
+.activated
+  color #563B8F
 
 .seperator
   height 1px

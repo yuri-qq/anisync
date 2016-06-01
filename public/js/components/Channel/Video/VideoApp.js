@@ -1,4 +1,4 @@
-var VideoApp = React.createClass({
+init.components.channel.VideoApp = React.createClass({
   displayName: "VideoApp",
 
   componentDidMount: function() {

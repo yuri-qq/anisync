@@ -10,16 +10,17 @@ var config = require("./config.json")[app.get("env")];
 app.locals = config;
 var http = require("http").Server(app);
 http.listen(config.web.http.port, config.web.host);
+var io;
 if(config.web.https.enabled) {
   var https = require("https").Server({
     key: fs.readFileSync(config.web.https.certificate.key),
     cert: fs.readFileSync(config.web.https.certificate.cert)
   }, app);
   https.listen(config.web.https.port, config.web.host);
-  var io = require("socket.io")(https);
+  io = require("socket.io")(https);
 }
 else {
-  var io = require("socket.io")(http);
+  io = require("socket.io")(http);
 }
 
 // database connection
@@ -84,16 +85,17 @@ io.use(function(socket, next) {
 });
 
 //socket.io controllers
-var indexSocket = require("./controllers/index-socket")(io);
-var channelSocket = require("./controllers/channel-socket")(io);
+require("./controllers/index-socket")(io);
+require("./controllers/create-socket")(io);
+require("./controllers/join-socket")(io);
+require("./controllers/channel-socket")(io);
 
 //routes
 var site = require("./controllers/site");
 var channel = require("./controllers/channel");
 app.all("/", site.index);
 app.all("/policy", site.policy);
-app.get("/create", channel.form);
-app.post("/create", channel.create);
+app.all("/create", channel.form);
 app.all("/channel/:id", channel.join);
 app.all("/channel/:id/kicked", channel.kicked);
 app.all("/channel/:id/banned", channel.banned);
@@ -105,7 +107,7 @@ app.use(function(req, res) {
 });
 
 //handle 500
-app.use(function(error, req, res, next){
+app.use(function(error, req, res) {
   console.log(error);
   res.status(500);
   res.render("500.jade", {title:"500: Internal Server Error", error: error});

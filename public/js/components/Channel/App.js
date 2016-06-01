@@ -1,11 +1,10 @@
-var socket = io.connect("/channels");
-var App = React.createClass({
+init.components.channel.App = React.createClass({
   displayName: "App",
 
   getInitialState: function() {
     return {
       moderator: false,
-      channelId: window.location.href.split("/").pop(),
+      channelId: init.channelId,
       name: init.name,
       onFocusName: "",
       lastErrorId: "",
@@ -16,38 +15,38 @@ var App = React.createClass({
 
   componentDidMount: function() {
     var self = this;
-    videoplayer = videojs("video", {
+    this.videoplayer = videojs("video", {
       plugins: {
         videoJsResolutionSwitcher: {
           default: "low"
         }
       }
     }, function() {
-      videoplayer.volume(typeof localStorage.volume !== "undefined" ? JSON.parse(localStorage.volume) : 1);
+      this.volume(typeof localStorage.volume !== "undefined" ? JSON.parse(localStorage.volume) : 1);
       self.updateStatus();
       this.disableControls = function() {
         this.tech_.el().style["pointer-events"] = "none";
         this.controlBar.progressControl.el().style["pointer-events"] = "none";
         this.controlBar.playToggle.el().style["pointer-events"] = "none";
         this.bigPlayButton.el().style["pointer-events"] = "none";
-      }
+      };
 
       this.enableControls = function() {
         this.tech_.el().style["pointer-events"] = "auto";
         this.controlBar.progressControl.el().style["pointer-events"] = "auto";
         this.controlBar.playToggle.el().style["pointer-events"] = "auto";
         this.bigPlayButton.el().style["pointer-events"] = "auto";
-      }
+      };
     });
 
-    videoplayer.tech_.on("click", this.togglePlay);
-    videoplayer.controlBar.playToggle.on("click", this.togglePlay);
-    videoplayer.controlBar.progressControl.seekBar.on("mouseup", this.clickedProgressbar);
+    this.videoplayer.tech_.on("click", this.togglePlay);
+    this.videoplayer.controlBar.playToggle.on("click", this.togglePlay);
+    this.videoplayer.controlBar.progressControl.seekBar.on("mouseup", this.clickedProgressbar);
 
-    videoplayer.on("volumechange", this.volumechange);
-    videoplayer.on("resolutionchange", this.resolutionchange);
-    videoplayer.on("ended", this.ended);
-    videoplayer.on("error", this.error);
+    this.videoplayer.on("volumechange", this.volumechange);
+    this.videoplayer.on("resolutionchange", this.resolutionchange);
+    this.videoplayer.on("ended", this.ended);
+    this.videoplayer.on("error", this.error);
     
     socket.on("joinSetup", function() { socket.emit("joinSetup"); });
     socket.on("play", this.play);
@@ -58,12 +57,21 @@ var App = React.createClass({
     socket.on("loadPlaylist", this.loadPlaylist);
     socket.on("updateChannelName", this.updateChannelName);
     socket.emit("join", this.state.channelId);
+
+    /**
+     * ask user if he really wants to leave the page
+     * @return {String} message to the user
+     */
+    window.onbeforeunload = function() {
+      return "If you are the last user in this channel, the channel will be removed.";
+    }
   },
 
   setup: function(data) {
     if(data.users.length > 0) this.refs.userApp.setUsers(data.users);
     if(data.playlist.length > 0) {
       this.refs.playlistApp.refs.playlist.setState({items: data.playlist});
+      this.refs.playlistApp.setState({repeat: data.repeat});
       socket.on("pushTime", this.receiveTime);
       socket.emit("getTime");
     }
@@ -72,12 +80,13 @@ var App = React.createClass({
   pushTime: function() {
     socket.emit("pushTime", {
       selected: this.refs.playlistApp.refs.playlist.selected(),
-      currentTime: videoplayer.currentTime(),
-      playing: !videoplayer.paused()
+      currentTime: this.videoplayer.currentTime(),
+      playing: !this.videoplayer.paused()
     });
   },
 
   receiveTime: function(data) {
+    var self = this;
     socket.off("pushTime");
 
     var items = this.refs.playlistApp.refs.playlist.state.items.slice();
@@ -85,56 +94,56 @@ var App = React.createClass({
     this.refs.playlistApp.refs.playlist.setState({items: items});
 
     this.setState({item: this.refs.playlistApp.refs.playlist.state.items[data.selected]});
-    videoplayer.updateSrc(this.refs.playlistApp.refs.playlist.state.items[data.selected].formats);
-    videoplayer.on("loadedmetadata", function() {
-      videoplayer.off("loadedmetadata");
-      videoplayer.currentTime(data.currentTime);
+    this.videoplayer.updateSrc(this.refs.playlistApp.refs.playlist.state.items[data.selected].formats);
+    this.videoplayer.on("loadedmetadata", function() {
+      self.videoplayer.off("loadedmetadata");
+      self.videoplayer.currentTime(data.currentTime);
       if(data.playing) {
-        videoplayer.play();
+        self.videoplayer.play();
       }
     });
   },
 
   updateStatus: function() {
     var status = {};
-    status.bufferProgress = (videoplayer.bufferedPercent() * 100).toFixed(3);
-    if(videoplayer.duration() === 0) {
+    status.bufferProgress = (this.videoplayer.bufferedPercent() * 100).toFixed(3);
+    if(this.videoplayer.duration() === 0) {
       status.timeProgress = 0;
     }
     else {
-      status.timeProgress = (videoplayer.currentTime() / videoplayer.duration() * 100).toFixed(3);
+      status.timeProgress = (this.videoplayer.currentTime() / this.videoplayer.duration() * 100).toFixed(3);
     }
-    status.time = Math.floor(videoplayer.currentTime() / 60) + ":" + ("0" + Math.floor(videoplayer.currentTime()) % 60).slice(-2);
+    status.time = Math.floor(this.videoplayer.currentTime() / 60) + ":" + ("0" + Math.floor(this.videoplayer.currentTime()) % 60).slice(-2);
 
     socket.emit("updateUser", status);
     setTimeout(this.updateStatus, 400);
   },
 
   play: function(time) {
-    if(typeof time !== "undefined") videoplayer.currentTime(time);
-    videoplayer.play();
+    if(typeof time !== "undefined") this.videoplayer.currentTime(time);
+    this.videoplayer.play();
   },
 
   pause: function(time) {
-    videoplayer.currentTime(time);
-    videoplayer.pause();
+    this.videoplayer.currentTime(time);
+    this.videoplayer.pause();
   },
 
   seeked: function(time) {
-    videoplayer.currentTime(time);
+    this.videoplayer.currentTime(time);
   },
 
   togglePlay: function() {
-    if(videoplayer.paused()) {
-      socket.emit("pause", videoplayer.currentTime());
+    if(this.videoplayer.paused()) {
+      socket.emit("pause", this.videoplayer.currentTime());
     }
     else {
-      socket.emit("play", videoplayer.currentTime());
+      socket.emit("play", this.videoplayer.currentTime());
     }
   },
 
   clickedProgressbar: function() {
-    socket.emit("seeked", videoplayer.currentTime());
+    socket.emit("seeked", this.videoplayer.currentTime());
   },
 
   ended: function() {
@@ -146,7 +155,7 @@ var App = React.createClass({
 
     var self = this;
     //wait until video can be played without having to buffer and report to server that the client is ready
-    videoplayer.one("canplaythrough", function() {
+    this.videoplayer.one("canplaythrough", function() {
       //limit ready emit to one time only (videoplayer.one() unexpectedly fires multiple times)
       if(!self.state.canplaythrough) {
         self.setState({canplaythrough: true});
@@ -154,37 +163,42 @@ var App = React.createClass({
       }
     });
 
-    videoplayer.updateSrc(this.refs.playlistApp.refs.playlist.state.items[index].formats);
+    this.videoplayer.updateSrc(this.refs.playlistApp.refs.playlist.state.items[index].formats);
   },
 
   disablePlayer: function() {
-    videoplayer.disableControls();
+    this.videoplayer.disableControls();
     this.refs.playlistApp.refs.playlist._sortableInstance.option("disabled", true);
   },
 
   enablePlayer: function() {
-    videoplayer.enableControls();
+    this.videoplayer.enableControls();
     this.refs.playlistApp.refs.playlist._sortableInstance.option("disabled", false);
   },
 
   volumechange: function() {
-    localStorage.setItem("volume", JSON.stringify(videoplayer.volume()));
+    localStorage.setItem("volume", JSON.stringify(this.videoplayer.volume()));
   },
 
   // set "high" as default resolution if 720p or greater is selected
   resolutionchange: function() {
-    var currentResolution = videoplayer.currentResolution();
+    var currentResolution = this.videoplayer.currentResolution();
     for (var i = currentResolution.sources.length - 1; i >= 0; i--) {
       if(currentResolution.label === currentResolution.sources[i].label) {
+        var options;
         if(currentResolution.sources[i].res >= 720) {
-          var options = {default: "high"}; 
+          options = {default: "high"}; 
         }
         else {
-          var options = {default: "low"}; 
+          options = {default: "low"}; 
         }
-        videoplayer.videoJsResolutionSwitcher(options);
+        this.videoplayer.videoJsResolutionSwitcher(options);
       }
     }
+  },
+
+  setItem: function(data) {
+    this.setState({item: data});
   },
 
   setModerator: function(moderator) {
@@ -198,7 +212,7 @@ var App = React.createClass({
   },
 
   loadPlaylist: function(items) {
-    videoplayer.pause();
+    this.videoplayer.pause();
     items[0].selected = true;
     this.setState({lastErrorId: ""});
     this.refs.playlistApp.refs.playlist.setState({items: items}, function() {
@@ -206,14 +220,15 @@ var App = React.createClass({
     });
   },
 
-  error: function(e) {
-    var error = videoplayer.error();
+  error: function() {
+    var items;
+    var error = this.videoplayer.error();
 
     //video mime type known, but no source supported by this browser
     if(error.code === -1) {
       //"fake" ready event so video starts playing for other clients
       socket.emit("ready");
-      var items = this.refs.playlistApp.refs.playlist.state.items.slice();
+      items = this.refs.playlistApp.refs.playlist.state.items.slice();
       items[this.refs.playlistApp.refs.playlist.selected()].error = true;
       this.refs.playlistApp.refs.playlist.setState({items: items}, function() {
         //"fake" ended event, so the playlist switches to the next video when video ended
@@ -223,7 +238,7 @@ var App = React.createClass({
 
     //video not supported (or video url expired, not available etc.)
     if(error.code === 4) {
-      var items = this.refs.playlistApp.refs.playlist.state.items.slice();
+      items = this.refs.playlistApp.refs.playlist.state.items.slice();
       var i = this.refs.playlistApp.refs.playlist.selected();
       var id = items[i].id;
       //don't try to get a new url for a video twice in a row
@@ -245,12 +260,22 @@ var App = React.createClass({
     this.setState({name: newName});
   },
 
-  saveName: function() {
+  handleFocus: function() {
     this.setState({onFocusName: this.state.name});
   },
 
-  handleChange: function(event) {
-    this.setState({name: event.target.value});
+  handleBlur: function(event) {
+    if(this.state.name && this.state.name.length <= 150) {
+      socket.emit("editChannelName", this.state.name);
+    }
+    else {
+      this.setState({name: this.state.onFocusName});
+    }
+    event.target.setSelectionRange(0, 0);
+  },
+
+  handleChange: function(name) {
+    this.setState({name: name});
   },
 
   handleKeyUp: function(event) {
@@ -259,28 +284,22 @@ var App = React.createClass({
     }
   },
 
-  handleInput: function(event) {
-    if(this.state.name) {
-      socket.emit("editChannelName", this.state.name);
-    }
-    else {
-      this.setState({name: this.state.onFocusName});
-    }
-  },
-
   render: function() {
     return(
       React.createElement("div", {id: "app"},
-        React.createElement("input", {
+        React.createElement(init.components.lib.MaxLengthInput, {
           type: "text",
-          id: "channelName",
+          id: "channel-name-input",
           name: "channelName",
           value: this.state.name,
           disabled: this.state.moderator ? "" : "disabled",
-          onFocus: this.saveName,
-          onChange: this.handleChange,
+          handleFocus: this.handleFocus,
+          handleBlur: this.handleBlur,
           onKeyUp: this.handleKeyUp,
-          onBlur: this.handleInput
+          update: this.handleChange,
+          maxStringLength: 150,
+          hideOnBlur: true,
+          negativeMargin: true
         }),
         React.createElement("div", {id: "nowPlaying"},
           React.createElement("div", {className: "title " + (this.state.item ? "" : "invisible")},
@@ -304,10 +323,16 @@ var App = React.createClass({
           )
         ),
         React.createElement("div", {id: "channel"},
-          React.createElement(VideoApp, {ref: "player"}),
-          React.createElement(ChatApp, {ref: "chatApp"}),
-          React.createElement(PlaylistApp, {ref: "playlistApp", app: this, playItem: this.playItem, moderator: this.state.moderator}),
-          React.createElement(UserApp, {
+          React.createElement(init.components.channel.VideoApp, {ref: "player"}),
+          React.createElement(init.components.channel.ChatApp, {ref: "chatApp"}),
+          React.createElement(init.components.channel.PlaylistApp, {
+            ref: "playlistApp",
+            setItem: this.setItem,
+            videoplayer: this.videoplayer,
+            playItem: this.playItem,
+            moderator: this.state.moderator
+          }),
+          React.createElement(init.components.channel.UserApp, {
             ref: "userApp",
             chatApp: this.refs.chatApp,
             disablePlayer: this.disablePlayer,

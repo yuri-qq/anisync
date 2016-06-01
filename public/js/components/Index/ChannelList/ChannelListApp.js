@@ -1,12 +1,15 @@
-var ChannelListApp = React.createClass({
+init.components.index.ChannelListApp = React.createClass({
   displayName: "ChannelListApp",
 
   getInitialState: function() {
-    return {channels: [], search: "", showPrivate: true};
+    return {
+      channels: [],
+      search: "",
+      showPrivate: true
+    };
   },
 
   componentDidMount: function() {
-    socket = io.connect("/index");
     socket.on("setChannels", this.setChannels);
     socket.on("addChannel", this.addChannel);
     socket.on("removeChannel", this.removeChannel);
@@ -14,7 +17,6 @@ var ChannelListApp = React.createClass({
     socket.on("decrementUsercount", this.decrementUsercount);
     socket.on("updateChannelName", this.updateChannelName);
   },
-
   addChannel: function(channel) {
     var channels = this.state.channels.concat([channel]);
     this.setState({channels: channels});
@@ -62,7 +64,6 @@ var ChannelListApp = React.createClass({
   },
 
   updateChannelName: function(data) {
-    console.log(data, this.state.channels);
     var channels = this.state.channels.slice();
     for (var i = channels.length - 1; i >= 0; i--) {
       if(channels[i].id == data.id) {
@@ -76,13 +77,25 @@ var ChannelListApp = React.createClass({
   render: function() {
     return(
       React.createElement("div", null,
-        React.createElement(ChannelControls, {ref: "channelControls", search: this.search, value: this.state.search, showPrivate: this.state.showPrivate, privateCheckboxChange: this.privateCheckboxChange}),
+        React.createElement(init.components.index.ChannelControls, {
+          ref: "channelControls",
+          search: this.search,
+          value: this.state.search,
+          showPrivate: this.state.showPrivate,
+          privateCheckboxChange: this.privateCheckboxChange
+        }),
         React.createElement("div", {className: "seperator"}),
         React.createElement("ul", {id: "channels"},
-          this.state.channels.map(function(channel, index) {
-            if(((channel.private && this.state.showPrivate) || !channel.private) && channel.name.indexOf(this.state.search) > -1) {
+          this.state.channels.map(function(channel) {
+            if(((channel.secured && this.state.showPrivate) || !channel.secured) && channel.name.indexOf(this.state.search) > -1) {
               return(
-                React.createElement(ChannelItem, {key: channel.id, id: channel.id, name: channel.name, private: channel.private, usercount: channel.usercount})
+                React.createElement(init.components.index.ChannelItem, {
+                  key: channel.id,
+                  id: channel.id,
+                  name: channel.name,
+                  secured: channel.secured,
+                  usercount: channel.usercount
+                })
               );
             }
           }, this)

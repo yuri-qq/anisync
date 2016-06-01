@@ -1,12 +1,8 @@
 module.exports.index = function(req, res) {
-  if(req.session.username != undefined) {
-    var username = req.session.username;
-  }
-  else {
-    var username = "";
-  }
-
-  res.render("index", {username: username});
+  res.render("index", {init: {
+    load: "index",
+    username: req.session.username ? req.session.username : ""
+  }});
 };
 
 module.exports.policy = function(req, res) {

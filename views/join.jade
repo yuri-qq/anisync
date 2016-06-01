@@ -1,14 +1,8 @@
 extends layout
 
-block content
-  form(method="post" action="").centered-form
-    div
-      if !username
-        input(type="text" name="username" id="username_input" placeholder="username" required)
+block append scripts
+  script(src="/js/lib/MaxLengthInput.js")
+  script(src="/js/components/Join/App.js")
 
-      if private
-        input(type="password" name="password" id="password" placeholder="password" class= errors && errors.password ? "error" : "" required)
-        if errors.password
-          div(class="error") Wrong Password. Please try again.
-          
-      input(type="submit" value="join").button
+block content
+  #app-mount

@@ -1,5 +1,12 @@
-var UserApp = React.createClass({
+init.components.channel.UserApp = React.createClass({
   displayName: "UserApp",
+  propTypes: {
+    setModerator: React.PropTypes.func.isRequired,
+    enablePlayer: React.PropTypes.func.isRequired,
+    disablePlayer: React.PropTypes.func.isRequired,
+    chatApp: React.PropTypes.element.isRequired,
+    moderator: React.PropTypes.bool.isRequired
+  },
 
   getInitialState: function() {
     return {users: []};
@@ -103,7 +110,7 @@ var UserApp = React.createClass({
         ),
         React.createElement("ul", {id: "users"}, 
           this.state.users.map(function(user) {
-            return React.createElement(UserItem, {
+            return React.createElement(init.components.channel.UserItem, {
               key: user.socketId,
               socketId: user.socketId,
               user: user,

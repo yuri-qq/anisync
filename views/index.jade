@@ -1,28 +1,14 @@
 extends layout
 
 block append scripts
+  script(src="/js/lib/MaxLengthInput.js")
+  script(src="/js/components/Index/Controls.js")
   script(src="/js/components/Index/ChannelList/ChannelControls.js")
   script(src="/js/components/Index/ChannelList/ChannelItem.js")
   script(src="/js/components/Index/ChannelList/ChannelListApp.js")
   script(src="/js/components/Index/App.js")
-  script(src="/js/index.js")
 
 block content
-  #controls
-    .forms
-      .input-button
-        input(type="text" id="username" placeholder="choose a username" value="#{username}")
-        button save
-
-      .button
-        a(href="/create") create a channel
-
-    #description
-      | AniSync - a service to synchronize media playback between browsers.
-      br
-      | Watch and listen to media files together with your friends all over the world!
-      br
-      | We support HTML5 videos from almost any site. Try it out, join a channel or create your own. (No registration required!)
   #app-mount
   if google.adsense.enabled
     include adsense

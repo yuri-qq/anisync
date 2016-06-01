@@ -1,5 +1,9 @@
-var Linkify = React.createClass({
+init.components.lib.Linkify = React.createClass({
   displayName: "Linkify",
+  propTypes: {
+    urls: React.PropTypes.string.isRequired,
+    children: React.PropTypes.node
+  },
 
   linkify: function(text) {
     var urls = this.props.urls;

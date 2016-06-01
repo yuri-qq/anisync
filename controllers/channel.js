@@ -1,47 +1,10 @@
 var Channel = require('../models/channel');
 
 module.exports.form = function(req, res) {
-  res.render("create", {username: req.session.username ? true : false});
-};
-
-module.exports.create = function(req, res, next) {
-  if(!req.session.username) req.session.username = req.body.username;
-  var private = req.body.private == 'on' ? true : false;
-  
-  var errors = {};
-  if(!req.session.username) errors.username = true;
-  if(!req.body.channelname) errors.channelname = true;
-  if(private && !req.body.password) errors.password = true;
-
-  if(Object.keys(errors).length) {
-    res.render("create", {
-      username: req.session.username ? true : false,
-      private: private,
-      password: req.body.password,
-      errors: errors
-    });
-    return;
-  }
-
-  var data = {
-    name: req.body.channelname,
-    playing: false,
-    private: private,
-    users: [],
-    playlist: []
-  };
-
-  if(private) data.password = req.body.password;
-
-  var newChannel = Channel(data);
-
-  newChannel.save(function(error, channel) {
-    if(error) return next(error);
-    if(!channel) return next(new Error("No channel found"));
-
-    req.session.loggedInId = channel.id;
-    res.redirect('/channel/' + channel.id);
-  });
+  res.render("create", {init: {
+    load: "create",
+    username: req.session.username ? req.session.username : ""
+  }});
 };
 
 function getChannel(id, next, callback) {
@@ -54,39 +17,20 @@ function getChannel(id, next, callback) {
 
 module.exports.join = function(req, res, next) {
   getChannel(req.params.id, next, function(data) {
-    var errors = {};
-
-    if(!req.session.username) req.session.username = req.body.username;
-
-    if(data.bannedIPs.indexOf(req.connection.remoteAddress) > -1) {
-      res.redirect("/channel/" + data.id + "/banned");
-      return;
-    }
-
-    if(!data.private || req.session.loggedInId == req.params.id || !req.body.password) {
-      renderView();
+    if(req.session.username && (req.session.loggedInId === req.params.id || !data.secured)) {
+      res.render("channel", {init: {
+        load: "channel",
+        name: data.name,
+        channelId: data.id
+      }});
     }
     else {
-      data.comparePassword(req.body.password, function(error, match) {
-        if(match) {
-          req.session.loggedInId = req.params.id;
-        }
-        else {
-          errors.password = true;
-        }
-        renderView();
-      });
+      res.render("join", {init: {
+        load: "join",
+        secured: data.secured,
+        username: req.session.username ? true : false
+      }});
     }
-
-    function renderView() {
-      if(req.session.username && (req.session.loggedInId == req.params.id || !data.private)) {
-        res.render("channel", {data: {name: data.name}});
-      }
-      else {
-        res.render("join", {private: data.private, username: req.session.username ? true : false, errors: errors});
-      }
-    }
-
   });
 };
 

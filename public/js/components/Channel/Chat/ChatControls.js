@@ -1,12 +1,17 @@
-var ChatControls = React.createClass({
+init.components.channel.ChatControls = React.createClass({
   displayName: "ChatControls",
-
-  getInitialState: function() {
-    return {value: ""};
+  propTypes: {
+    handleInput: React.PropTypes.func.isRequired
   },
 
-  handleChange: function(event) {
-    this.setState({value: event.target.value});
+  getInitialState: function() {
+    return {
+      message: ""
+    };
+  },
+
+  handleChange: function(message) {
+    this.setState({message: message});
   },
 
   handleKeyUp: function(event) {
@@ -14,17 +19,27 @@ var ChatControls = React.createClass({
   },
 
   handleInput: function() {
-    if(this.state.value) {
-      this.props.handleInput(this.state.value);
-      this.setState({value: ""});
+    if(this.state.message && this.state.message.length <= 1000) {
+      this.props.handleInput(this.state.message);
+      this.setState({message: ""});
     }
   },
 
   render: function() {
     return(
       React.createElement("div", {className: "input-button"},
-        React.createElement("input", {type: "text", placeholder: "type a message", value: this.state.value, onChange: this.handleChange, onKeyUp: this.handleKeyUp}),
-        React.createElement("button", {disabled: this.props.disabled, onClick: this.handleInput}, "send")
+        React.createElement(init.components.lib.MaxLengthInput, {
+          ref: "messageInput",
+          type: "text",
+          placeholder: "type a message",
+          onKeyUp: this.handleKeyUp,
+          maxStringLength: 1000,
+          value: this.state.message,
+          update: this.handleChange
+        }),
+        React.createElement("button", {
+          onClick: this.handleInput
+        }, "send")
       )
     );
   }

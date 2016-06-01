@@ -13,12 +13,17 @@ var channelSchema = new Schema({
   },
   name: String,
   playing: Boolean,
-  private: Boolean,
+  secured: Boolean,
   password: String,
   users: [userSchema],
   playlist: [playlistItemSchema],
+  repeat: Boolean,
   bannedIPs: [String],
-  createdAt: {type: Date, expires: 10, default: Date.now} //expire after 10 seconds (if no user joins)
+  createdAt: {
+    type: Date,
+    expires: 10,
+    default: Date.now
+  } //expire after 10 seconds (if no user joins)
 });
 
 channelSchema.set("toObject", {virtuals: true});
@@ -53,12 +58,12 @@ channelSchema.methods.toIndex = function() {
   var channel = {
     id: this.id,
     name: this.name,
-    private: this.private,
+    secured: this.secured,
     usercount: this.users.length
   };
 
   return channel;
 };
 
-Channel = mongoose.model("channel", channelSchema);
+var Channel = mongoose.model("channel", channelSchema);
 module.exports = Channel;

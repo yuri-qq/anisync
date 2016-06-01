@@ -1,10 +1,17 @@
-var PlaylistApp = React.createClass({
+init.components.channel.PlaylistApp = React.createClass({
   displayName: "PlaylistApp",
+  propTypes: {
+    moderator: React.PropTypes.bool.isRequired,
+    playItem: React.PropTypes.func.isRequired,
+    videoplayer: React.PropTypes.object.isRequired,
+    setItem: React.PropTypes.func.isRequired
+  },
 
   getInitialState: function() {
     return {
       disableInput: false,
-      inputError: false
+      inputError: false,
+      repeat: true
     };
   },
 
@@ -13,6 +20,7 @@ var PlaylistApp = React.createClass({
     socket.on("removeItem",this.removeItem);
     socket.on("moveItem", this.moveItem);
     socket.on("refreshItem", this.refreshItem);
+    socket.on("setRepeat", this.setRepeat);
   },
 
   addItems: function(data) {
@@ -70,11 +78,42 @@ var PlaylistApp = React.createClass({
     return this.refs.playlist.state.items;
   },
 
+  repeatToggle: function() {
+    socket.emit("setRepeat", !this.state.repeat);
+  },
+
+  setRepeat: function(bool) {
+    if(this.props.moderator) {
+      this.setState({repeat: bool});
+    }
+  },
+
+  shufflePlaylist: function() {
+    this.refs.playlist.shufflePlaylist();
+  },
+
   render: function() {
     return(
       React.createElement("div", {id: "playlist-app"},
-        React.createElement(PlaylistControls, {ref: "playlistControls", getPlaylist: this.getPlaylist, disabled: this.state.disableInput, inputError: this.state.inputError, handleInput: this.handleInput, moderator: this.props.moderator}),
-        React.createElement(Playlist, {ref: "playlist", app: this.props.app, playItem: this.props.playItem, moderator: this.props.moderator})
+        React.createElement(init.components.channel.PlaylistControls, {
+          ref: "playlistControls",
+          getPlaylist: this.getPlaylist,
+          disabled: this.state.disableInput,
+          inputError: this.state.inputError,
+          handleInput: this.handleInput,
+          moderator: this.props.moderator,
+          repeat: this.state.repeat,
+          repeatToggle: this.repeatToggle,
+          shufflePlaylist: this.shufflePlaylist
+        }),
+        React.createElement(init.components.channel.Playlist, {
+          ref: "playlist",
+          setItem: this.props.setItem,
+          videoplayer: this.props.videoplayer,
+          playItem: this.props.playItem,
+          moderator: this.props.moderator,
+          repeat: this.state.repeat
+        })
       )
     );
   }

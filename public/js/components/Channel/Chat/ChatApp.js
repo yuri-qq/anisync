@@ -1,4 +1,4 @@
-var ChatApp = React.createClass({
+init.components.channel.ChatApp = React.createClass({
   displayName: "ChatApp",
 
   getInitialState: function() {
@@ -46,11 +46,20 @@ var ChatApp = React.createClass({
         React.createElement("div", {ref: "chatWindow", id: "chat-wrapper"},
           React.createElement("div", {id: "chat"}, 
             this.state.messages.map(function(message, index) {
-              return React.createElement(ChatMessage, {key: index, info: message.info, username: message.username, text: message.text, urls: message.urls, time: message.time});
+              return React.createElement(init.components.channel.ChatMessage, {
+                key: index,
+                info: message.info,
+                username: message.username,
+                text: message.text,
+                urls: message.urls,
+                time: message.time
+              });
             })
           )
         ),
-        React.createElement(ChatControls, {handleInput: this.handleInput})
+        React.createElement(init.components.channel.ChatControls, {
+          handleInput: this.handleInput
+        })
       )
     );
   }

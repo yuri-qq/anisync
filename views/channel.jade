@@ -1,14 +1,15 @@
 extends layout
 
 block append scripts
-  script.
-    var init = {name: "#{data.name}"};
   script(src="//vjs.zencdn.net/5.8.0/video.min.js")
   script(src="/js/lib/videojs-resolution-switcher.js")
   script(src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.4.2/Sortable.min.js")
   script(src="/js/lib/react-sortable-mixin.js")
+  script(src="/js/lib/fisherYatesShuffle.js")
+  script(src="/js/lib/MaxLengthInput.js")
   script(src="/js/lib/Linkify.js")
   script(src="/js/components/Channel/Video/VideoApp.js")
+  script(src="/js/components/Channel/Playlist/PlaylistButton.js")
   script(src="/js/components/Channel/Playlist/PlaylistLoader.js")
   script(src="/js/components/Channel/Playlist/PlaylistControls.js")
   script(src="/js/components/Channel/Playlist/PlaylistItem.js")
@@ -20,7 +21,6 @@ block append scripts
   script(src="/js/components/Channel/Users/UserItem.js")
   script(src="/js/components/Channel/Users/UserApp.js")
   script(src="/js/components/Channel/App.js")
-  script(src="/js/channel.js")
 
 block content
   #app-mount

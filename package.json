@@ -30,5 +30,61 @@
   "devDependencies": {
     "morgan": "^1.7.0"
   },
-  "description": "AniSync - a service to synchronize media playback between browsers."
+  "description": "AniSync - a service to synchronize media playback between browsers.",
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "es6": true,
+      "node": true,
+      "mongo": true
+    },
+    "extends": "eslint:recommended",
+    "parserOptions": {
+      "sourceType": "module"
+    },
+    "rules": {
+      "indent": [
+        "error",
+        2
+      ],
+      "linebreak-style": [
+        "error",
+        "unix"
+      ],
+      "quotes": [
+        "error",
+        "double"
+      ],
+      "semi": [
+        "error",
+        "always"
+      ]
+    },
+    "globals": {
+      "socket": true,
+      "init": true,
+      "React": true,
+      "ReactDOM": true,
+      "io": true,
+      "SortableMixin": true,
+      "videojs": true
+    },
+    "plugins": [
+      "react",
+      "react-native"
+    ],
+    "extends": ["eslint:recommended", "plugin:react/recommended"],
+    "rules": {
+      "react-native/no-unused-styles": "error",
+      "react-native/split-platform-components": "error",
+      "react-native/no-inline-styles": "error",
+      "react-native/no-color-literals": "error",
+      "no-console": "off"
+    },
+    "parserOptions": {
+      "ecmaFeatures": {
+        "jsx": true
+      }
+    }
+  }
 }

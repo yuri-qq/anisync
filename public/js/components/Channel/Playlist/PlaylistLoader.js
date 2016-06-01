@@ -1,5 +1,8 @@
-var PlaylistLoader = React.createClass({
+init.components.channel.PlaylistLoader = React.createClass({
   displayName: "PlaylistLoader",
+  propTypes: {
+    getPlaylist: React.PropTypes.func.isRequired
+  },
 
   getInitialState: function() {
     if(localStorage.playlists) var playlists = JSON.parse(localStorage.playlists);
@@ -46,7 +49,7 @@ var PlaylistLoader = React.createClass({
         React.createElement("div", {className: "input-button"},
           React.createElement("select", {value: this.state.selectValue, onChange: this.handleChange},
             React.createElement("option", {selected: true, disabled: true, style: {display: "none"}}, "---"),
-            Object.keys(this.state.playlists).map(function(value, index) {
+            Object.keys(this.state.playlists).map(function(value) {
               return React.createElement("option", {value: value}, value);
             })
           ),

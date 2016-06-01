@@ -1,19 +1,8 @@
 extends layout
 
 block append scripts
-  script(src="/js/create.js")
+  script(src="/js/lib/MaxLengthInput.js")
+  script(src="/js/components/Create/App.js")
 
 block content
-  form(method="post" action="").centered-form
-    div
-      if !username
-        input(type="text" name="username" placeholder="username" required="required" class= errors && errors.username ? "error" : "")
-
-      input(type="text" name="channelname" placeholder="channel name" required="required" class= errors && errors.channelname ? "error" : "")
-
-      label
-        input(type="checkbox" name="private" checked= private ? "checked" : undefined)
-        | set a password
-      input(type="password" name="password" placeholder="channel password" value= password ? password : "" class= errors && errors.password ? "error" : private ? "" : "hidden")
-
-      input(type="submit" value="Create").button
+  #app-mount

@@ -22,6 +22,11 @@ class Socket {
   }
 
   setUsername(username) {
+    if(username.length > 60 || username.length === 0) {
+      this.socket.emit("errors", {username: true});
+      return;
+    }
+    
     this.socket.request.session.username = username;
     this.socket.request.session.save();
   }
