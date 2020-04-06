@@ -9,26 +9,26 @@
   "author": "Yurifag",
   "license": "MIT",
   "dependencies": {
-    "bcrypt": "^0.8.5",
-    "body-parser": "^1.15.0",
-    "compression": "^1.6.1",
-    "connect-mongo": "^1.1.0",
-    "express": "^4.13.4",
-    "express-minify": "^0.2.0",
-    "express-session": "^1.13.0",
-    "jade": "^1.11.0",
-    "jstransformer-marked": "^1.0.1",
-    "linkify-it": "^1.2.0",
-    "marked": "^0.3.5",
-    "mongoose": "^4.4.4",
-    "shortid": "^2.2.4",
-    "socket.io": "^1.4.5",
-    "stylus": "^0.53.0",
-    "tlds": "^1.96.0",
-    "youtube-dl": "^1.10.5"
+    "bcrypt": "^4.0.1",
+    "body-parser": "^1.19.0",
+    "compression": "^1.7.4",
+    "connect-mongo": "^3.2.0",
+    "express": "^4.17.1",
+    "express-minify": "^1.0.0",
+    "express-session": "^1.17.0",
+    "pug": "^2.0.4",
+    "jstransformer-marked": "^1.0.3",
+    "linkify-it": "^2.2.0",
+    "marked": "^0.8.2",
+    "mongoose": "^5.9.7",
+    "shortid": "^2.2.15",
+    "socket.io": "^2.3.0",
+    "stylus": "^0.54.7",
+    "tlds": "^1.207.0",
+    "youtube-dl": "^3.0.2"
   },
   "devDependencies": {
-    "morgan": "^1.7.0"
+    "morgan": "^1.10.0"
   },
   "description": "AniSync - a service to synchronize media playback between browsers.",
   "eslintConfig": {
@@ -38,27 +38,21 @@
       "node": true,
       "mongo": true
     },
-    "extends": "eslint:recommended",
+    "extends": [
+      "eslint:recommended",
+      "plugin:react/recommended"
+    ],
     "parserOptions": {
-      "sourceType": "module"
+      "ecmaFeatures": {
+        "jsx": true
+      }
     },
     "rules": {
-      "indent": [
-        "error",
-        2
-      ],
-      "linebreak-style": [
-        "error",
-        "unix"
-      ],
-      "quotes": [
-        "error",
-        "double"
-      ],
-      "semi": [
-        "error",
-        "always"
-      ]
+      "react-native/no-unused-styles": "error",
+      "react-native/split-platform-components": "error",
+      "react-native/no-inline-styles": "error",
+      "react-native/no-color-literals": "error",
+      "no-console": "off"
     },
     "globals": {
       "socket": true,
@@ -72,19 +66,6 @@
     "plugins": [
       "react",
       "react-native"
-    ],
-    "extends": ["eslint:recommended", "plugin:react/recommended"],
-    "rules": {
-      "react-native/no-unused-styles": "error",
-      "react-native/split-platform-components": "error",
-      "react-native/no-inline-styles": "error",
-      "react-native/no-color-literals": "error",
-      "no-console": "off"
-    },
-    "parserOptions": {
-      "ecmaFeatures": {
-        "jsx": true
-      }
-    }
+    ]
   }
 }

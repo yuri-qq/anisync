@@ -1,17 +1,4 @@
-# Legal Notice
-according to § 5 TMG (German Teleservices Act):  
-<br>
-Jannes Grzebien  
-Hauptstraße 16  
-22964 Steinburg  
-Germany  
-<br>
-## Contact:
-Telephone: 01637734855  
-E-Mail:    jannesgrzebien@gmail.com  
-<br>
-<br>
-## Disclaimer:  
+#Disclaimer:  
 <br>
 #### Liability for content
 After common law we, as service provider, are responsible for our content on this website. However, as a service provider we are not obliged to monitor transmitted or stored third party content or to investigate circumstances that indicate illegal activity. Obligations to remove or block the use of information under the common laws remain untouched. However, a relevant liability is only possible from the date of knowledge of a specific infringement. If we become aware of such violations, we will remove that content immediately.  

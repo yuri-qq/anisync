@@ -29,7 +29,7 @@ mongoose.connect("mongodb://" + config.mongodb.host + ":" + config.mongodb.port 
   Channel.remove({}).exec();
 });
 
-if(app.get("env") == "production") {
+if(app.get("env") === "production") {
   var compression = require("compression");
   var minify = require("express-minify");
   app.use(compression());
@@ -42,7 +42,7 @@ else {
 }
 
 app.set("views", __dirname + "/views");
-app.set("view engine", "jade");
+app.set("view engine", "pug");
 app.use(stylus.middleware({src: __dirname + "/public", compile: function(str, path) {
   return stylus(str).set("filename", path);
 }}));
@@ -67,11 +67,11 @@ app.use(function(req, res, next) {
 
 var sessionMiddleware = session({
   store: new MongoStore({mongooseConnection: mongoose.connection}),
-  secret: config.sessionSecret,
+  secret: config.session.secret,
   resave: false,
   saveUninitialized: true,
   cookie: {
-    secure: true,
+    secure: config.session.secureCookie,
     maxAge: 31536000000,
     expires: new Date(Date.now() + 31536000000)
   }
@@ -103,12 +103,12 @@ app.all("/channel/:id/banned", channel.banned);
 //handle 404
 app.use(function(req, res) {
   res.status(400);
-  res.render("404.jade", {title: "404: File Not Found"});
+  res.render("404.pug", {title: "404: File Not Found"});
 });
 
 //handle 500
 app.use(function(error, req, res) {
   console.log(error);
   res.status(500);
-  res.render("500.jade", {title:"500: Internal Server Error", error: error});
+  res.render("500.pug", {title:"500: Internal Server Error", error: error});
 });

@@ -3,7 +3,7 @@
     "web" : {
       "host": "localhost",
       "http": {
-        "port": 80
+        "port": 8080
       },
       "https": {
         "enabled": false,
@@ -31,7 +31,10 @@
         "port": 8118
       }
     },
-    "sessionSecret": "changeme",
+    "session": {
+      "secret": "changeme",
+      "secureCookie": false
+    },
     "google": {
       "analytics": {
         "enabled": false,
@@ -81,7 +84,10 @@
         "port": 8118
       }
     },
-    "sessionSecret": "changeme",
+    "session": {
+      "secret": "changeme",
+      "secureCookie": false
+    },
     "google": {
       "analytics": {
         "enabled": false,
