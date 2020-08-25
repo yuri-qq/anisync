@@ -55,7 +55,7 @@ class Socket {
 
         //assume first user who joins is channel creator
         var user = {
-          socketId: self.socket.client.id,
+          socketId: self.socket.id,
           username: self.socket.request.session.username,
           moderator: data.users.length ? false : true
         };
@@ -89,7 +89,7 @@ class Socket {
   setEventBool(eventName, callback) {
     var query = {};
     query["users.$." + eventName] = true;
-    Channel.findOneAndUpdate({"users.socketId": this.socket.client.id}, {$set: query}, {new: true}, function(error, data) {
+    Channel.findOneAndUpdate({"users.socketId": this.socket.id}, {$set: query}, {new: true}, function(error, data) {
       if(error) throw error;
 
       var i;
@@ -198,7 +198,7 @@ class Socket {
     var self = this;
     Channel.findOne({_id: this.id}, function(error, data) {
       //only allow a single client to trigger a refresh
-      if(self.socket.client.id === data.users[0].socketId) {
+      if(self.socket.id === data.users[0].socketId) {
         Channel.findOne({"playlist._id": id}, {"playlist.$": 1}, function(error, data) {
           if(error) throw error;
           if(!data) return;
@@ -244,7 +244,7 @@ class Socket {
   }
 
   updateUser(data) {
-    data.socketId = this.socket.client.id;
+    data.socketId = this.socket.id;
     this.io.of("/channel").to(this.id).emit("updateUser", data);
   }
 
@@ -262,7 +262,7 @@ class Socket {
       if(error) throw error;
 
       for(var i = 0; i < data.users.length; i++) {
-        if(self.socket.client.id == data.users[i].socketId && data.users[i].moderator) {
+        if(self.socket.id == data.users[i].socketId && data.users[i].moderator) {
           callback();
         }
       }
@@ -316,10 +316,10 @@ class Socket {
   }
 
   disconnect() {
-    this.socket.to(this.id).emit("disconnected", {socketId: this.socket.client.id, username: this.socket.request.session.username});
+    this.socket.to(this.id).emit("disconnected", {socketId: this.socket.id, username: this.socket.request.session.username});
 
     var self = this;
-    Channel.update({_id: this.id}, {$pull: {users: {socketId: this.socket.client.id}}}, function(error, data) {
+    Channel.update({_id: this.id}, {$pull: {users: {socketId: this.socket.id}}}, function(error, data) {
       if(error) throw error;
       if(!data) return;
       

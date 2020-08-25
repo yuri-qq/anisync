@@ -1,4 +1,5 @@
 var fs = require("fs");
+var path = require("path");
 var stylus = require("stylus");
 var bodyParser = require("body-parser");
 var session = require("express-session");
@@ -99,6 +100,9 @@ app.all("/create", channel.form);
 app.all("/channel/:id", channel.join);
 app.all("/channel/:id/kicked", channel.kicked);
 app.all("/channel/:id/banned", channel.banned);
+
+// serve client js statically
+app.use("/js/socket.io", express.static(path.join(__dirname, "node_modules/socket.io-client/dist/")));
 
 //handle 404
 app.use(function(req, res) {
