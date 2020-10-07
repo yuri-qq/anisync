@@ -24,7 +24,7 @@ class Socket {
   join(data) {
     var session = this.socket.request.session;
     var errors = {};
-    Channel.findOne({"_id": data.id}, function(error, channel) {
+    Channel.findOne({"id": data.id}, function(error, channel) {
       if(error) errors.database = true;
       if(!channel) errors.notfound = true;
 

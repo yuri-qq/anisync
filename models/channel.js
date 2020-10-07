@@ -6,7 +6,7 @@ var userSchema = require("./schemas/user");
 var playlistItemSchema = require("./schemas/playlistItem");
 
 var channelSchema = new Schema({
-  _id: {
+  id: {
     type: String,
     unique: true,
     default: shortId.generate
@@ -28,9 +28,6 @@ var channelSchema = new Schema({
 
 channelSchema.set("toObject", {virtuals: true});
 channelSchema.set("toJSON", {virtuals: true});
-channelSchema.virtual("id").get(function() {
-  return this._id.toString();
-});
 
 channelSchema.pre("save", function(next) {
   var channel = this;

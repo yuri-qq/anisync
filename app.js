@@ -26,9 +26,18 @@ else {
 
 // database connection
 var Channel = require("./models/channel");
-mongoose.connect("mongodb://" + config.mongodb.host + ":" + config.mongodb.port + "/" + config.mongodb.database, {user: config.mongodb.user, pass: config.mongodb.password}, function() {
-  Channel.remove({}).exec();
-});
+mongoose.connect(
+  "mongodb://" + config.mongodb.host + ":" + config.mongodb.port + "/" + config.mongodb.database,
+  {
+    user: config.mongodb.user,
+    pass: config.mongodb.password,
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+    useFindAndModify: false
+  },
+  function() { Channel.deleteMany({}).exec(); }
+);
 
 if(app.get("env") === "production") {
   var compression = require("compression");

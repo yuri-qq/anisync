@@ -8,7 +8,7 @@ module.exports.form = function(req, res) {
 };
 
 function getChannel(id, next, callback) {
-  Channel.findOne({"_id": id}, function(error, data) {
+  Channel.findOne({"id": id}, function(error, data) {
     if(error) return next(error);
     if(!data) return next();
     callback(data);

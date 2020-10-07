@@ -44,7 +44,7 @@ class Socket {
 
   join(id) {
     var self = this;
-    Channel.findOne({_id: this.id}, function(error, data) {
+    Channel.findOne({id: this.id}, function(error, data) {
       if(error) throw error;
       if(!data) return;
 
@@ -62,7 +62,7 @@ class Socket {
         self.io.of("/channel").to(self.id).emit("connected", user);
 
         //remove expiration time of channel
-        Channel.findOneAndUpdate({_id: self.id}, {$push: {users: user}, $set: {createdAt: null}}, {upsert: true, new: true}, function(error, data) {
+        Channel.findOneAndUpdate({id: self.id}, {$push: {users: user}, $set: {createdAt: null}}, {upsert: true, new: true}, function(error, data) {
           if(error) throw error;
 
           self.socket.emit("setup", data);
@@ -103,7 +103,7 @@ class Socket {
       if(count === data.users.length) {
         for(i = 0; i < data.users.length; i++) {
           query["users.$." + eventName] = false;
-          Channel.update({"users.socketId": data.users[i].socketId}, {$set: query}).exec();
+          Channel.updateOne({"users.socketId": data.users[i].socketId}, {$set: query}).exec();
         }
         callback();
       }
@@ -123,14 +123,14 @@ class Socket {
     var self = this;
     this.setEventBool("ready", function() {
       self.io.of("/channel").to(self.id).emit("play", 0);
-      Channel.update({_id: self.id}, {playing: true}).exec();
+      Channel.updateOne({id: self.id}, {playing: true}).exec();
     });
   }
 
   play(time) {
     var self = this;
     this.isModerator(function() {
-      Channel.update({_id: self.id}, {playing: true}).exec();
+      Channel.updateOne({id: self.id}, {playing: true}).exec();
       self.socket.to(self.id).emit("play", time);
     });
   }
@@ -138,7 +138,7 @@ class Socket {
   pause(time) {
     var self = this;
     this.isModerator(function() {
-      Channel.update({_id: self.id}, {playing: false}).exec();
+      Channel.updateOne({id: self.id}, {playing: false}).exec();
       self.socket.to(self.id).emit("pause", time);
     });
   }
@@ -159,7 +159,7 @@ class Socket {
           return;
         }
 
-        Channel.findOneAndUpdate({_id: self.id}, {$push: {playlist: {$each: files}}}, {upsert: true, new: true}, function(error, data) {
+        Channel.findOneAndUpdate({id: self.id}, {$push: {playlist: {$each: files}}}, {upsert: true, new: true}, function(error, data) {
           if(error) throw error;
 
           for(var i = 0; i < files.length; i++) {
@@ -174,7 +174,7 @@ class Socket {
   removeItem(data) {
     var self = this;
     this.isModerator(function() {
-      Channel.update({_id: self.id}, {$pull: {playlist: {_id: data.id}}}, function(error) {
+      Channel.updateOne({id: self.id}, {$pull: {playlist: {id: data.id}}}, function(error) {
         if(error) throw error;
         self.socket.to(self.id).emit("removeItem", data.index);
       });
@@ -184,11 +184,11 @@ class Socket {
   moveItem(data) {
     var self = this;
     this.isModerator(function() {
-      Channel.findOne({_id: self.id}, function(error, channelObject) {
+      Channel.findOne({id: self.id}, function(error, channelObject) {
         if(error) throw error;
 
         channelObject.playlist.splice(data.newIndex, 0, channelObject.playlist.splice(data.oldIndex, 1)[0]);
-        Channel.update({_id: self.id}, {$set: {playlist: channelObject.playlist}}).exec();
+        Channel.updateOne({id: self.id}, {$set: {playlist: channelObject.playlist}}).exec();
       });
       self.socket.to(self.id).emit("moveItem", {oldIndex: data.oldIndex, newIndex: data.newIndex});
     });
@@ -196,10 +196,10 @@ class Socket {
 
   refreshItem(id) {
     var self = this;
-    Channel.findOne({_id: this.id}, function(error, data) {
+    Channel.findOne({id: this.id}, function(error, data) {
       //only allow a single client to trigger a refresh
       if(self.socket.id === data.users[0].socketId) {
-        Channel.findOne({"playlist._id": id}, {"playlist.$": 1}, function(error, data) {
+        Channel.findOne({"playlist.id": id}, {"playlist.$": 1}, function(error, data) {
           if(error) throw error;
           if(!data) return;
 
@@ -209,7 +209,7 @@ class Socket {
               error: error,
               formats: files ? files[0].formats : []
             };
-            if(!error) Channel.findOneAndUpdate({"playlist._id": id}, {$set: {"playlist.$.formats": files[0].formats}}).exec();
+            if(!error) Channel.findOneAndUpdate({"playlist.id": id}, {$set: {"playlist.$.formats": files[0].formats}}).exec();
             self.io.of("/channel").to(self.id).emit("refreshItem", data);
           });
         });
@@ -227,7 +227,7 @@ class Socket {
   loadPlaylist(items) {
     var self = this;
     this.isModerator(function() {
-      Channel.findOneAndUpdate({_id: self.id}, {$set: {playlist: items}}, {upsert: true, new: true}, function(error, data) {
+      Channel.findOneAndUpdate({id: self.id}, {$set: {playlist: items}}, {upsert: true, new: true}, function(error, data) {
         if(error) throw error;
 
         self.io.of("/channel").to(self.id).emit("loadPlaylist", data.playlist);
@@ -258,7 +258,7 @@ class Socket {
 
   isModerator(callback) {
     var self = this;
-    Channel.findOne({_id: this.id}, function(error, data) {
+    Channel.findOne({id: this.id}, function(error, data) {
       if(error) throw error;
 
       for(var i = 0; i < data.users.length; i++) {
@@ -274,7 +274,7 @@ class Socket {
     this.isModerator(function() {
       var socket = self.io.nsps["/channel"].sockets["/channel#" + data.socketId];
       if(socket) {
-        if(data.ban) Channel.update({_id: self.id}, {$push: {bannedIPs: socket.handshake.address}}).exec();
+        if(data.ban) Channel.updateOne({id: self.id}, {$push: {bannedIPs: socket.handshake.address}}).exec();
         data.username = self.getUsername(data.socketId);
         self.io.of("/channel").to(self.id).emit("kickban", data);
         socket.disconnect();
@@ -292,7 +292,7 @@ class Socket {
     var self = this;
     this.isModerator(function() {
       if(newName) {
-        Channel.update({_id: self.id}, {$set: {name: newName}}).exec();
+        Channel.updateOne({id: self.id}, {$set: {name: newName}}).exec();
         self.io.of("/channel").to(self.id).emit("updateChannelName", newName);
         self.io.of("/index").emit("updateChannelName", {id: self.id, newName: newName});
       }
@@ -303,7 +303,7 @@ class Socket {
     var self = this;
     this.isModerator(function() {
       self.io.of("/channel").to(self.id).emit("setRepeat", bool);
-      Channel.update({_id: self.id}, {$set: {repeat: bool}}).exec();
+      Channel.updateOne({id: self.id}, {$set: {repeat: bool}}).exec();
     });
   }
 
@@ -311,7 +311,7 @@ class Socket {
     var self = this;
     this.isModerator(function() {
       self.io.of("/channel").to(self.id).emit("shufflePlaylist", playlist);
-      Channel.update({_id: self.id}, {$set: {playlist: playlist}}).exec();
+      Channel.updateOne({id: self.id}, {$set: {playlist: playlist}}).exec();
     });
   }
 
@@ -319,18 +319,18 @@ class Socket {
     this.socket.to(this.id).emit("disconnected", {socketId: this.socket.id, username: this.socket.request.session.username});
 
     var self = this;
-    Channel.update({_id: this.id}, {$pull: {users: {socketId: this.socket.id}}}, function(error, data) {
+    Channel.updateOne({id: this.id}, {$pull: {users: {socketId: this.socket.id}}}, function(error, data) {
       if(error) throw error;
       if(!data) return;
       
       self.io.of("/index").emit("decrementUsercount", self.id);
 
-      Channel.findOne({_id: self.id}, function(error, data) {
+      Channel.findOne({id: self.id}, function(error, data) {
         if(error) throw error;
         if(!data) return;
 
         if(data.users.length == 0) {
-          Channel.remove({_id: self.id}, function(error) {
+          Channel.deleteOne({id: self.id}, function(error) {
             if(error) throw error;
             
             self.io.of("/index").emit("removeChannel", self.id);
