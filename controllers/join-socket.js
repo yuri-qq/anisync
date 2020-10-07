@@ -23,12 +23,19 @@ class Socket {
 
   join(data) {
     var session = this.socket.request.session;
-    var errors = {};
-    Channel.findOne({"id": data.id}, function(error, channel) {
+    var errors = {
+      database: false,
+      notfound: false,
+      username: false,
+      password: false
+    };
+
+    var self = this;
+    Channel.findOne({"id": data.channelId}, function(error, channel) {
       if(error) errors.database = true;
       if(!channel) errors.notfound = true;
 
-      if(data.username > 60) {
+      if(data.username.length === 0 || data.username.length > 60) {
         errors.username = true;
       }
       else if(!session.username) {
@@ -36,24 +43,39 @@ class Socket {
         session.save();
       }
 
-      if(channel.bannedIPs.indexOf(this.socket.remoteAddress) > -1) {
-        this.socket.redirect("/channel/" + channel.id + "/banned");
+      if(channel.bannedIPs.indexOf(self.socket.remoteAddress) > -1) {
+        self.socket.redirect("/channel/" + channel.id + "/banned");
         return;
       }
 
-      if(!channel.secured || session.loggedInId == channel.id || !channel.password) {
-        this.socket.redirect("/channel/" + channel.id);
-      }
-      else {
-        channel.comparePassword(data.password, function(error, match) {
-          if(error) errors.password = true;
-          if(match) {
-            session.loggedInId = data.id;
-            session.save();
-            this.socket.redirect("/channel/" + channel.id);
+      new Promise((resolve) => {
+        if(channel.secured && session.loggedInId !== channel.id) {
+          channel.comparePassword(data.password, function(error, match) {
+            if(error) throw error;
+            if(match) {
+              session.loggedInId = channel.id;
+              session.save();
+            }
+            else {
+              errors.password = true;
+            }
+
+            resolve();
+          });
+        }
+        else {
+          resolve();
+        }
+      }).then(() => {
+        for(const [, error] of Object.entries(errors)) {
+          if(error) {
+            self.socket.emit("errors", errors);
+            return;
           }
-        });
-      }
+        }
+  
+        self.socket.redirect("/channel/" + channel.id);
+      });
     });
   }
 

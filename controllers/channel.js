@@ -28,7 +28,8 @@ module.exports.join = function(req, res, next) {
       res.render("join", {init: {
         load: "join",
         secured: data.secured,
-        username: req.session.username ? true : false
+        username: req.session.username ? true : false,
+        channelId: data.id
       }});
     }
   });

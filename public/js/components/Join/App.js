@@ -5,7 +5,8 @@ init.components.join.App = React.createClass({
     return {
       username: init.username ? init.username : "",
       password: "",
-      secured: init.secured
+      secured: init.secured,
+      errors: {}
     };
   },
 
@@ -34,16 +35,12 @@ init.components.join.App = React.createClass({
     socket.emit("join", {
       username: this.state.username,
       password: this.state.password,
-      channelid: init.channelid
+      channelId: init.channelId
     });
   },
 
   handleErrors: function(errors) {
     this.setState({errors: errors});
-  },
-
-  redirect: function(url) {
-    window.location = init.domain ? ("//" + init.domain + url) : url;
   },
 
   render: function() {
