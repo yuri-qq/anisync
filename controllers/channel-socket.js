@@ -174,7 +174,7 @@ class Socket {
   removeItem(data) {
     var self = this;
     this.isModerator(function() {
-      Channel.updateOne({id: self.id}, {$pull: {playlist: {id: data.id}}}, function(error) {
+      Channel.updateOne({id: self.id}, {$pull: {playlist: {_id: data.id}}}, function(error) {
         if(error) throw error;
         self.socket.to(self.id).emit("removeItem", data.index);
       });
