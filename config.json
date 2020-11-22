@@ -13,7 +13,8 @@
           "key": "",
           "cert": ""
         }
-      }
+      },
+      "trustedProxies": []
     },
     "mongodb": {
       "host": "localhost",
@@ -66,7 +67,8 @@
           "key": "",
           "cert": ""
         }
-      }
+      },
+      "trustedProxies": []
     },
     "mongodb": {
       "host": "localhost",

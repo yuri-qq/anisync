@@ -32,7 +32,8 @@ The config.json has 2 identical blocks, one for development and one for producti
         "key": "",
         "cert": ""
       }
-    }
+    },
+    "trustedProxies": [] //List of trusted reverse proxies. X-Real-IP header has to be set.
   },
   "mongodb": {
     "host": "localhost", //address of the MongoDB server
@@ -46,7 +47,7 @@ The config.json has 2 identical blocks, one for development and one for producti
     "proxy": { //optional HTTP proxy for Youtube-DL (e.g. to bypass IP blocks)
       "enabled": false,
       "domains": ["youtube.com"], //list of domains that should be routed through the proxy
-                      //if empty and enabled: true, route all requests through proxy
+                                  //if empty and enabled: true, route all requests through proxy
       "host": "localhost", //address of proxy server
       "port": 8118 //port of proxy server
     }

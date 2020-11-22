@@ -20,16 +20,17 @@ var YoutubeDL = require("../util/YoutubeDL");
 var linkify = require("linkify-it")();
 linkify.tlds(require("tlds")); 
 
-function ChannelSocketController(io) {
-  if(!(this instanceof ChannelSocketController)) return new ChannelSocketController(io);
+function ChannelSocketController(io, config) {
+  if(!(this instanceof ChannelSocketController)) return new ChannelSocketController(io, config);
 
-  io.of("/channel").on("connection", (socket) => new Socket(io, socket));
+  io.of("/channel").on("connection", (socket) => new Socket(io, socket, config));
 }
 
 class Socket {
-  constructor(io, socket) {
-    this.socket = socket;
+  constructor(io, socket, config) {
     this.io = io;
+    this.socket = socket;
+    this.config = config;
 
     this.socket.on("join", (id) => {
       this.id = id;
@@ -64,7 +65,13 @@ class Socket {
       if(error) throw error;
       if(!data) return;
 
-      if((!data.secured || self.socket.request.session.loggedInId === self.id) && data.bannedIPs.indexOf(self.socket.handshake.address) === -1) {
+      var ip = self.socket.handshake.address;
+      if(self.socket.handshake.headers["x-real-ip"] && self.config.trustedProxies.indexOf(self.socket.handshake.address) > -1) {
+        //if behind a trusted reverse proxy, use the X-Real-IP header
+        ip = self.socket.handshake.headers["x-real-ip"];
+      }
+
+      if((!data.secured || self.socket.request.session.loggedInId === self.id) && data.bannedIPs.indexOf(ip) === -1) {
 
         self.socket.join(self.id);
         console.log(self.socket.client.id + " joined " + id);
@@ -288,9 +295,16 @@ class Socket {
   kickban(data) {
     var self = this;
     this.isModerator(function() {
-      var socket = self.io.nsps["/channel"].sockets["/channel#" + data.socketId];
+      var socket = self.io.nsps["/channel"].sockets[data.socketId];
       if(socket) {
-        if(data.ban) Channel.updateOne({id: self.id}, {$push: {bannedIPs: socket.handshake.address}}).exec();
+        if(data.ban) {
+          var ip = socket.handshake.address;
+          if(socket.handshake.headers["x-real-ip"] && self.config.trustedProxies.indexOf(socket.handshake.address) > -1) {
+            //if behind a trusted reverse proxy, use the X-Real-IP header
+            ip = socket.handshake.headers["x-real-ip"];
+          }
+          Channel.updateOne({id: self.id}, {$push: {bannedIPs: ip}}).exec();
+        }
         data.username = self.getUsername(data.socketId);
         self.io.of("/channel").to(self.id).emit("kickban", data);
         socket.disconnect();
@@ -299,7 +313,7 @@ class Socket {
   }
 
   getUsername(id) {
-    var socket = this.io.nsps["/channel"].sockets["/channel#" + id];
+    var socket = this.io.nsps["/channel"].sockets[id];
     if(socket) return socket.request.session.username;
     return false;
   }

@@ -39,7 +39,7 @@ html
       script(src="https://unpkg.com/react@0.14.7/dist/react.min.js")
       script(src="https://unpkg.com/react-dom@0.14.7/dist/react-dom.js")
       script.
-        var init = !{JSON.stringify(init)};
+        var init = !{init ? JSON.stringify(init) : "\"\""};
         init.components = {[init.load]: {}, "lib": {"functions": {}}};
       script(src="/js/componentLoader.js")
 

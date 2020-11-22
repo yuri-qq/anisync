@@ -40,6 +40,10 @@ else {
   io = require("socket.io")(http);
 }
 
+if(config.web.trustedProxies.length > 0) {
+  app.set("trust proxy", config.web.trustedProxies);
+}
+
 // database connection
 var Channel = require("./models/channel");
 mongoose.connect(
@@ -114,7 +118,7 @@ io.use(function(socket, next) {
 require("./controllers/index-socket")(io);
 require("./controllers/create-socket")(io);
 require("./controllers/join-socket")(io);
-require("./controllers/channel-socket")(io);
+require("./controllers/channel-socket")(io, {trustedProxies: config.web.trustedProxies});
 
 //routes
 var site = require("./controllers/site");

@@ -59,11 +59,6 @@ class Socket {
         session.save();
       }
 
-      if(channel.bannedIPs.indexOf(self.socket.remoteAddress) > -1) {
-        self.socket.redirect("/channel/" + channel.id + "/banned");
-        return;
-      }
-
       new Promise((resolve) => {
         if(channel.secured && session.loggedInId !== channel.id) {
           channel.comparePassword(data.password, function(error, match) {
