@@ -47,7 +47,11 @@ class YoutubeDL {
           var formats = [];
           if(media[i].format.indexOf("unknown") === -1) {
             for(var i2 = 0; i2 < media[i].formats.length; i2++) {
-              if(media[i].formats[i2].format_note != "DASH video" && media[i].formats[i2].format_note != "DASH audio" && media[i].formats[i2].acodec != "none") {
+              if(media[i].formats[i2].format_note != "DASH video" &&
+                 media[i].formats[i2].format_note != "DASH audio" &&
+                 media[i].formats[i2].format_note != "tiny" && // filter YouTube's audio only formats
+                 media[i].formats[i2].acodec != "none")
+              {
                 if((media[i].formats[i2].ext == "mp4" || media[i].formats[i2].ext == "webm")) {
                   formats.push({
                     type: "video/" + media[i].formats[i2].ext,
