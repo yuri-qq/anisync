@@ -1,7 +1,7 @@
 {
   "name": "anisync",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js"
@@ -29,44 +29,9 @@
     "youtube-dl": "^3.0.2"
   },
   "devDependencies": {
+    "eslint": "^7.15.0",
+    "eslint-plugin-react": "^7.21.5",
     "morgan": "^1.10.0"
   },
-  "description": "AniSync - a service to synchronize media playback between browsers.",
-  "eslintConfig": {
-    "env": {
-      "browser": true,
-      "es6": true,
-      "node": true,
-      "mongo": true
-    },
-    "extends": [
-      "eslint:recommended",
-      "plugin:react/recommended"
-    ],
-    "parserOptions": {
-      "ecmaFeatures": {
-        "jsx": true
-      }
-    },
-    "rules": {
-      "react-native/no-unused-styles": "error",
-      "react-native/split-platform-components": "error",
-      "react-native/no-inline-styles": "error",
-      "react-native/no-color-literals": "error",
-      "no-console": "off"
-    },
-    "globals": {
-      "socket": true,
-      "init": true,
-      "React": true,
-      "ReactDOM": true,
-      "io": true,
-      "SortableMixin": true,
-      "videojs": true
-    },
-    "plugins": [
-      "react",
-      "react-native"
-    ]
-  }
+  "description": "AniSync - a service to synchronize media playback between browsers."
 }
