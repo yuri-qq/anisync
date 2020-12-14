@@ -15,14 +15,14 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 init.components.index.App = React.createClass({
-  displayName: "App",
+    displayName: "App",
 
-  render: function() {
-    return(
-      React.createElement("div", null,
-        React.createElement(init.components.index.Controls, null),
-        React.createElement(init.components.index.ChannelListApp, null)
-      )
-    );
-  }
+    render: function() {
+        return(
+            React.createElement("div", null,
+                React.createElement(init.components.index.Controls, null),
+                React.createElement(init.components.index.ChannelListApp, null)
+            )
+        );
+    }
 });

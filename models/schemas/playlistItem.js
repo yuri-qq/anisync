@@ -18,9 +18,9 @@ var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 
 var playlistItemSchema = new Schema({
-  formats: Array,
-  webpage: String,
-  title: String
+    formats: Array,
+    webpage: String,
+    title: String
 });
 
 playlistItemSchema.set("toObject", {virtuals: true});

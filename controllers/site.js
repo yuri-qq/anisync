@@ -15,12 +15,12 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 module.exports.index = function(req, res) {
-  res.render("index", {init: {
-    load: "index",
-    username: req.session.username ? req.session.username : ""
-  }});
+    res.render("index", {init: {
+        load: "index",
+        username: req.session.username ? req.session.username : ""
+    }});
 };
 
 module.exports.policy = function(req, res) {
-  res.render("policy");
+    res.render("policy");
 };

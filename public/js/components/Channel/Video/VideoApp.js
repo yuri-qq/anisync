@@ -15,22 +15,22 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 init.components.channel.VideoApp = React.createClass({
-  displayName: "VideoApp",
+    displayName: "VideoApp",
 
-  componentDidMount: function() {
-    var wrapper = document.createElement("div");
-    wrapper.innerHTML = "<video id='video' class='video-js vjs-16-9 vjs-default-skin' controls='controls' preload='auto'></video>";
-    var video = wrapper.firstChild;
-    this.refs.video.appendChild(video);
-  },
+    componentDidMount: function() {
+        var wrapper = document.createElement("div");
+        wrapper.innerHTML = "<video id='video' class='video-js vjs-16-9 vjs-default-skin' controls='controls' preload='auto'></video>";
+        var video = wrapper.firstChild;
+        this.refs.video.appendChild(video);
+    },
 
-  contextMenu: function(event) {
-    event.preventDefault();
-  },
+    contextMenu: function(event) {
+        event.preventDefault();
+    },
 
-  render: function() {
-    return (
-      React.createElement("div", {id: "video-app", ref: "video", onContextMenu: this.contextMenu})
-    );
-  }
+    render: function() {
+        return (
+            React.createElement("div", {id: "video-app", ref: "video", onContextMenu: this.contextMenu})
+        );
+    }
 });
