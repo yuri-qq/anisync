@@ -61,18 +61,23 @@ class Socket {
 
       new Promise((resolve) => {
         if(channel.secured && session.loggedInId !== channel.id) {
-          channel.comparePassword(data.password, function(error, match) {
-            if(error) throw error;
-            if(match) {
-              session.loggedInId = channel.id;
-              session.save();
-            }
-            else {
-              errors.password = true;
-            }
+          try {
+            channel.comparePassword(data.password, function(error, match) {
+              if(error) throw error;
+              if(match) {
+                session.loggedInId = channel.id;
+                session.save();
+              }
+              else {
+                errors.password = true;
+              }
 
-            resolve();
-          });
+              resolve();
+            });
+          }
+          catch(error) {
+            console.error(error);
+          }
         }
         else {
           resolve();
