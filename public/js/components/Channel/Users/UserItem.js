@@ -34,7 +34,7 @@ init.components.channel.UserItem = React.createClass({
         var data = {
             socketId: this.props.socketId,
             moderator: !this.props.user.moderator
-        }
+        };
         if(this.props.socketId != socket.id) socket.emit("moderatorUpdate", data);
     },
 

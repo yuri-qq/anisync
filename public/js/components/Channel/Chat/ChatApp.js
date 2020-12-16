@@ -31,11 +31,11 @@ init.components.channel.ChatApp = React.createClass({
     },
 
     connectMessage: function(username) {
-        this.appendMessage({info: true, username: username, text: "connected"})
+        this.appendMessage({info: true, username: username, text: "connected"});
     },
 
     disconnectMessage: function(username) {
-        this.appendMessage({info: true, username: username, text: "disconnected"})
+        this.appendMessage({info: true, username: username, text: "disconnected"});
     },
 
     chatMessage: function(message) {

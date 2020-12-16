@@ -68,7 +68,7 @@ init.components.index.ChannelListApp = React.createClass({
     },
 
     search: function(event) {
-        this.setState({search: event.target.value})
+        this.setState({search: event.target.value});
     },
 
     privateCheckboxChange: function(event) {

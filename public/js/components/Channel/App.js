@@ -75,12 +75,12 @@ init.components.channel.App = React.createClass({
         socket.emit("join", this.state.channelId);
 
         /**
-     * ask user if he really wants to leave the page
-     * @return {String} message to the user
-     */
+        * ask user if he really wants to leave the page
+        * @return {String} message to the user
+        */
         window.onbeforeunload = function() {
             return "If you are the last user in this channel, the channel will be removed.";
-        }
+        };
     },
 
     setup: function(data) {
