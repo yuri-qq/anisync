@@ -36,5 +36,14 @@
             "error",
             "always"
         ]
+    },
+    "globals": {
+      "socket": true,
+      "init": true,
+      "React": true,
+      "ReactDOM": true,
+      "io": true,
+      "SortableMixin": true,
+      "videojs": true
     }
 }
