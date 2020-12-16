@@ -8,6 +8,10 @@
   },
   "author": "Yurifag",
   "license": "AGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Yurifag/anisync.git"
+  },
   "dependencies": {
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
