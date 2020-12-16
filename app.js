@@ -118,7 +118,10 @@ io.use(function(socket, next) {
 require("./controllers/index-socket")(io);
 require("./controllers/create-socket")(io);
 require("./controllers/join-socket")(io);
-require("./controllers/channel-socket")(io, {trustedProxies: config.web.trustedProxies});
+require("./controllers/channel-socket")(io, {
+    trustedProxies: config.web.trustedProxies,
+    youtubedl: config.youtubedl
+});
 
 //routes
 var site = require("./controllers/site");

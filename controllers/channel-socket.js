@@ -41,7 +41,7 @@ class Socket {
             this.socket.on("play", (time) => this.play(time));
             this.socket.on("pause", (time) => this.pause(time));
             this.socket.on("seeked", (time) => this.seeked(time));
-            this.socket.on("addItems", (data) => this.addItems(data));
+            this.socket.on("addMedia", (data) => this.addMedia(data));
             this.socket.on("removeItem", (data) => this.removeItem(data));
             this.socket.on("moveItem", (data) => this.moveItem(data));
             this.socket.on("refreshItem", (id) => this.refreshItem(id));
@@ -184,29 +184,33 @@ class Socket {
         });
     }
 
-    addItems(data) {
-        var self = this;
-        this.isModerator(function() {
-            YoutubeDL.getMedia(data.url, data.addPlaylist, function(error, files) {
-                if(error) {
-                    self.socket.emit("addItems", {error: error});
-                    return;
-                }
+    addMedia(data) {
+        this.isModerator(() => {
+            let ytdl = new YoutubeDL(this.config.youtubedl.bin, this.config.youtubedl.proxy);
 
+            ytdl.on("mediaFound", (item) => {
                 try {
-                    Channel.findOneAndUpdate({id: self.id}, {$push: {playlist: {$each: files}}}, {upsert: true, new: true}, function(error, data) {
+                    Channel.findOneAndUpdate({id: this.id}, {$push: {playlist: item}}, {upsert: true, new: true}, (error, data) => {
                         if(error) throw error;
-
-                        for(var i = 0; i < files.length; i++) {
-                            files[i].id = data.playlist[data.playlist.length - files.length + i].id;
-                        }
-                        self.io.of("/channel").to(self.id).emit("addItems", files);
+                        item.id = data.playlist[data.playlist.length - 1].id;
+                        this.io.of("/channel").to(this.id).emit("addItem", item);
                     });
                 }
                 catch(error) {
                     console.error(error);
                 }
             });
+
+            ytdl.on("getMediaFinished", (extractedMediaCount) => {
+                if(extractedMediaCount > 0) {
+                    this.socket.emit("getMediaSuccess");
+                }
+                else {
+                    this.socket.emit("getMediaError");
+                }
+            });
+
+            ytdl.getMedia(data.url, data.addPlaylist);
         });
     }
 
@@ -244,31 +248,45 @@ class Socket {
     }
 
     refreshItem(id) {
-        var self = this;
-        Channel.findOne({id: this.id}, function(error, data) {
-            //only allow a single client to trigger a refresh
-            if(self.socket.id === data.users[0].socketId) {
-                try {
-                    Channel.findOne({"playlist.id": id}, {"playlist.$": 1}, function(error, data) {
+        try {
+            Channel.findOne({id: this.id}, (error, data) => {
+                if(error) throw error;
+
+                //only allow a single client to trigger a refresh
+                if(this.socket.id === data.users[0].socketId) {
+                    Channel.findOne({"playlist._id": id}, {"playlist.$": 1}, (error, data) => {
                         if(error) throw error;
                         if(!data) return;
 
-                        YoutubeDL.getMedia(data.playlist[0].webpage, false, function(error, files) {
-                            var data = {
+                        let ytdl = new YoutubeDL(this.config.youtubedl.bin, this.config.youtubedl.proxy);
+
+                        ytdl.on("mediaFound", (item) => {
+                            Channel.findOneAndUpdate({"playlist.id": id}, {$set: {"playlist.$.formats": item.formats}}).exec();
+                            this.io.of("/channel").to(this.id).emit("refreshItem", {
                                 id: id,
                                 error: error,
-                                formats: files ? files[0].formats : []
-                            };
-                            if(!error) Channel.findOneAndUpdate({"playlist.id": id}, {$set: {"playlist.$.formats": files[0].formats}}).exec();
-                            self.io.of("/channel").to(self.id).emit("refreshItem", data);
+                                formats: item.formats
+                            });
                         });
+            
+                        ytdl.on("getMediaFinished", (extractedMediaCount) => {
+                            if(extractedMediaCount === 0) {
+                                this.io.of("/channel").to(this.id).emit("refreshItem", {
+                                    id: id,
+                                    error: true,
+                                    formats: []
+                                });
+                            }
+                        });
+            
+                        ytdl.getMedia(data.playlist[0].webpage, false);
                     });
                 }
-                catch(error) {
-                    console.error(error);
-                }
-            }
-        });
+            });
+        }
+        catch(error) {
+            console.error(error);
+        }
     }
 
     playItem(index) {

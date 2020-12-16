@@ -2,7 +2,8 @@
 A service to synchronize media playback between browsers.
 
 # Dependencies
-* [MongoDB](https://www.mongodb.org/)
+* [MongoDB](https://www.mongodb.org)
+* [youtube-dl](https://youtube-dl.org)
 
 # Installation
 To to install all necessary Node.js packages, type:
@@ -43,7 +44,7 @@ The config.json has 2 identical blocks, one for development and one for producti
     "password": "" //MongoDB login password, if necessary
   },
   "youtubedl": {
-    "maxBuffer": 4096, //maxBuffer in KB, sets the maximum size of websites Youtube-DL can download
+    "bin": "", //Location of the youtube-dl binary. Defaults to "youtube-dl".
     "proxy": { //optional HTTP proxy for Youtube-DL (e.g. to bypass IP blocks)
       "enabled": false,
       "domains": ["youtube.com"], //list of domains that should be routed through the proxy

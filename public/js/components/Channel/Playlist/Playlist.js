@@ -43,12 +43,12 @@ init.components.channel.Playlist = React.createClass({
         socket.on("shufflePlaylist", this.setPlaylist);
     },
 
-    addItems: function(data) {
-        var items = this.state.items.concat(data);
-        var previousState = this.state.items.length;
-        if(previousState == 0) items[0].selected = true;
-        this.setState({items: items}, function() {
-            if(previousState == 0) this.props.playItem(0);
+    addItem: function(item) {
+        let items = this.state.items.slice();
+        items.push(item);
+        if(items.length === 1) items[0].selected = true;
+        this.setState({items: items}, () => {
+            if(this.state.items.length === 1) this.props.playItem(0);
         });
     },
 
@@ -61,7 +61,7 @@ init.components.channel.Playlist = React.createClass({
     },
 
     removeItem: function(removeIndex) {
-        var items = this.state.items.filter(function(_, index) { return index !== removeIndex });
+        var items = this.state.items.filter(function(_, index) { return index !== removeIndex; });
         var selected = this.selected();
 
         if(removeIndex < selected) {
@@ -140,7 +140,7 @@ init.components.channel.Playlist = React.createClass({
 
     selected: function() {
         for(var i = 0; i < this.state.items.length; i += 1) {
-            if(this.state.items[i]['selected'] === true) {
+            if(this.state.items[i]["selected"] === true) {
                 return i;
             }
         }
@@ -169,7 +169,7 @@ init.components.channel.Playlist = React.createClass({
                         index: index,
                         refreshing: playlistItem.refreshing,
                         className: (playlistItem.selected ? "selected " : "") + (playlistItem.refreshing ? "refreshing " : "") + (playlistItem.error ? "error" : "")
-                    }
+                    };
 
                     return(
                         React.createElement(init.components.channel.PlaylistItem, options)

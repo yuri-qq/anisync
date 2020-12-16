@@ -15,86 +15,104 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 "use strict";
-var youtubedl = require("youtube-dl");
-var app = require("../app");
-var config = require("../config.json")[app.get("env")];
+const { spawn } = require("child_process");
+const EventEmitter = require("events");
 
-class YoutubeDL {
-    static getMedia(url, addPlaylist, callback) {
-        var args = [];
+class YoutubeDL extends EventEmitter {
+    constructor(bin, proxy) {
+        super();
+        this.bin = bin === "" ? "youtube-dl" : bin;
+        this.proxy = proxy;
+    }
 
-        //route traffic through http proxy (e.g. to circumvent IP blocks)
-        if(config.youtubedl.proxy.enabled) {
-            if(config.youtubedl.proxy.domains.length == 0) args = args.concat(["--proxy", config.youtubedl.proxy.host + ":" + config.youtubedl.proxy.port]);
-            for(var i = config.youtubedl.proxy.domains.length - 1; i >= 0; i--) {
-                if(url.indexOf(config.youtubedl.proxy.domains[i]) > -1) {
-                    args = args.concat(["--proxy", config.youtubedl.proxy.host + ":" + config.youtubedl.proxy.port]);
-                    break;
+    getMedia(url, addPlaylist) {
+        console.log("Getting media for " + url);
+
+        let args = ["--ignore-errors", "--dump-json"];
+
+        if(this.proxy.enabled) {
+            if(this.proxy.domains.length === 0) {
+                args = args.concat(["--proxy", this.proxy.host + ":" + this.proxy.port]);
+            }
+            else {
+                for(let i = this.proxy.domains.length - 1; i >= 0; i--) {
+                    if(url.indexOf(this.proxy.domains[i]) > -1) {
+                        args = args.concat(["--proxy", this.proxy.host + ":" + this.proxy.port]);
+                        break;
+                    }
                 }
             }
         }
+
         if(!addPlaylist) args = args.concat(["--playlist-end", "1"]);
 
-        //maxBuffer in KB
-        youtubedl.getInfo(url, args, {maxBuffer: config.youtubedl.maxBuffer * 1000}, function(error, media) {
-            if(!error) {
-                if(Object.prototype.toString.call(media) !== "[object Array]") {
-                    media = [media];
-                }
+        args.push(url);
 
-                var files = [];
-                for(var i = 0; i < media.length; i++) {
-                    var formats = [];
-                    if(media[i].format.indexOf("unknown") === -1) {
-                        for(var i2 = 0; i2 < media[i].formats.length; i2++) {
-                            if(media[i].formats[i2].format_note != "DASH video" &&
-                 media[i].formats[i2].format_note != "DASH audio" &&
-                 media[i].formats[i2].format_note != "tiny" && // filter YouTube's audio only formats
-                 media[i].formats[i2].acodec != "none")
-                            {
-                                if((media[i].formats[i2].ext == "mp4" || media[i].formats[i2].ext == "webm")) {
-                                    formats.push({
-                                        type: "video/" + media[i].formats[i2].ext,
-                                        src: media[i].formats[i2].url,
-                                        res: media[i].formats[i2].height,
-                                        label: media[i].formats[i2].height + "p"
-                                    });
-                                }
-                                else if(media[i].formats[i2].ext == "mp3" || media[i].formats[i2].ext == "ogg") {
-                                    formats.push({
-                                        type: "audio/" + media[i].formats[i2].ext,
-                                        src: media[i].formats[i2].url,
-                                        label: "audio"
-                                    });
-                                }
+        let extractedMediaCount = 0;
+
+        const subprocess = spawn(this.bin, args);
+
+        let jsonString = "";
+        subprocess.stdout.on("data", (data) => {
+            jsonString += data.toString();
+
+            // youtube-dl output is line feed terminated, byte value 10 == LF
+            if(data[data.length - 1] === 10) {
+                let media = JSON.parse(jsonString);
+                jsonString = "";
+
+                let formats = [];
+                if(media.format.indexOf("unknown") === -1) {
+                    for(let i = 0; i < media.formats.length; i++) {
+                        if(media.formats[i].format_note !== "tiny" && // filter YouTube's audio only formats
+                        media.formats[i].acodec !== "none")
+                        {
+                            if((media.formats[i].ext === "mp4" || media.formats[i].ext === "webm")) {
+                                formats.push({
+                                    type: "video/" + media.formats[i].ext,
+                                    src: media.formats[i].url,
+                                    res: media.formats[i].height,
+                                    label: media.formats[i].height + "p"
+                                });
+                            }
+                            else if(media.formats[i].ext === "mp3" || media.formats[i].ext === "ogg") {
+                                formats.push({
+                                    type: "audio/" + media.formats[i].ext,
+                                    src: media.formats[i].url,
+                                    label: "audio"
+                                });
                             }
                         }
                     }
-                    else {
-                        //unknown format
-                        formats.push({
-                            type: "video/mp4",
-                            src: media[i].url,
-                            label: "unknown"
-                        }, 
-                        {
-                            type: "video/webm",
-                            src: media[i].url,
-                            label: "unknown"
-                        });
-                    }
-                    formats.reverse();
-
-                    if(!formats.length) return callback(true);
-
-                    files.push({formats: formats, webpage: media[i].webpage_url, title: media[i].title});
                 }
-                return callback(false, files);
+                else {
+                    //unknown format
+                    formats.push({
+                        type: "video/mp4",
+                        src: media.url,
+                        label: "unknown"
+                    }, 
+                    {
+                        type: "video/webm",
+                        src: media.url,
+                        label: "unknown"
+                    });
+                }
+                formats.reverse();
+
+                if(formats.length > 0) {
+                    extractedMediaCount++;
+                    this.emit("mediaFound", {formats: formats, webpage: media.webpage_url, title: media.title});
+                }
             }
-            else {
-                console.log(error);
-                return callback(true);
-            }
+        });
+
+        subprocess.stderr.on("data", (data) => {
+            console.error(data.toString());
+        });
+
+        subprocess.on("close", () => {
+            this.emit("getMediaFinished", extractedMediaCount);
         });
     }
 }

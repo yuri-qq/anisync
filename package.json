@@ -25,8 +25,7 @@
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.0",
     "stylus": "^0.54.7",
-    "tlds": "^1.207.0",
-    "youtube-dl": "^3.0.2"
+    "tlds": "^1.207.0"
   },
   "devDependencies": {
     "eslint": "^7.15.0",

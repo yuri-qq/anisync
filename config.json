@@ -24,7 +24,7 @@
       "password": ""
     },
     "youtubedl": {
-      "maxBuffer": 4096,
+      "bin": "",
       "proxy": {
         "enabled": false,
         "domains": ["youtube.com"],
@@ -78,7 +78,7 @@
       "password": ""
     },
     "youtubedl": {
-      "maxBuffer": 4096,
+      "bin": "",
       "proxy": {
         "enabled": false,
         "domains": ["youtube.com"],

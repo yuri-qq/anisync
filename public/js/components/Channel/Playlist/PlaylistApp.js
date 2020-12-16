@@ -32,21 +32,26 @@ init.components.channel.PlaylistApp = React.createClass({
     },
 
     componentDidMount: function() {
-        socket.on("addItems", this.addItems);
-        socket.on("removeItem",this.removeItem);
+        socket.on("addItem", this.addItem);
+        socket.on("getMediaSuccess", this.getMediaSuccess);
+        socket.on("getMediaError", this.getMediaError);
+        socket.on("removeItem", this.removeItem);
         socket.on("moveItem", this.moveItem);
         socket.on("refreshItem", this.refreshItem);
         socket.on("setRepeat", this.setRepeat);
     },
 
-    addItems: function(data) {
-        if(data.error) {
-            this.setState({inputError: true});
-        }
-        else {
-            this.setState({inputError: false});
-            this.refs.playlist.addItems(data);
-        }
+    addItem: function(item) {
+        this.refs.playlist.addItem(item);
+    },
+
+    getMediaSuccess: function() {
+        this.setState({inputError: false});
+        this.clearInput();
+    },
+
+    getMediaError: function() {
+        this.setState({inputError: true});
         this.clearInput();
     },
 
@@ -82,7 +87,7 @@ init.components.channel.PlaylistApp = React.createClass({
 
     handleInput: function(value, addPlaylist) {
         this.setState({disableInput: true});
-        socket.emit("addItems", {url: value, addPlaylist: addPlaylist});
+        socket.emit("addMedia", {url: value, addPlaylist: addPlaylist});
     },
 
     clearInput: function() {
