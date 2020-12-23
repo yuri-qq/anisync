@@ -65,7 +65,9 @@ class YoutubeDL extends EventEmitter {
                 if(media.format.indexOf("unknown") === -1) {
                     for(let i = 0; i < media.formats.length; i++) {
                         if(media.formats[i].format_note !== "tiny" && // filter YouTube's audio only formats
-                        media.formats[i].acodec !== "none")
+                           media.formats[i].format_note != "DASH video" && // filter YouTube's DASH streaming formats
+                           media.formats[i].format_note != "DASH audio" &&
+                           media.formats[i].acodec !== "none")
                         {
                             if((media.formats[i].ext === "mp4" || media.formats[i].ext === "webm")) {
                                 formats.push({
