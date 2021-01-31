@@ -26,14 +26,14 @@
     "mongoose": "^5.9.7",
     "pug": "^2.0.4",
     "shortid": "^2.2.15",
-    "socket.io": "^2.3.0",
-    "socket.io-client": "^2.3.0",
+    "socket.io": "^2.4.1",
+    "socket.io-client": "^2.4.0",
     "stylus": "^0.54.7",
     "tlds": "^1.207.0"
   },
   "devDependencies": {
-    "eslint": "^7.15.0",
-    "eslint-plugin-react": "^7.21.5",
+    "eslint": "^7.19.0",
+    "eslint-plugin-react": "^7.22.0",
     "morgan": "^1.10.0"
   },
   "description": "AniSync - a service to synchronize media playback between browsers."
