@@ -22,7 +22,7 @@
     "express-session": "^1.17.0",
     "jstransformer-marked": "^1.0.3",
     "linkify-it": "^2.2.0",
-    "marked": "^0.8.2",
+    "marked": "^4.0.10",
     "mongoose": "^5.9.7",
     "pug": "^2.0.4",
     "shortid": "^2.2.15",
